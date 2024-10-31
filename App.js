@@ -3,6 +3,8 @@ import { StyleSheet, Text, View } from 'react-native';
 import { NavigationContainer } from '@react-navigation/native';
 import { createNativeStackNavigator } from '@react-navigation/native-stack';
 import FoodScreen from './frontend/screens/foodScreen';
+import TapBar from './frontend/components/TapBar';
+
 
 
 const Stack = createNativeStackNavigator();
@@ -21,7 +23,10 @@ const Navigation = () => {
 
 export default function App() {
   return (
-    <Navigation />
+    <>
+   <Navigation />
+    <TapBar />
+   </>
   );
 }
 
