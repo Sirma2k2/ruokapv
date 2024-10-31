@@ -6,6 +6,7 @@ import FoodScreen from './frontend/screens/foodScreen';
 import TaskBar from './frontend/components/taskBar';
 import { Platform } from 'react-native';
 
+
 const Stack = createNativeStackNavigator();
 
 
