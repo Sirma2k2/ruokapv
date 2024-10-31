@@ -1,6 +1,7 @@
 import React from 'react';
 import { View, Text, StyleSheet } from 'react-native';
 
+// TaskBar component tarkoitettu Androidille, koska iOS:ssä on oma alapalkki ja se näyttää paremmalta
 
 const TaskBar = () => {
     return (
