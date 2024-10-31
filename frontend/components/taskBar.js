@@ -1,14 +1,25 @@
 import React from 'react';
-import './taskBar.css';
+import { View, Text, StyleSheet } from 'react-native';
+
 
 const TaskBar = () => {
     return (
-        <div className="taskbar">
-            <button className="taskbar-button">Home</button>
-            <button className="taskbar-button">Tasks</button>
-            <button className="taskbar-button">Settings</button>
-        </div>
+        <View style={styles.container}>
+            <Text style={styles.text}>Task Bar</Text>
+        </View>
     );
 };
 
+const styles = StyleSheet.create({
+    container: {
+        height: 50,
+        backgroundColor: '#6200EE',
+        justifyContent: 'center',
+        alignItems: 'center',
+    },
+    text: {
+        color: '#FFFFFF',
+        fontSize: 18,
+    },
+});
 export default TaskBar;
