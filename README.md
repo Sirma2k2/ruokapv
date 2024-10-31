@@ -43,7 +43,7 @@ npm install --legacy-peer-deps
 ## 4. Käynnistä projekti
 Kun kaikki riippuvuudet on asennettu, voit käynnistää projektin seuraavalla komennolla:
 ```bash
-npm start
+npx expo start
 ```
 
 ## 5. Huomautuksia
