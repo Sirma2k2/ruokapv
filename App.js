@@ -1,7 +1,8 @@
 import { StatusBar } from 'expo-status-bar';
 import { StyleSheet, Text, View } from 'react-native';
+import { NavigationContainer } from '@react-navigation/native';
 import { createNativeStackNavigator } from '@react-navigation/native-stack';
-
+import FoodScreen from './frontend/screens/foodScreen';
 
 
 const Stack = createNativeStackNavigator();
@@ -9,10 +10,12 @@ const Stack = createNativeStackNavigator();
 
 const Navigation = () => {
   return (
+    <NavigationContainer>
     <Stack.Navigator>
-      <Stack.Screen name="Home" component={Home} />
-      <Stack.Screen name="Details" component={Details} />
+      <Stack.Screen name="Home" component={FoodScreen} />
+    
     </Stack.Navigator>
+  </NavigationContainer>
   )
 }
 
