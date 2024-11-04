@@ -38,6 +38,9 @@ npm install react-native-reanimated
 Jos kohtaat riippuvuuskonflikteja, yritä asentaa riippuvuudet seuraavilla komennoilla:
 ```bash
 npm install --legacy-peer-deps
+
+npm install react-native-svg react-native-svg-charts
+
 ```
 
 ## 4. Käynnistä projekti
