@@ -39,7 +39,7 @@ Jos kohtaat riippuvuuskonflikteja, yritä asentaa riippuvuudet seuraavilla komen
 ```bash
 npm install --legacy-peer-deps
 
-npm install react-native-svg react-native-svg-charts
+npm install react-native-svg react-native-svg-charts --legacy-peer-deps
 
 ```
 
