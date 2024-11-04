@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import { View, TextInput, Button, Text, Modal, StyleSheet } from 'react-native';
+//import { ActivityIndicator, MD2Colors } from 'react-native-paper'; // Myöhemmin käytettäväksi
 
 const AddFoodScreen = ({ navigation }) => {
   const [foodName, setFoodName] = useState('');
@@ -11,8 +12,20 @@ const AddFoodScreen = ({ navigation }) => {
   const [submittedCalories, setSubmittedCalories] = useState(''); // Tallennetaan lisätyt kalorit
 
   const handleAddFood = () => {
-    if (!foodName || !amount) {
+    if (!foodName && !amount) {
       alert('Anna ruoan nimi ja määrä ensin (kalorit ovat valinnaiset)');
+      return;
+    }
+    if (!foodName) {
+        alert('Anna ruoan nimi ensin');
+        return;
+    }
+    if (!amount) {
+      alert('Anna ruoan määrä ensin');
+      return;
+    }
+    if (isNaN(amount)) {
+      alert('Määrän tulee olla numero');
       return;
     }
 
