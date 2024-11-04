@@ -21,12 +21,12 @@ export default class TapBar extends Component {
             tapBarActiveTintColor: "blue"
 
         }}>
-        <Tab.Screen name="Päänäyttö" component={HomeScreen}
+        <Tab.Screen name="Koti" component={HomeScreen}
         options={{
             tabBarIcon: () => <Ionicons name='home' size={20} />
         }} 
         />
-        <Tab.Screen name="Ruoka Näyttö" component={foodScreen}
+        <Tab.Screen name="Ruokapäiväkirja" component={foodScreen}
         options={{
             tabBarIcon: () => <Ionicons name='fast-food' size={20} />
         }}
