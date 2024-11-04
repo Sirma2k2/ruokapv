@@ -1,30 +1,55 @@
-import React, { useState } from 'react';
-import { View, TextInput, Button, Text, Modal, StyleSheet } from 'react-native';
+import React, { useState, useEffect } from 'react';
+import { View, TextInput, Button, Text, Modal, StyleSheet, FlatList } from 'react-native';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 
 const AddFoodScreen = ({ navigation }) => {
   const [foodName, setFoodName] = useState('');
   const [amount, setAmount] = useState('');
   const [calories, setCalories] = useState('');
-  const [modalVisible, setModalVisible] = useState(false); // Modalin näkyvyys
-  const [submittedFoodName, setSubmittedFoodName] = useState(''); // Tallennetaan lisätty ruoka
-  const [submittedAmount, setSubmittedAmount] = useState(''); // Tallennetaan lisätty määrä
-  const [submittedCalories, setSubmittedCalories] = useState(''); // Tallennetaan lisätyt kalorit
+  const [modalVisible, setModalVisible] = useState(false);
+  const [submittedFoodName, setSubmittedFoodName] = useState('');
+  const [submittedAmount, setSubmittedAmount] = useState('');
+  const [submittedCalories, setSubmittedCalories] = useState('');
+  const [meals, setMeals] = useState([]); // Lisätään tila tallennetuille aterioille
 
-  const handleAddFood = () => {
+  useEffect(() => {
+    // Ladataan tallennetut ateriat AsyncStoragesta sovelluksen käynnistyessä
+    const loadMeals = async () => {
+      try {
+        const storedMeals = await AsyncStorage.getItem('meals');
+        if (storedMeals) {
+          setMeals(JSON.parse(storedMeals));
+        }
+      } catch (error) {
+        console.error('Failed to load meals', error);
+      }
+    };
+
+    loadMeals();
+  }, []);
+
+  const handleAddFood = async () => {
     if (!foodName || !amount) {
       alert('Anna ruoan nimi ja määrä ensin (kalorit ovat valinnaiset)');
       return;
     }
 
-    // Tallennetaan lisätyt tiedot modalin näyttämistä varten
-    setSubmittedFoodName(foodName);
-    setSubmittedAmount(amount); // Korjattu käytetään submittedAmountia
-    setSubmittedCalories(calories);
+    const newMeal = { foodName, amount, calories };
+    const updatedMeals = [...meals, newMeal];
+    setMeals(updatedMeals);
 
-    // Avaa modal onnistuneen lisäyksen jälkeen
+    // Tallennetaan uudet ateriat AsyncStorageen
+    try {
+      await AsyncStorage.setItem('meals', JSON.stringify(updatedMeals));
+    } catch (error) {
+      console.error('Failed to save meals', error);
+    }
+
+    setSubmittedFoodName(foodName);
+    setSubmittedAmount(amount);
+    setSubmittedCalories(calories);
     setModalVisible(true);
 
-    // Tyhjennetään input-kentät
     setFoodName('');
     setAmount('');
     setCalories('');
@@ -72,13 +97,21 @@ const AddFoodScreen = ({ navigation }) => {
           <Text style={styles.modalText}>Ruokapäiväkirjaan lisätty:</Text>
           <Text style={styles.modalText}>{submittedFoodName}</Text>
           <Text style={styles.modalText}>Määrä: {submittedAmount} g</Text>
-          {/* Ehtolause kalorimäärän näyttämiseksi */}
           {submittedCalories && !isNaN(submittedCalories) && (
             <Text style={styles.modalText}>jossa Kaloreita: {submittedCalories}</Text>
           )}
           <Button title="Sulje" onPress={() => setModalVisible(false)} />
         </View>
       </Modal>
+
+      {/* Lista tallennetuista aterioista */}
+      <FlatList
+        data={meals}
+        keyExtractor={(item, index) => index.toString()}
+        renderItem={({ item }) => (
+          <Text>{`${item.foodName} - ${item.amount} g${item.calories ? ' - Kaloreita: ' + item.calories : ''}`}</Text>
+        )}
+      />
     </View>
   );
 };
