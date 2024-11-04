@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { View, TextInput, Button, Text, Modal, StyleSheet, FlatList } from 'react-native';
 import AsyncStorage from '@react-native-async-storage/async-storage';
+//import { ActivityIndicator, MD2Colors } from 'react-native-paper'; // Myöhemmin käytettäväksi
 
 const AddFoodScreen = ({ navigation }) => {
   const [foodName, setFoodName] = useState('');
@@ -11,6 +12,7 @@ const AddFoodScreen = ({ navigation }) => {
   const [submittedAmount, setSubmittedAmount] = useState('');
   const [submittedCalories, setSubmittedCalories] = useState('');
   const [meals, setMeals] = useState([]); // Lisätään tila tallennetuille aterioille
+
 
   useEffect(() => {
     // Ladataan tallennetut ateriat AsyncStoragesta sovelluksen käynnistyessä
@@ -31,6 +33,18 @@ const AddFoodScreen = ({ navigation }) => {
   const handleAddFood = async () => {
     if (!foodName || !amount) {
       alert('Anna ruoan nimi ja määrä ensin (kalorit ovat valinnaiset)');
+      return;
+    }
+    if (!foodName) {
+        alert('Anna ruoan nimi ensin');
+        return;
+    }
+    if (!amount) {
+      alert('Anna ruoan määrä ensin');
+      return;
+    }
+    if (isNaN(amount)) {
+      alert('Määrän tulee olla numero');
       return;
     }
 
