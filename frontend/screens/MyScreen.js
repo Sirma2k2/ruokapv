@@ -1,5 +1,5 @@
 import React, { Component } from 'react';
-import { Text, TouchableOpacity, View, Modal, Button, StyleSheet } from 'react-native';
+import { Text, TouchableOpacity, View, Modal, StyleSheet } from 'react-native';
 import Ionicons from 'react-native-vector-icons/Ionicons'; 
 
 export default class MyScreen extends Component {
@@ -22,7 +22,7 @@ export default class MyScreen extends Component {
 
         <Modal
           transparent={true}
-          animationType="slide"
+          animationType="fade"
           visible={this.state.menuBarVisible}
           onRequestClose={this.toggleMenu}
         >
@@ -30,17 +30,22 @@ export default class MyScreen extends Component {
             <View style={styles.menuContainer}>
               <Text style={styles.menuTitle}>Menu</Text>
 
-               {/* Asetukset-nappi */}
-               <TouchableOpacity onPress={this.toggleMenu} style={styles.menuItem}>
+              {/* Asetukset-nappi */}
+              <TouchableOpacity onPress={this.toggleMenu} style={styles.menuItem}>
                 <Ionicons name="cog-outline" size={24} color="black" />
                 <Text style={styles.menuItemText}>Asetukset</Text>
               </TouchableOpacity>
 
+              {/* Dark-light mode nappi */}
+              <TouchableOpacity onPress={this.toggleMenu} style={styles.menuItem}>
+                <Ionicons name="contrast-outline" size={24} color="black" />
+              </TouchableOpacity>
+
               {/* Hampparivalikko pois */}
-              <TouchableOpacity onPress={this.toggleMenu} style={styles.closeButton}>
-              <Ionicons name="arrow-back-outline" size={24} color="black" />
-                <Text style={styles.closeButtonText}>Takaisin</Text>
-             </TouchableOpacity>
+              <TouchableOpacity onPress={this.toggleMenu} style={styles.menuItem}>
+                <Ionicons name="arrow-back-outline" size={24} color="black" />
+                <Text style={styles.menuItemText}>Takaisin</Text>
+              </TouchableOpacity>
 
             </View>
           </View>
@@ -89,15 +94,5 @@ const styles = StyleSheet.create({
     fontSize: 20,
     fontWeight: 'bold',
     marginBottom: 10,
-  },
-  closeButton: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    paddingVertical: 10,
-  },
-  closeButtonText: {
-    color: 'black',  
-    fontSize: 16,
-    marginLeft: 10, 
   },
 });
