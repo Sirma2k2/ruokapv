@@ -5,11 +5,11 @@ import Ionicons from 'react-native-vector-icons/Ionicons';
 export default class MyScreen extends Component {
   state = {
     menuBarVisible: false, 
-  };
+  }
 
   toggleMenu = () => {
-    this.setState({ menuBarVisible: !this.state.menuBarVisible });
-  };
+    this.setState({ menuBarVisible: !this.state.menuBarVisible })
+  }
 
   render() {
     return (
@@ -38,13 +38,15 @@ export default class MyScreen extends Component {
 
               {/* Hampparivalikko pois */}
               <TouchableOpacity onPress={this.toggleMenu} style={styles.closeButton}>
-                <Text style={styles.closeButtonText}>Close</Text>
-              </TouchableOpacity>
+              <Ionicons name="arrow-back-outline" size={24} color="black" />
+                <Text style={styles.closeButtonText}>Takaisin</Text>
+             </TouchableOpacity>
+
             </View>
           </View>
         </Modal>
       </View>
-    );
+    )
   }
 }
 
@@ -79,19 +81,23 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     paddingVertical: 10,
   },
+  menuItemText: {
+    fontSize: 16,
+    marginLeft: 10,
+  },
   menuTitle: {
     fontSize: 20,
     fontWeight: 'bold',
     marginBottom: 10,
   },
   closeButton: {
-    marginTop: 15,
+    flexDirection: 'row',
+    alignItems: 'center',
     paddingVertical: 10,
-    backgroundColor: '#2196F3',
-    borderRadius: 5,
   },
   closeButtonText: {
-    color: 'white',
-    textAlign: 'center',
+    color: 'black',  
+    fontSize: 16,
+    marginLeft: 10, 
   },
 });
