@@ -8,11 +8,11 @@ export default class MyScreen extends Component {
     settingsVisible: false,
   };
 
-  toggleMenu = () => { 
+  toggleMenu = () => {
     this.setState({ menuBarVisible: !this.state.menuBarVisible });
   };
 
-  toggleSettings = () => { 
+  toggleSettings = () => {
     this.setState({ settingsVisible: !this.state.settingsVisible });
   };
 
@@ -25,7 +25,7 @@ export default class MyScreen extends Component {
         </TouchableOpacity>
         <Modal
           transparent={true}
-          animationType="slide"
+          animationType="fade"
           visible={this.state.menuBarVisible}
           onRequestClose={this.toggleMenu}
         >
@@ -35,6 +35,9 @@ export default class MyScreen extends Component {
               <TouchableOpacity onPress={this.toggleSettings} style={styles.menuItem}>
                 <Ionicons name="cog-outline" size={24} color="black" />
                 <Text style={styles.menuItemText}>Asetukset</Text>
+              </TouchableOpacity>
+              <TouchableOpacity onPress={this.toggleMenu} style={styles.menuItem}>
+                <Ionicons name="contrast-outline" size={24} color="black" />
               </TouchableOpacity>
               <TouchableOpacity onPress={this.toggleMenu} style={styles.closeButton}>
                 <Ionicons name="arrow-back-outline" size={24} color="black" />
