@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
-import { View, TextInput, Button, Text, Modal, StyleSheet, FlatList } from 'react-native';
+import { View, TextInput, Button, Text, Modal, FlatList, StyleSheet } from 'react-native';
 import AsyncStorage from '@react-native-async-storage/async-storage';
-//import { ActivityIndicator, MD2Colors } from 'react-native-paper'; // Myöhemmin käytettäväksi
+import { useTheme } from '../components/ThemeContext';  // hook
 
 const AddFoodScreen = ({ navigation }) => {
   const [foodName, setFoodName] = useState('');
@@ -11,11 +11,11 @@ const AddFoodScreen = ({ navigation }) => {
   const [submittedFoodName, setSubmittedFoodName] = useState('');
   const [submittedAmount, setSubmittedAmount] = useState('');
   const [submittedCalories, setSubmittedCalories] = useState('');
-  const [meals, setMeals] = useState([]); // Lisätään tila tallennetuille aterioille
+  const [meals, setMeals] = useState([]); // Store meals
 
+  const { theme } = useTheme();  //teema
 
-  useEffect(() => {
-    // Ladataan tallennetut ateriat AsyncStoragesta sovelluksen käynnistyessä
+  useEffect(() => { // load
     const loadMeals = async () => {
       try {
         const storedMeals = await AsyncStorage.getItem('meals');
@@ -30,17 +30,9 @@ const AddFoodScreen = ({ navigation }) => {
     loadMeals();
   }, []);
 
-  const handleAddFood = async () => {
+  const handleAddFood = async () => { // add
     if (!foodName || !amount) {
       alert('Anna ruoan nimi ja määrä ensin (kalorit ovat valinnaiset)');
-      return;
-    }
-    if (!foodName) {
-        alert('Anna ruoan nimi ensin');
-        return;
-    }
-    if (!amount) {
-      alert('Anna ruoan määrä ensin');
       return;
     }
     if (isNaN(amount)) {
@@ -52,7 +44,7 @@ const AddFoodScreen = ({ navigation }) => {
     const updatedMeals = [...meals, newMeal];
     setMeals(updatedMeals);
 
-    // Tallennetaan uudet ateriat AsyncStorageen
+    // Save to AsyncStorage
     try {
       await AsyncStorage.setItem('meals', JSON.stringify(updatedMeals));
     } catch (error) {
@@ -70,30 +62,29 @@ const AddFoodScreen = ({ navigation }) => {
   };
 
   return (
-    <View style={styles.container}>
-      <Text style={styles.text}>Anna ruoan nimi ja kalorit</Text>
+    <View style={[styles.container, theme.container]}>
+      <Text style={[styles.text, theme.text]}>Anna ruoan nimi ja kalorit</Text>
       <TextInput 
-        style={styles.input}
+        style={[styles.input, theme.input]}
         placeholder="Ruoan nimi" 
         value={foodName} 
         onChangeText={setFoodName} 
       />
       <TextInput 
-        style={styles.input}
+        style={[styles.input, theme.input]}
         placeholder="Määrä (g)"
         keyboardType="numeric"
         value={amount}
         onChangeText={setAmount} 
       />
       <TextInput 
-        style={styles.input}
+        style={[styles.input, theme.input]}
         placeholder="Kalorit (valinnainen)" 
         keyboardType="numeric" 
         value={calories} 
         onChangeText={setCalories} 
       />
       <Button
-        style={styles.button}
         title="Lisää" 
         onPress={handleAddFood} 
       />
@@ -107,71 +98,25 @@ const AddFoodScreen = ({ navigation }) => {
           setModalVisible(!modalVisible);
         }}
       >
-        <View style={styles.modalView}>
-          <Text style={styles.modalText}>Ruokapäiväkirjaan lisätty:</Text>
-          <Text style={styles.modalText}>{submittedFoodName}</Text>
-          <Text style={styles.modalText}>Määrä: {submittedAmount} g</Text>
+        <View style={[styles.modalView, theme.modalContainer]}>
+          <Text style={[styles.modalText, theme.text]}>Ruokapäiväkirjaan lisätty:</Text>
+          <Text style={[styles.modalText, theme.text]}>{submittedFoodName}</Text>
+          <Text style={[styles.modalText, theme.text]}>Määrä: {submittedAmount} g</Text>
           {submittedCalories && !isNaN(submittedCalories) && (
-            <Text style={styles.modalText}>jossa Kaloreita: {submittedCalories}</Text>
+            <Text style={[styles.modalText, theme.text]}>jossa Kaloreita: {submittedCalories}</Text>
           )}
           <Button title="Sulje" onPress={() => setModalVisible(false)} />
         </View>
       </Modal>
-
-      {/* Lista tallennetuista aterioista */}
-      <FlatList
-        data={meals}
-        keyExtractor={(item, index) => index.toString()}
-        renderItem={({ item }) => (
-          <Text>{`${item.foodName} - ${item.amount} g${item.calories ? ' - Kaloreita: ' + item.calories : ''}`}</Text>
-        )}
-      />
     </View>
   );
 };
 
 const styles = StyleSheet.create({
-  container: {
-    margin: 10,
-    flex: 1,
-    justifyContent: 'center', 
-    alignItems: 'center',
-    marginBottom: 100,
-  },
-  input: {
-    marginVertical: 10,
-    width: '80%',
-    padding: 10,
-    borderWidth: 1,
-    borderColor: '#ccc',
-    borderRadius: 5,
-  },
-  button: {
-    padding: 10,
-    marginVertical: 15,
-  },
-  text: {
-    marginVertical: 15,
-  },
-  modalView: {
-    margin: 20,
-    backgroundColor: 'white',
-    borderRadius: 20,
-    padding: 35,
-    alignItems: 'center',
-    shadowColor: '#000',
-    shadowOffset: {
-      width: 0,
-      height: 2,
-    },
-    shadowOpacity: 0.25,
-    shadowRadius: 4,
-    elevation: 5,
-  },
-  modalText: {
-    marginBottom: 15,
-    textAlign: 'center',
-  },
+  container: { flex: 1, justifyContent: 'center', alignItems: 'center' },
+  input: { backgroundColor: 'white', marginVertical: 10, width: '80%', padding: 10, borderWidth: 1, borderColor: '#ccc', borderRadius: 5 },
+  modalView: { margin: 20, backgroundColor: 'white', borderRadius: 20, padding: 35, alignItems: 'center', shadowColor: '#000', shadowOffset: { width: 0, height: 2 }, shadowOpacity: 0.25, shadowRadius: 4, elevation: 5 },
+  modalText: { marginBottom: 15, textAlign: 'center' },
 });
 
 export default AddFoodScreen;

@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { View, Text, FlatList, StyleSheet } from 'react-native';
 import PieChart from '../components/PieChart'; // piechart.js josta tulee data
+import { useTheme } from '../components/ThemeContext'; 
 
 const HomeScreen = () => {
   const [foodHistory, setFoodHistory] = useState([
@@ -14,9 +15,9 @@ const HomeScreen = () => {
     { id: '8', name: 'REISSUMIES', amount: 250, calories: 400, date: '2024-11-08', color: 'aqua' },
     { id: '9', name: 'PIHVI', amount: 250, calories: 400, date: '2024-11-09', color: '#124123' },
   ]);
- 
 
   const [averageCalories, setAverageCalories] = useState(0);
+  const { theme } = useTheme();  // Access the theme from context
 
   useEffect(() => {
     if (foodHistory.length > 0) {
@@ -26,60 +27,36 @@ const HomeScreen = () => {
   }, [foodHistory]);
 
   return (
-    <View style={styles.container}>
-      <Text style={styles.title}>Ruokapäiväkirja</Text>
-      <Text style={styles.subtitle}>Ruokailuiden Historia</Text>
+    <View style={[styles.container, { backgroundColor: theme.container.backgroundColor }]}>
+      <Text style={[styles.title, { color: theme.text.color }]}>Ruokapäiväkirja</Text>
+      <Text style={[styles.subtitle, { color: theme.text.color }]}>Ruokailuiden Historia</Text>
       <FlatList
         data={foodHistory}
         keyExtractor={(item) => item.id}
         renderItem={({ item }) => (
-          <View style={styles.item}>
-            <Text>{item.date}: {item.name}, {item.amount}g, {item.calories} kcal</Text>
+          <View style={[styles.item, { borderBottomColor: theme.borderColor }]}>
+            <Text style={{ color: theme.text.color }}>
+              {item.date}: {item.name}, {item.amount}g, {item.calories} kcal
+            </Text>
           </View>
         )}
       />
-      <Text style={styles.averageText}>
+      <Text style={[styles.averageText, { color: theme.text.color }]}>
         Keskimääräisen ateriaisi kalorit: {averageCalories.toFixed(2)} kcal
       </Text>
-      <Text style={styles.pieTitle}>ViikonAterioiden Kalorit</Text>
+      <Text style={[styles.pieTitle, { color: theme.text.color }]}>Viikon Aterioiden Kalorit</Text>
       <PieChart data={foodHistory} />
     </View>
   );
 };
 
 const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    padding: 20,
-    backgroundColor: '#F5FCFF',
-  },
-  title: {
-    fontSize: 24,
-    textAlign: 'center',
-    margin: 10,
-    fontWeight: 'bold',
-  },
-  subtitle: {
-    fontSize: 20,
-    marginVertical: 10,
-    fontWeight: '600',
-  },
-  item: {
-    padding: 10,
-    borderBottomWidth: 1,
-    borderBottomColor: '#ccc',
-  },
-  averageText: {
-    marginTop: 20,
-    fontSize: 18,
-    fontWeight: 'bold',
-  },
-  pieTitle: {
-    marginTop: 20,
-    fontSize: 22,
-    fontWeight: 'bold',
-    textAlign: 'center',
-  },
+  container: { flex: 1, padding: 20 },
+  title: { fontSize: 24, textAlign: 'center', margin: 10, fontWeight: 'bold' },
+  subtitle: { fontSize: 20, marginVertical: 10, fontWeight: '600' },
+  item: { padding: 10, borderBottomWidth: 1 },
+  averageText: { marginTop: 20, fontSize: 18, fontWeight: 'bold' },
+  pieTitle: { marginTop: 20, fontSize: 22, fontWeight: 'bold', textAlign: 'center' },
 });
 
 export default HomeScreen;
