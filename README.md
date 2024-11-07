@@ -8,47 +8,29 @@ Ennen kuin aloitat, varmista, että sinulla on asennettuna:
 - npm (tulee Node.js:n mukana)
 - Expo CLI (asennettavissa komennolla `npm install -g expo-cli`)
 
-## 2. Projekti
-Varmista, että sinulla on luotu Expo-projekti. Voit luoda uuden projektin komennolla:
-```
-expo init food-diary
-```
 
-## 3. Riippuvuuksien asentaminen
+## 2. Riippuvuuksien asentaminen
 Avaa projektin kansio ja asenna tarvittavat riippuvuudet seuraavilla komennoilla:
 
-### 3.1. Yleiset riippuvuudet
-```bash
-npm install expo expo-status-bar
-```
+- npm install @expo/metro-runtime@~3.2.3
+- npm install @react-native-async-storage/async-storage@^2.0.0
+- npm install @react-navigation/bottom-tabs@^6.6.1
+- npm install @react-navigation/native@^6.1.18
+- npm install @react-navigation/native-stack@^6.11.0
+- npm install expo@~51.0.28
+- npm install expo-status-bar@~1.12.1
+- npm install react@18.2.0
+- npm install react-dom@18.2.0
+- npm install react-native@0.74.5
+- npm install react-native-chart-kit@^6.12.0
+- npm install react-native-paper@^5.12.5
+- npm install react-native-reanimated@^3.16.1
+- npm install react-native-safe-area-context@^4.13.1
+- npm install react-native-screens@^3.35.0
+- npm install react-native-svg@^15.8.0
+- npm install react-native-svg-charts@^5.4.0
+- npm install react-native-web@~0.19.10
+- npm install react-navigation-tabs@^2.11.2
 
-### 3.2. React Navigation -riippuvuudet
-Asenna React Navigation -riippuvuudet:
-```bash
-npm install @react-navigation/native @react-navigation/native-stack @react-navigation/bottom-tabs react-native-screens react-native-safe-area-context
-```
-
-### 3.3. React Native Reanimated
-Asenna React Native Reanimated:
-```bash
-npm install react-native-reanimated
-```
-
-### 3.4. Riippuvuuksien ratkaiseminen
-Jos kohtaat riippuvuuskonflikteja, yritä asentaa riippuvuudet seuraavilla komennoilla:
-```bash
-npm install --legacy-peer-deps
-
-npm install react-native-svg react-native-svg-charts --legacy-peer-deps
-
-```
-
-## 4. Käynnistä projekti
-Kun kaikki riippuvuudet on asennettu, voit käynnistää projektin seuraavalla komennolla:
-```bash
-npx expo start
-```
-
-## 5. Huomautuksia
-- Jos käytät Expo SDK:n versiota, varmista, että käytät yhteensopivia versioita React Native -kirjastosta.
-- Tarkista projektin README-tiedosto tai virallinen dokumentaatio mahdollisten versio- ja asennusohjeiden vuoksi.
+-Kehitystyökalujen Asennus
+- npm install @babel/core@^7.20.0 --save-dev

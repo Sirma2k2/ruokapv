@@ -1,6 +1,8 @@
 import React, { Component } from 'react';
 import { Text, TouchableOpacity, View, Modal, StyleSheet } from 'react-native';
+
 import Ionicons from 'react-native-vector-icons/Ionicons';
+
 
 export default class MyScreen extends Component {
   state = {
@@ -62,6 +64,23 @@ export default class MyScreen extends Component {
               <TouchableOpacity onPress={this.toggleSettings} style={styles.closeButton}>
                 <Ionicons name="arrow-back-outline" size={24} color="black" />
                 <Text style={styles.closeButtonText}>Close</Text>
+              </TouchableOpacity>
+
+              {/* Asetukset-nappi */}
+              <TouchableOpacity onPress={this.toggleMenu} style={styles.menuItem}>
+                <Ionicons name="cog-outline" size={24} color="black" />
+                <Text style={styles.menuItemText}>Asetukset</Text>
+              </TouchableOpacity>
+
+              {/* Dark-light mode nappi */}
+              <TouchableOpacity onPress={this.toggleMenu} style={styles.menuItem}>
+                <Ionicons name="contrast-outline" size={24} color="black" />
+              </TouchableOpacity>
+
+              {/* Hampparivalikko pois */}
+              <TouchableOpacity onPress={this.toggleMenu} style={styles.menuItem}>
+                <Ionicons name="arrow-back-outline" size={24} color="black" />
+                <Text style={styles.menuItemText}>Takaisin</Text>
               </TouchableOpacity>
             </View>
           </View>
@@ -133,3 +152,4 @@ const styles = StyleSheet.create({
     marginLeft: 10,
   },
 });
+
