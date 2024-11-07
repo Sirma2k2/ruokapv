@@ -1,6 +1,10 @@
 import React from 'react';
 import { View, Text, StyleSheet } from 'react-native';
 
+
+
+
+
 const PieChart = ({ data }) => {
   const totalCalories = data.reduce((sum, item) => sum + item.calories, 0);
   const pieSections = data.map(item => ({

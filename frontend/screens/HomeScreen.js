@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { View, Text, FlatList, StyleSheet } from 'react-native';
-import PieChart from '../components/PieChart';
+import PieChart from '../components/PieChart'; // piechart.js josta tulee data
 
 const HomeScreen = () => {
   const [foodHistory, setFoodHistory] = useState([
@@ -39,9 +39,9 @@ const HomeScreen = () => {
         )}
       />
       <Text style={styles.averageText}>
-        Viikon keskiarvoiset kalorit: {averageCalories.toFixed(2)} kcal
+        Keskimääräisen ateriaisi kalorit: {averageCalories.toFixed(2)} kcal
       </Text>
-      <Text style={styles.pieTitle}>Aterioiden Kalorit</Text>
+      <Text style={styles.pieTitle}>ViikonAterioiden Kalorit</Text>
       <PieChart data={foodHistory} />
     </View>
   );
