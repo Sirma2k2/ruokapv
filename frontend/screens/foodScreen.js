@@ -32,11 +32,11 @@ const AddFoodScreen = ({ navigation }) => {
 
   const handleAddFood = async () => { // add
     if (!foodName || !amount) {
-      alert('Anna ruoan nimi ja määrä ensin (kalorit ovat valinnaiset)');
+      alert('Give food name and amount (calories are optional)'); 
       return;
     }
     if (isNaN(amount)) {
-      alert('Määrän tulee olla numero');
+      alert('Amount must be a number');
       return;
     }
 
@@ -63,29 +63,29 @@ const AddFoodScreen = ({ navigation }) => {
 
   return (
     <View style={[styles.container, theme.container]}>
-      <Text style={[styles.text, theme.text]}>Anna ruoan nimi ja kalorit</Text>
+      <Text style={[styles.text, theme.text]}>Plugin your meal</Text>
       <TextInput 
         style={[styles.input, theme.input]}
-        placeholder="Ruoan nimi" 
+        placeholder="The name of the food" 
         value={foodName} 
         onChangeText={setFoodName} 
       />
       <TextInput 
         style={[styles.input, theme.input]}
-        placeholder="Määrä (g)"
+        placeholder="Amount (g)"
         keyboardType="numeric"
         value={amount}
         onChangeText={setAmount} 
       />
       <TextInput 
         style={[styles.input, theme.input]}
-        placeholder="Kalorit (valinnainen)" 
+        placeholder="Calories (optional)" 
         keyboardType="numeric" 
         value={calories} 
         onChangeText={setCalories} 
       />
       <Button
-        title="Lisää" 
+        title="Add" 
         onPress={handleAddFood} 
       />
       
@@ -99,13 +99,13 @@ const AddFoodScreen = ({ navigation }) => {
         }}
       >
         <View style={[styles.modalView, theme.modalContainer]}>
-          <Text style={[styles.modalText, theme.text]}>Ruokapäiväkirjaan lisätty:</Text>
+          <Text style={[styles.modalText, theme.text]}>Added to food diary:</Text>
           <Text style={[styles.modalText, theme.text]}>{submittedFoodName}</Text>
-          <Text style={[styles.modalText, theme.text]}>Määrä: {submittedAmount} g</Text>
+          <Text style={[styles.modalText, theme.text]}>Amount: {submittedAmount} g</Text>
           {submittedCalories && !isNaN(submittedCalories) && (
-            <Text style={[styles.modalText, theme.text]}>jossa Kaloreita: {submittedCalories}</Text>
+            <Text style={[styles.modalText, theme.text]}>and the calories: {submittedCalories}</Text>
           )}
-          <Button title="Sulje" onPress={() => setModalVisible(false)} />
+          <Button title="Close" onPress={() => setModalVisible(false)} />
         </View>
       </Modal>
     </View>

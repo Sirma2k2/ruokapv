@@ -7,19 +7,22 @@ import TapBar from './frontend/components/TapBar';
 import TaskBar from './frontend/components/taskBar';
 import { Platform } from 'react-native';
 import HomeScreen from './frontend/screens/HomeScreen'; // not needed since we are using TapBar as navigation
-import { ThemeProvider } from './frontend/components/ThemeContext';
+import { ThemeProvider, useTheme } from './frontend/components/ThemeContext'; // if dark mode is implemented
 
 
 
 
 export default function App() {
+
+
+
   return (
     <ThemeProvider>
 
 
       {Platform.OS === 'android' && <TaskBar />}
      <TapBar />
-    </ThemeProvider>
+    </ThemeProvider >
 
   );
 }
