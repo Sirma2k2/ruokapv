@@ -7,6 +7,7 @@ import HomeScreen from '../screens/HomeScreen'
 import foodScreen from '../screens/foodScreen'
 import Ionicons from "@expo/vector-icons/Ionicons"
 import MyScreen from '../screens/MyScreen';
+import AppNavi from '../navigation/MyStack'
 
 
 
@@ -14,7 +15,7 @@ const Tab = createBottomTabNavigator();
 export default class TapBar extends Component {
   render() {
     return (
-     <NavigationContainer>
+   
         <Tab.Navigator screenOptions={{
             tabBarLabelPosition: "below-icon",
             tapBarShowLabel: true,
@@ -31,13 +32,13 @@ export default class TapBar extends Component {
             tabBarIcon: () => <Ionicons name='fast-food' size={20} />
         }}
          />
-         <Tab.Screen name="Profile" component={MyScreen}
+         <Tab.Screen name="Profile" component={AppNavi}
         options={{
             tabBarIcon: () => <Ionicons name='accessibility' size={20} />
         }}
          />
         </Tab.Navigator>
-        </NavigationContainer>
+        
     
 
     )
