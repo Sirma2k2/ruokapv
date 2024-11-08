@@ -3,8 +3,10 @@ import { Text, TouchableOpacity, View, Modal, StyleSheet } from 'react-native';
 import Ionicons from 'react-native-vector-icons/Ionicons';
 import { useTheme } from '../components/ThemeContext'; // Import useTheme hook
 import Checkbox from 'expo-checkbox';
+import { useNavigation } from '@react-navigation/native';
 
 const MyScreen = () => {
+  const navigation = useNavigation()
   const [menuBarVisible, setMenuBarVisible] = useState(false);
   const [settingsVisible, setSettingsVisible] = useState(false);
   const [checkboxValues, setCheckboxValues] = useState({ // default checkbox values
@@ -38,6 +40,12 @@ const MyScreen = () => {
       <Text style={[styles.text, theme.text]}>MyScreen</Text>
       <TouchableOpacity onPress={() => setMenuBarVisible(!menuBarVisible)} style={styles.menuButton}>
         <Text style={[styles.menuText, theme.text]}>☰</Text>
+      </TouchableOpacity>
+
+      <TouchableOpacity onPress={() => {
+        console.log("navigate to notes")
+      navigation.navigate('NotesScreen')}}>
+         <Text> Omat Muistiinpanot</Text>
       </TouchableOpacity>
 
       <Modal
