@@ -15,6 +15,7 @@ const MyStack = () => {
       {/* Notes Screen */}
       <Stack.Screen name="NotesScreen" component={NotesScreen}
       options={{ title: 'My notes' }} />
+      
     </Stack.Navigator>
   );
 };
