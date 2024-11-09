@@ -9,9 +9,12 @@ const MyStack = () => {
   return (
     <Stack.Navigator>
       {/* Profile Screen (MyScreen) */}
-      <Stack.Screen name="MyScreen" component={MyScreen} options={{ title: 'Profile' }} />
+      <Stack.Screen name="MyScreen" component={MyScreen}
+       options={{ headerShown: false }} />
+
       {/* Notes Screen */}
-      <Stack.Screen name="NotesScreen" component={NotesScreen} />
+      <Stack.Screen name="NotesScreen" component={NotesScreen}
+      options={{ title: 'My notes' }} />
     </Stack.Navigator>
   );
 };
