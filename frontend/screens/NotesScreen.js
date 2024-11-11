@@ -51,15 +51,14 @@ const NotesScreen = () => {
     setDate(currentDate)
   }
 
-  const toggleNoteDone = (index) => {
-    const updatedNotes = notes.map((note, i) =>
-      i === index ? { ...note, done: !note.done } : note
-    );
+  const deleteNote = (index) => {
+    const updatedNotes = notes.filter((_, i) => i !== index)
     setNotes(updatedNotes)
-    saveNotes()
+    saveNotes(updatedNotes)
   }
+  
 
-  // Toggle modal visibility
+
   const toggleModal = () => {
     setModalVisible(!modalVisible)
   }
@@ -128,8 +127,8 @@ const NotesScreen = () => {
                   <Text style={styles.noteText}>Description: {note.description}</Text>
                   <Text style={styles.noteText}>Date: {note.date}</Text>
                   <Button
-                    title={note.done ? "Mark as Undone" : "Mark as Done"}
-                    onPress={() => toggleNoteDone(index)}
+                    title="Delete note"
+                    onPress={() => deleteNote(index)}
                   />
                 </View>
               ))
