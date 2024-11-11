@@ -13,7 +13,7 @@ const AddFoodScreen = ({ navigation }) => {
   const [submittedCalories, setSubmittedCalories] = useState('');
   const [meals, setMeals] = useState([]); // Store meals
 
-  const { theme } = useTheme();  //teema
+  const { theme } = useTheme();  // theme
 
   useEffect(() => { // load
     const loadMeals = async () => {

@@ -3,9 +3,7 @@ import { View, Text, StyleSheet } from 'react-native';
 
 
 
-
-
-const PieChart = ({ data }) => {
+const PieChart = ({ data }) => { // data is just defined here, it does not come externally, rather it is just here and redefined in its component
   const totalCalories = data.reduce((sum, item) => sum + item.calories, 0);
   const pieSections = data.map(item => ({
     ...item,

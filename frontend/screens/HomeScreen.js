@@ -4,7 +4,7 @@ import PieChart from '../components/PieChart'; // piechart.js josta tulee data
 import { useTheme } from '../components/ThemeContext'; 
 
 const HomeScreen = () => {
-  const [foodHistory, setFoodHistory] = useState([
+  const [foodHistory, setFoodHistory] = useState([ // hardcoded 
     { id: '1', name: 'Apple', amount: 150, calories: 80, date: '2024-11-01', color: '#FF6384' },
     { id: '2', name: 'Chicken Breast', amount: 200, calories: 350, date: '2024-11-02', color: '#36A2EB' },
     { id: '3', name: 'Rice', amount: 180, calories: 220, date: '2024-11-03', color: '#FFCE56' },
