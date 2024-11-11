@@ -12,6 +12,7 @@ Ennen kuin aloitat, varmista, että sinulla on asennettuna:
 ## 2. Riippuvuuksien asentaminen
 Avaa projektin kansio ja asenna tarvittavat riippuvuudet seuraavilla komennoilla:
 
+- npm install expo-secure-store --legacy-peer-deps
 - npm install @expo/metro-runtime@~3.2.3
 - npm install @react-native-async-storage/async-storage@^2.0.0
 - npm install @react-navigation/bottom-tabs@^6.6.1
