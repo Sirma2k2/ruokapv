@@ -1,42 +1,81 @@
 import { Text, View, StyleSheet, Button, TouchableOpacity, Modal } from 'react-native';
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { TextInput } from 'react-native-paper';
 import DateTimePicker from '@react-native-community/datetimepicker';
+import { useData } from '../hooks/SaveDataFront';
 
 const NotesScreen = () => {
-  const [date, setDate] = useState(new Date())
-  const [title, setTitle] = useState("");
-  const [description, setDescription] = useState("")
-  const [showDatePicker, setShowDatePicker] = useState(false)
-  const [modalVisable, setmodalVisable] = useState(false)
+  const [date, setDate] = useState(new Date());
+  const [title, setTitle] = useState('');
+  const [description, setDescription] = useState('');
+  const [showDatePicker, setShowDatePicker] = useState(false);
+  const [modalVisible, setModalVisible] = useState(false);
+  const { getData, saveData } = useData();
+  const [note, setNote] = useState('');
+  const [notes, setNotes] = useState([]);
 
   
-  const onDateChange = (event, selectedDate) => {
-    const currentDate = selectedDate || date
-    setShowDatePicker(false)
-    if (selectedDate) {
-      setDate(currentDate)
+  useEffect(() => {
+    getData()
+      .then((data) => {
+        if (data) setNotes(data)
+      })
+      .catch((error) => console.log(error))
+  }, [])
+
+  
+  const saveNotes = async () => {
+    try {
+      await saveData(notes);
+    } catch (error) {
+      console.log("Failed to save notes:", error)
     }
   }
 
+ 
+  const addNote = () => {
+    if (title.trim() !== '' && description.trim() !== '') {
+      const newNote = { title, description, date: date.toLocaleDateString(), done: false }
+      const updatedNotes = [...notes, newNote]
+      setNotes(updatedNotes)
+      setTitle('')
+      setDescription('')
+      saveNotes()
+    }
+  }
+
+
+  const onDateChange = (event, selectedDate) => {
+    const currentDate = selectedDate || date
+    setShowDatePicker(false)
+    setDate(currentDate)
+  }
+
+  const toggleNoteDone = (index) => {
+    const updatedNotes = notes.map((note, i) =>
+      i === index ? { ...note, done: !note.done } : note
+    );
+    setNotes(updatedNotes)
+    saveNotes()
+  }
+
+  // Toggle modal visibility
   const toggleModal = () => {
-    setmodalVisable(!modalVisable)
+    setModalVisible(!modalVisible)
   }
 
   return (
     <View style={styles.container}>
-     
+      {/* Date Picker */}
       <TouchableOpacity onPress={() => setShowDatePicker(true)}>
         <Text style={styles.label}>Date</Text>
         <TextInput
-          value={date.toLocaleDateString()} 
-          editable={false} 
+          value={date.toLocaleDateString()}
+          editable={false}
           style={styles.input}
           theme={{ colors: { background: '#e0e0e0' } }}
         />
       </TouchableOpacity>
-
-     
       {showDatePicker && (
         <DateTimePicker
           value={date}
@@ -46,49 +85,60 @@ const NotesScreen = () => {
         />
       )}
 
-     
+      {/* Title Input */}
       <Text style={styles.label}>Title</Text>
       <TextInput
         value={title}
-        onChangeText={text => setTitle(text)}
+        onChangeText={(text) => setTitle(text)}
         style={styles.input}
         theme={{ colors: { background: '#e0e0e0' } }}
       />
 
-      
+      {/* Description Input */}
       <Text style={styles.label}>Description</Text>
       <TextInput
         value={description}
-        onChangeText={text => setDescription(text)}
+        onChangeText={(text) => setDescription(text)}
         multiline
         style={[styles.input, styles.descriptionInput]}
         theme={{ colors: { background: '#e0e0e0' } }}
       />
 
-      
-      <Button style={styles.button}
-      title="Save" onPress={() => { /* Handle Save Action */ }} />
+      {/* Save Button */}
+      <Button style={styles.button} title="Add Note" onPress={addNote} />
 
-      
-        <Button title="View Saved Notes" onPress={toggleModal} />
+      {/* View Saved Notes Button */}
+      <Button title="View Saved Notes" onPress={toggleModal} />
 
+      {/* Notes Modal */}
+      <Modal
+        visible={modalVisible}
+        animationType="slide"
+        transparent={true}
+        onRequestClose={toggleModal}
+      >
+        <View style={styles.modalOverlay}>
+          <View style={styles.modalContent}>
+            <Text style={styles.modalTitle}>Saved Notes</Text>
+            
+            {notes.length > 0 ? (
+              notes.map((note, index) => (
+                <View key={index} style={styles.noteItem}>
+                  <Text style={styles.noteText}>Title: {note.title}</Text>
+                  <Text style={styles.noteText}>Description: {note.description}</Text>
+                  <Text style={styles.noteText}>Date: {note.date}</Text>
+                  <Button
+                    title={note.done ? "Mark as Undone" : "Mark as Done"}
+                    onPress={() => toggleNoteDone(index)}
+                  />
+                </View>
+              ))
+            ) : (
+              <Text>No notes saved</Text>
+            )}
 
-<Modal
-  visible={modalVisable}
-  animationType="slide"
-  transparent={true}
-  onRequestClose={toggleModal}
->
-  <View style={styles.modalOverlay}>
-    <View style={styles.modalContent}>
-      <Text style={styles.modalTitle}>Saved Notes</Text>
-   
-   
-      <Text style={styles.noteText}>Title: {title}</Text>
-      <Text style={styles.noteText}>Description: {description}</Text>
-
-              {/* Close button */}
-              <Button title="Close" onPress={toggleModal} />
+            {/* Close Modal Button */}
+            <Button title="Close" onPress={toggleModal} />
           </View>
         </View>
       </Modal>
@@ -118,14 +168,14 @@ const styles = StyleSheet.create({
   descriptionInput: {
     height: 100,
   },
-  button:{
+  button: {
     marginTop: 10,
   },
   modalOverlay: {
     flex: 1,
     justifyContent: 'center',
     alignItems: 'center',
-    backgroundColor: 'rgba(0, 0, 0, 0.5)', // Semi-transparent background
+    backgroundColor: 'rgba(0, 0, 0, 0.5)',
   },
   modalContent: {
     width: 300,
@@ -139,9 +189,15 @@ const styles = StyleSheet.create({
     fontWeight: 'bold',
     marginBottom: 10,
   },
+  noteItem: {
+    marginBottom: 15,
+    padding: 10,
+    borderRadius: 5,
+    backgroundColor: '#f0f0f0',
+  },
   noteText: {
     fontSize: 16,
-    marginBottom: 8,
+    marginBottom: 5,
   },
 });
 
