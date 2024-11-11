@@ -6,14 +6,13 @@ import { View, Text, StyleSheet } from 'react-native';
 const TaskBar = ({darkMode}) => {
     return (
         <View style={[styles.container, { backgroundColor: darkMode ? '#333' : '#6200EE' }]}>
-            <Text style={styles.text}>Task Bar</Text>
         </View>
     );
 };
 
 const styles = StyleSheet.create({
     container: {
-        height: 50,
+        height: 32.5,
         backgroundColor: '#6200EE',
         justifyContent: 'center',
         alignItems: 'center',

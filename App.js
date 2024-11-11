@@ -1,6 +1,6 @@
 import { StatusBar } from 'expo-status-bar';
 import { StyleSheet, Text, View } from 'react-native';
-import { NavigationContainer } from '@react-navigation/native'; // not needed since we are using TapBar as navigation
+import { NavigationContainer } from '@react-navigation/native'; 
 import { createNativeStackNavigator } from '@react-navigation/native-stack'; // not needed since we are using TapBar as navigation
 import FoodScreen from './frontend/screens/foodScreen';// not needed since we are using TapBar as navigation
 import TapBar from './frontend/components/TapBar';
