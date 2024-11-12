@@ -44,6 +44,8 @@ const MyScreen = () => {
 
 
   return (
+    
+  
     <View style={[styles.container, theme.container]}>
       <TouchableOpacity style = {styles.Notes} onPress={() => {
         console.log("navigate to notes");
