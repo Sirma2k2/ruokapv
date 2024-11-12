@@ -1,10 +1,10 @@
 import React, { useState } from 'react';
-import { Text, TouchableOpacity, View, Modal, StyleSheet, TextInput, ScrollView } from 'react-native';
+import { Text, TouchableOpacity, View, Modal, StyleSheet, TextInput, ScrollView, Settings } from 'react-native';
 import Ionicons from 'react-native-vector-icons/Ionicons';
 import { useTheme } from '../components/ThemeContext';
 import Checkbox from 'expo-checkbox';
 import { useNavigation } from '@react-navigation/native';
-
+import SettingsModal from '../components/SettingsModal';
 
 const MyScreen = () => {
   const navigation = useNavigation();
@@ -17,21 +17,23 @@ const MyScreen = () => {
     dietType: '',
     goal: ''
   });
-  const [menuBarVisible, setMenuBarVisible] = useState(false);
+
   const [settingsVisible, setSettingsVisible] = useState(false);
-  const [checkboxValues, setCheckboxValues] = useState({
+  const [switchValues, setSwitchValues] = useState({
     option1: false,
     option2: false,
     option3: false,
-    option4: false,
-    option5: false,
   });
-  
+
+  const toggleSettingsVisible = () => {
+    setSettingsVisible(!settingsVisible);
+    console.log("Settings Modal State:", !settingsVisible);
+  };
 
   const { theme, toggleTheme } = useTheme();
 
-  const handleCheckboxChange = (key) => (newValue) => {
-    setCheckboxValues((prev) => ({ ...prev, [key]: newValue }));
+  const handleSwitchChange = (key) => (newValue) => {
+    setSwitchValues((prev) => ({ ...prev, [key]: newValue }));
   };
 
   const handleInputChange = (name) => (value) => {
@@ -42,16 +44,35 @@ const MyScreen = () => {
     console.log('User Data:', userData);
   };
 
+  const setLog = () => {
+    console.log("MenuBar State:", menuBarVisible);
+  }
 
   return (
     <View style={[styles.container, theme.container]}>
-      <TouchableOpacity style = {styles.Notes} onPress={() => {
+        {/* SettingsModal */}
+        <SettingsModal
+        visible={settingsVisible}
+        toggleVisible={toggleSettingsVisible}
+        switchValues={switchValues}
+        handleSwitchChange={handleSwitchChange}
+        toggleTheme={toggleTheme}
+      />
+
+      <TouchableOpacity style={styles.Notes} onPress={() => {
         console.log("navigate to notes");
         navigation.navigate('NotesScreen');
       }}>
-        <Text> My Notes</Text>
+      <Ionicons name="document-text" size={30} color={theme.text.color} />
       </TouchableOpacity>
       <View style={styles.topRightContainer}></View>
+      <TouchableOpacity style={styles.settingsIcon} onPress={() => {
+      console.log("Settings button pressed");
+      setSettingsVisible(!settingsVisible);
+    }}>
+      <Ionicons name="menu" size={30} color={theme.text.color} />
+    </TouchableOpacity>
+
       <ScrollView style={styles.formContainer} contentContainerStyle={styles.scrollContent}>
         <Text style={[styles.title, theme.text]}>User Profile</Text>
 
@@ -100,20 +121,30 @@ const MyScreen = () => {
 
         <Text style={[styles.label, theme.text]}>Activity Level</Text>
         <View style={styles.buttonGroup}>
-          {['low', 'medium', 'high'].map((level) => (
-            <TouchableOpacity
-              key={level}
-              style={[
-                styles.choiceButton,
-                userData.activityLevel === level && styles.selectedButton,
-              ]}
-              onPress={() => handleInputChange('activityLevel')(level)}
-            >
-              <Text style={[styles.choiceButtonText, theme.text]}>{level.charAt(0).toUpperCase() + level.slice(1)}</Text>
-            </TouchableOpacity>
-          ))}
+            {['low', 'medium', 'high'].map((level) => (
+              <TouchableOpacity
+                key={level}
+                style={[
+                  styles.choiceButton,
+                  userData.activityLevel === level && {
+                    backgroundColor: theme.darkMode ? '#000' : '#007bff'
+                  },
+                ]}
+                onPress={() => handleInputChange('activityLevel')(level)}
+              >
+                <Text
+                  style={[
+                    styles.choiceButtonText,
+                    userData.activityLevel === level && {
+                      color: theme.darkMode ? '#fff' : '#333'
+                    },
+                  ]}
+                >
+                  {level.charAt(0).toUpperCase() + level.slice(1)}
+                </Text>
+              </TouchableOpacity>
+            ))}
         </View>
-
         <Text style={[styles.label, theme.text]}>Diet Type</Text>
         <View style={styles.buttonGroup}>
           {['balanced', 'keto', 'vegan'].map((diet) => (
@@ -121,11 +152,22 @@ const MyScreen = () => {
               key={diet}
               style={[
                 styles.choiceButton,
-                userData.dietType === diet && styles.selectedButton,
+                userData.dietType === diet && {
+                  backgroundColor: theme.darkMode ? '#000' : '#007bff'
+                },
               ]}
               onPress={() => handleInputChange('dietType')(diet)}
             >
-              <Text style={[styles.choiceButtonText, theme.text]}>{diet.charAt(0).toUpperCase() + diet.slice(1)}</Text>
+              <Text
+                style={[
+                  styles.choiceButtonText,
+                  userData.dietType === diet && {
+                    color: theme.darkMode ? '#fff' : '#333'
+                  },
+                ]}
+              >
+                {diet.charAt(0).toUpperCase() + diet.slice(1)}
+              </Text>
             </TouchableOpacity>
           ))}
         </View>
@@ -137,11 +179,22 @@ const MyScreen = () => {
               key={goal}
               style={[
                 styles.choiceButton,
-                userData.goal === goal && styles.selectedButton,
+                userData.goal === goal && {
+                  backgroundColor: theme.darkMode ? '#000' : '#007bff'
+                },
               ]}
               onPress={() => handleInputChange('goal')(goal)}
             >
-              <Text style={[styles.choiceButtonText, theme.text]}>{goal.charAt(0).toUpperCase() + goal.slice(1)}</Text>
+              <Text
+                style={[
+                  styles.choiceButtonText,
+                  userData.goal === goal && {
+                    color: theme.darkMode ? '#fff' : '#333'
+                  },
+                ]}
+              >
+                {goal.charAt(0).toUpperCase() + goal.slice(1)}
+              </Text>
             </TouchableOpacity>
           ))}
         </View>
@@ -149,6 +202,7 @@ const MyScreen = () => {
         <TouchableOpacity style={styles.submitButton} onPress={handleSubmit}>
           <Text style={styles.submitButtonText}>Change</Text>
         </TouchableOpacity>
+
       </ScrollView>
     </View>
   );
@@ -169,7 +223,8 @@ const styles = StyleSheet.create({
   choiceButtonText: { textAlign: 'center', color: '#333' },
   submitButton: { backgroundColor: '#007bff', padding: 20, borderRadius: 8, marginTop: 20 },
   submitButtonText: { textAlign: 'center', color: '#fff', fontSize: 16, fontWeight: 'bold' },
-  Notes: { position: 'absolute', top: 10, right: 30,}
+  Notes: { position: 'absolute', top: 50, right: 30, margin: 5, padding: 5 },
+  settingsIcon: { position: 'absolute', top: 10, right: 30, zIndex: 1, margin: 5, padding: 5 },
 });
 
 export default MyScreen;

@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { View, Text, FlatList, StyleSheet } from 'react-native';
+import { View, Text, FlatList, StyleSheet, ScrollView } from 'react-native';
 import PieChart from '../components/PieChart'; // piechart.js josta tulee data
 import { useTheme } from '../components/ThemeContext'; 
 
@@ -27,8 +27,8 @@ const HomeScreen = () => {
   }, [foodHistory]);
 
   return (
+    <ScrollView>
     <View style={[styles.container, { backgroundColor: theme.container.backgroundColor }]}>
-      <Text style={[styles.title, { color: theme.text.color }]}>Food diary</Text>
       <Text style={[styles.subtitle, { color: theme.text.color }]}>Meal diary</Text>
       <FlatList
         data={foodHistory}
@@ -44,9 +44,10 @@ const HomeScreen = () => {
       <Text style={[styles.averageText, { color: theme.text.color }]}>
         The calories of your average meal: {averageCalories.toFixed(2)} calories
       </Text>
-      <Text style={[styles.pieTitle, { color: theme.text.color }]}>Meals of your week</Text>
+      <Text style={[styles.pieTitle, { color: theme.text.color }]}>Your last five meals</Text>
       <PieChart data={foodHistory} />
     </View>
+    </ScrollView>
   );
 };
 
