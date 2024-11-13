@@ -1,53 +1,34 @@
-import React, { useState } from 'react'; 
+import React from 'react';
 import { View, Text, TouchableOpacity, StyleSheet } from 'react-native';
-import { useTheme } from '../components/ThemeContext'; 
+import { useTheme } from '../components/ThemeContext';
 
-const FoodScreen = ({ navigation }) => {  
-  const [currentScreen, setCurrentScreen] = useState('menu');
+const FoodScreen = ({ navigation }) => {
   const { theme } = useTheme();
 
   return (
     <View style={[styles.container, { backgroundColor: theme.container.backgroundColor }]}>
-      {currentScreen === 'menu' ? (
-        <>
-          <Text style={[styles.header, { color: theme.text.color }]}>Select Meal Type</Text>
+      <Text style={[styles.header, { color: theme.text.color }]}>Select Meal Type</Text>
 
-         
-          <TouchableOpacity 
-            style={[styles.button, { backgroundColor: theme.buttonBackgroundColor }]} 
-            onPress={() => navigation.navigate('Breakfast')} 
-          >
-            <Text style={[styles.buttonText, { color: theme.buttonTextColor }]}>Breakfast</Text>
-          </TouchableOpacity>
+      <TouchableOpacity 
+        style={[styles.button, { backgroundColor: theme.buttonBackgroundColor }]} 
+        onPress={() => navigation.navigate('Breakfast')}  // Navigate to Breakfast screen
+      >
+        <Text style={[styles.buttonText, { color: theme.buttonTextColor }]}>Breakfast</Text>
+      </TouchableOpacity>
 
-        
-          <TouchableOpacity 
-            style={[styles.button, { backgroundColor: theme.buttonBackgroundColor }]} 
-            onPress={() => navigation.navigate('Lunch')}  
-          >
-            <Text style={[styles.buttonText, { color: theme.buttonTextColor }]}>Lunch</Text>
-          </TouchableOpacity>
+      <TouchableOpacity 
+        style={[styles.button, { backgroundColor: theme.buttonBackgroundColor }]} 
+        onPress={() => navigation.navigate('Lunch')}  // Navigate to Lunch screen
+      >
+        <Text style={[styles.buttonText, { color: theme.buttonTextColor }]}>Lunch</Text>
+      </TouchableOpacity>
 
-          
-          <TouchableOpacity 
-            style={[styles.button, { backgroundColor: theme.buttonBackgroundColor }]} 
-            onPress={() => navigation.navigate('Dinner')}  
-          >
-            <Text style={[styles.buttonText, { color: theme.buttonTextColor }]}>Dinner</Text>
-          </TouchableOpacity>
-        </>
-      ) : (
-        <>
-          <Text style={[styles.header, { color: theme.text.color }]}>Add {currentScreen} Entry</Text>
-          
-          <TouchableOpacity 
-            style={[styles.button, { backgroundColor: theme.buttonBackgroundColor }]} 
-            onPress={() => setCurrentScreen('menu')}
-          >
-            <Text style={[styles.buttonText, { color: theme.buttonTextColor }]}>Back to Menu</Text>
-          </TouchableOpacity>
-        </>
-      )}
+      <TouchableOpacity 
+        style={[styles.button, { backgroundColor: theme.buttonBackgroundColor }]} 
+        onPress={() => navigation.navigate('Dinner')}  // Navigate to Dinner screen
+      >
+        <Text style={[styles.buttonText, { color: theme.buttonTextColor }]}>Dinner</Text>
+      </TouchableOpacity>
     </View>
   );
 };
