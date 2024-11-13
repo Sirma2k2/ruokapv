@@ -1,16 +1,23 @@
 import React from 'react';
 import { View, Text, TouchableOpacity, StyleSheet } from 'react-native';
+import { useTheme } from '../components/ThemeContext'; // Import the useTheme hook
 
-const DinnerScreen = ({ navigation }) => (
-  <View style={styles.container}>
-    <Text style={styles.header}>Build Your dinner</Text>
-    
+const DinnerScreen = ({ navigation }) => {
+  const { theme } = useTheme(); // Access the theme from context
 
-    <TouchableOpacity style={styles.button} onPress={() => navigation.goBack()}>
-      <Text style={styles.buttonText}>Back to Menu</Text>
-    </TouchableOpacity>
-  </View>
-)
+  return (
+    <View style={[styles.container, { backgroundColor: theme.container.backgroundColor }]}>
+      <Text style={[styles.header, { color: theme.text.color }]}>Build Your Dinner</Text>
+      
+      <TouchableOpacity 
+        style={[styles.button, { backgroundColor: theme.buttonBackgroundColor }]} 
+        onPress={() => navigation.goBack()}
+      >
+        <Text style={[styles.buttonText, { color: theme.buttonText.color }]}>Back to Menu</Text>
+      </TouchableOpacity>
+    </View>
+  );
+};
 
 const styles = StyleSheet.create({
   container: { 
@@ -22,6 +29,7 @@ const styles = StyleSheet.create({
     fontSize: 24, 
     marginTop: 40, 
     marginBottom: 20, 
+    fontWeight: 'bold'
   },
   button: {
     alignItems: 'center',
@@ -29,11 +37,9 @@ const styles = StyleSheet.create({
     paddingVertical: 12,
     paddingHorizontal: 32,
     borderRadius: 4,
-    backgroundColor: 'black',
     marginVertical: 10, 
   },
   buttonText: {
-    color: 'white',  
     fontSize: 18,    
   }
 });
