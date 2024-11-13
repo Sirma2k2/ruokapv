@@ -52,8 +52,8 @@ const HomeScreen = () => {
 };
 
 const styles = StyleSheet.create({
-  container: { flex: 1, padding: 20 },
-  title: { fontSize: 24, textAlign: 'center', margin: 10, fontWeight: 'bold' },
+  container: { flex: 1, padding: 20, margin: 1 },
+  title: { fontSize: 24, textAlign: 'center',  margin: 10, fontWeight: 'bold' },
   subtitle: { fontSize: 20, marginVertical: 10, fontWeight: '600' },
   item: { padding: 10, borderBottomWidth: 1 },
   averageText: { marginTop: 20, fontSize: 18, fontWeight: 'bold' },
