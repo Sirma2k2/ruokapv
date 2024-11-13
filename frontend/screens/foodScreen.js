@@ -1,10 +1,13 @@
 import React from 'react';
 import { View, Text, TouchableOpacity, StyleSheet } from 'react-native';
 import { useTheme } from '../components/ThemeContext'; // Import the useTheme hook to access the theme
+import { useState } from 'react';
 
 const FoodScreen = () => {
+
   const [currentScreen, setCurrentScreen] = useState('menu');
   const { theme } = useTheme(); // Get the theme from the context
+
 
   const selectMealType = (mealType) => {
     setCurrentScreen(mealType);
