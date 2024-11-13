@@ -1,23 +1,15 @@
 import React from 'react';
 import { View, Text, TouchableOpacity, StyleSheet } from 'react-native';
 
-const FoodScreen = ({ navigation }) => (
+const LunchScreen = ({ navigation }) => (
   <View style={styles.container}>
-    <Text style={styles.header}>Select Meal Type</Text>
+    <Text style={styles.header}>Build Your Breakfast</Text>
     
-    <TouchableOpacity style={styles.button} onPress={() => navigation.navigate('Breakfast')}>
-      <Text style={styles.buttonText}>Breakfast</Text>
-    </TouchableOpacity>
-
-    <TouchableOpacity style={styles.button} onPress={() => navigation.navigate('Lunch')}>
-      <Text style={styles.buttonText}>Lunch</Text>
-    </TouchableOpacity>
-
-    <TouchableOpacity style={styles.button} onPress={() => navigation.navigate('Dinner')}>
-      <Text style={styles.buttonText}>Dinner</Text>
+    <TouchableOpacity style={styles.button} onPress={() => navigation.goBack()}>
+      <Text style={styles.buttonText}>Back to Menu</Text>
     </TouchableOpacity>
   </View>
-);
+)
 
 const styles = StyleSheet.create({
   container: { 
@@ -45,4 +37,4 @@ const styles = StyleSheet.create({
   }
 });
 
-export default FoodScreen;
+export default LunchScreen;
