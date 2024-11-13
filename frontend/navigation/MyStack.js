@@ -23,18 +23,18 @@ const MyStack = () => {
       
       <Stack.Screen 
         name="Breakfast" component={BreakfastScreen}
-        options={{ title: 'Build Your Breakfast' }}
+        options={{headerShown: false }}
       />
 
       <Stack.Screen 
         name="Lunch" 
         component={LunchScreen}
-        options={{ title: 'Build Your Lunch' }}
+        options={{headerShown: false  }}
       />
       <Stack.Screen 
         name="Dinner" 
         component={DinnerScreen}
-        options={{ title: 'Build Your Dinner' }}
+        options={{ headerShown: false  }}
       />
 
    
