@@ -3,7 +3,7 @@ import { View, Text, TouchableOpacity, StyleSheet } from 'react-native';
 
 const DinnerScreen = ({ navigation }) => (
   <View style={styles.container}>
-    <Text style={styles.header}>Build Your Breakfast</Text>
+    <Text style={styles.header}>Build Your dinner</Text>
     
 
     <TouchableOpacity style={styles.button} onPress={() => navigation.goBack()}>

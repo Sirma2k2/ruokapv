@@ -6,6 +6,8 @@ import BreakfastScreen from '../screens/BreakfastScreen'
 import DinnerScreen from '../screens/DinnerScreen' 
 import LunchScreen from '../screens/LunchScreen'
 
+
+
 const Stack = createNativeStackNavigator();
 
 const MyStack = () => {
@@ -37,7 +39,7 @@ const MyStack = () => {
 
    
     </Stack.Navigator>
-  );
-};
+  )
+}
 
 export default MyStack;
