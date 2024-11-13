@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React from 'react';
 import { View, Text, TouchableOpacity, StyleSheet } from 'react-native';
 import { useTheme } from '../components/ThemeContext'; // Import the useTheme hook to access the theme
 
@@ -10,6 +10,25 @@ const FoodScreen = () => {
     setCurrentScreen(mealType);
   };
 
+  const FoodScreen = ({ navigation }) => (
+  <View style={styles.container}>
+    <Text style={styles.header}>Select Meal Type</Text>
+    
+    <TouchableOpacity style={styles.button} onPress={() => navigation.navigate('Breakfast')}>
+      <Text style={styles.buttonText}>Breakfast</Text>
+    </TouchableOpacity>
+
+    <TouchableOpacity style={styles.button} onPress={() => navigation.navigate('Lunch')}>
+      <Text style={styles.buttonText}>Lunch</Text>
+    </TouchableOpacity>
+
+    <TouchableOpacity style={styles.button} onPress={() => navigation.navigate('Dinner')}>
+      <Text style={styles.buttonText}>Dinner</Text>
+    </TouchableOpacity>
+  </View>
+);
+  
+  
   return (
     <View style={[styles.container, { backgroundColor: theme.container.backgroundColor }]}>
       {currentScreen === 'menu' ? (
@@ -53,6 +72,9 @@ const FoodScreen = () => {
   );
 };
 
+
+
+
 const styles = StyleSheet.create({
   container: { 
     flex: 1, 
@@ -72,6 +94,7 @@ const styles = StyleSheet.create({
     paddingHorizontal: 32,
     borderRadius: 4,
     elevation: 3,
+    backgroundColor: 'black',
     marginVertical: 10, 
   },
   buttonText: {
