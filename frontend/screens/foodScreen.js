@@ -1,5 +1,6 @@
 import React from 'react';
 import { View, Text, TouchableOpacity, StyleSheet } from 'react-native';
+<<<<<<< HEAD
 import { useTheme } from '../components/ThemeContext';
 
 const FoodScreen = ({ navigation }) => {
@@ -32,6 +33,26 @@ const FoodScreen = ({ navigation }) => {
     </View>
   );
 };
+=======
+
+const FoodScreen = ({ navigation }) => (
+  <View style={styles.container}>
+    <Text style={styles.header}>Select Meal Type</Text>
+    
+    <TouchableOpacity style={styles.button} onPress={() => navigation.navigate('Breakfast')}>
+      <Text style={styles.buttonText}>Breakfast</Text>
+    </TouchableOpacity>
+
+    <TouchableOpacity style={styles.button} onPress={() => navigation.navigate('Lunch')}>
+      <Text style={styles.buttonText}>Lunch</Text>
+    </TouchableOpacity>
+
+    <TouchableOpacity style={styles.button} onPress={() => navigation.navigate('Dinner')}>
+      <Text style={styles.buttonText}>Dinner</Text>
+    </TouchableOpacity>
+  </View>
+);
+>>>>>>> e6df97a7fe11095dfd7f3d64ea031cf26f772d4c
 
 const styles = StyleSheet.create({
   container: { 
@@ -43,7 +64,6 @@ const styles = StyleSheet.create({
     fontSize: 24, 
     marginTop: 40, 
     marginBottom: 20, 
-    fontWeight: 'bold' 
   },
   button: {
     alignItems: 'center',
@@ -51,11 +71,11 @@ const styles = StyleSheet.create({
     paddingVertical: 12,
     paddingHorizontal: 32,
     borderRadius: 4,
-    elevation: 3,
     backgroundColor: 'black',
     marginVertical: 10, 
   },
   buttonText: {
+    color: 'white',  
     fontSize: 18,    
   }
 });
