@@ -5,6 +5,7 @@ import { useTheme } from '../components/ThemeContext';
 import Checkbox from 'expo-checkbox';
 import { useNavigation } from '@react-navigation/native';
 import SettingsModal from '../components/SettingsModal';
+//import { application } from 'express';
 
 const MyScreen = () => {
   const navigation = useNavigation();
@@ -40,8 +41,34 @@ const MyScreen = () => {
     setUserData((prev) => ({ ...prev, [name]: value }));
   };
 
-  const handleSubmit = () => {
+  const handleSubmit = async() => {
     console.log('User Data:', userData);
+
+    try {
+      const response = await fetch('http://localhost:3000/add-user', {
+        method: 'POST', 
+        headers: { 
+          'content-type': 'application/json',
+        }, 
+        body: JSON.stringify({
+          knimi: userData.name,
+          ika: userData.age, 
+          paino: userData.weight,
+          pituus: userData.height,
+          aktiviteetti: userData.activityLevel === 'low' ? 1: userData.activityLevel === 'medium' ? 2: 3,
+          tyyppi: userData.dietType === 'balanced' ? 1 : userData.dietType === 'keto' ? 2 : 3, 
+          tavoite: userData.goal === 'lose' ? 1 : userData.goal === 'maintain' ? 2 : 3,
+        }),
+      })
+      if (response.ok) {
+        console.log('Successfully added')
+      } else {
+        console.log('Failed: ', response.status)
+      }
+      } catch(error) {
+        console.error('Error:', error)
+      
+    }
   };
 
   const setLog = () => {
@@ -207,8 +234,8 @@ const MyScreen = () => {
 
       </ScrollView>
     </View>
-  );
-};
+  
+       )}
 
 
 const styles = StyleSheet.create({
