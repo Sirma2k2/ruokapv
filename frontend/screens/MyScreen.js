@@ -62,11 +62,16 @@ const MyScreen = () => {
       })
       if (response.ok) {
         console.log('Successfully added')
+        alert('Käyttäjä lisätty onnistuneesti')
       } else {
         console.log('Failed: ', response.status)
+        alert('Virhe käyttäjän lisäämisessä')
+        
       }
       } catch(error) {
+        
         console.error('Error:', error)
+        
       
     }
   };
