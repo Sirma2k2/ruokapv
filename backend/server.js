@@ -44,6 +44,32 @@ app.post('/api/add-food', async (req, res) => {
     res.status(500).json({ error: 'Failed to add food to database' });
   }
 });
+app.get('/get-user', async( req,res)=> {
+  try {
+    const result = await pool.query('SELECT * FROM users')
+    res.json(result.rows)
+  } catch(err){
+    console.error('Query error', err)
+    res.status(500).send('database query failed')
+  }
+})
+
+app.post('/add-user', async(req,res) => {
+  const {knimi, ika, paino, pituus, aktiviteetti, tyyppi, tavoite } = req.body
+
+  if(!knimi || !ika || !paino || !pituus || !aktiviteetti || !tyyppi || !tavoite) {
+    return res.status(400).json({ error: 'something missing'})
+  }
+  try { 
+    const query = 'INSERT INTO users(knimi, ika, paino, pituus, aktiviteetti, tyyppi, tavoite) VALUES($1, $2, $3, $4, $5, $6, $7)'
+    const values = [knimi, ika, paino, pituus, aktiviteetti, tyyppi, tavoite || null]
+    await pool.query(query, values)
+    res.status(201).json({ message: 'user added successfully' })
+  } catch(err) {
+    console.error('Error inserting user to the database', err)
+    res.status(500).json({ error: 'Failed to add user to the database' })
+  }
+})
 
 // Palvelimen käynnistys
 app.listen(port, () => {
