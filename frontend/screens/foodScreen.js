@@ -3,6 +3,8 @@ import { View, Text, TouchableOpacity, StyleSheet } from 'react-native';
 import { useTheme } from '../components/ThemeContext'; // Import the useTheme hook
 
 const FoodScreen = ({ navigation }) => {
+
+
   const { theme } = useTheme(); // Access the theme from context
 
   return (
