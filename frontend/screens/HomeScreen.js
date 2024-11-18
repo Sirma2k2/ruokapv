@@ -4,25 +4,43 @@ import PieChart from '../components/PieChart'; // piechart.js josta tulee data
 import { useTheme } from '../components/ThemeContext'; 
 
 const HomeScreen = () => {
-  const [foodHistory, setFoodHistory] = useState([ // hardcoded 
-    { id: '1', name: 'Apple', amount: 150, calories: 80, date: '2024-11-01', color: '#FF6384' },
-    { id: '2', name: 'Chicken Breast', amount: 200, calories: 350, date: '2024-11-02', color: '#36A2EB' },
-    { id: '3', name: 'Rice', amount: 180, calories: 220, date: '2024-11-03', color: '#FFCE56' },
-    { id: '4', name: 'Salad', amount: 100, calories: 50, date: '2024-11-04', color: '#4BC0C0' },
-    { id: '5', name: 'Oatmeal', amount: 200, calories: 150, date: '2024-11-05', color: '#9966FF' },
-    { id: '6', name: 'Ham Pie', amount: 150, calories: 300, date: '2024-11-06', color: '#FF9F40' },
-    { id: '7', name: 'Chicken Pasta', amount: 250, calories: 400, date: '2024-11-07', color: 'green' },
-    { id: '8', name: 'Rye Bread', amount: 250, calories: 400, date: '2024-11-08', color: 'aqua' },
-    { id: '9', name: 'Steak', amount: 250, calories: 400, date: '2024-11-09', color: '#124123' },
-  ]);
-
+  const [foodHistory, setFoodHistory] = useState([]) // hardcoded 
   const [averageCalories, setAverageCalories] = useState(0);
+  const [totalCalories, setTotalCalories] = useState(0)
   const { theme } = useTheme();  // Access the theme from context
+
+  useEffect(() => {
+    const fetchFoodHistory = async () => {
+    try {
+      const response = await fetch ('http://localhost:3000/get-food')
+
+    if (response.ok){
+      const data = await response.json()
+      
+      const transformedData = data.map(item => ({
+        id: item.id || Math.random().toString(), // Generoi id, jos sitä ei ole
+        name: item.ruokanimi,
+        amount: item.maarag,
+        calories: item.kalorit
+      }));
+      setFoodHistory(transformedData);
+    } else {
+      console.error('Failed to fetch food history')
+    } 
+  }catch (error) {
+    console.error('Error fetching data', error)
+  }   
+  }
+  fetchFoodHistory();
+}, []);
+
+ 
 
   useEffect(() => {
     if (foodHistory.length > 0) {
       const totalCalories = foodHistory.reduce((sum, item) => sum + item.calories, 0);
       setAverageCalories(totalCalories / foodHistory.length);
+      setTotalCalories(totalCalories)
     }
   }, [foodHistory]);
 
@@ -44,6 +62,9 @@ const HomeScreen = () => {
       <Text style={[styles.averageText, { color: theme.text.color }]}>
         The calories of your average meal: {averageCalories.toFixed(2)} calories
       </Text>
+      <Text style={[styles.totalText, { color: theme.text.color}]}>
+        Total calories consumed: {totalCalories.toFixed(2)} calories {}
+      </Text>
       <Text style={[styles.pieTitle, { color: theme.text.color }]}>Your last five meals</Text>
       <PieChart data={foodHistory} />
     </View>
@@ -57,6 +78,7 @@ const styles = StyleSheet.create({
   subtitle: { fontSize: 20, marginVertical: 10, fontWeight: '600' },
   item: { padding: 10, borderBottomWidth: 1 },
   averageText: { marginTop: 20, fontSize: 18, fontWeight: 'bold' },
+  totalText: { marginTop: 10, fontSize: 18, fontWeight: 'bold'},
   pieTitle: { marginTop: 20, fontSize: 22, fontWeight: 'bold', textAlign: 'center' },
 });
 
