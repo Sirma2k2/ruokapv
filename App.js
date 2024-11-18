@@ -20,8 +20,6 @@ export default function App() {
   return (
     <NavigationContainer>
     <ThemeProvider>
-
-
       {Platform.OS === 'android' && <TaskBar />}
      <TapBar />
     </ThemeProvider >
