@@ -6,9 +6,9 @@ import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
 import HomeScreen from '../screens/HomeScreen'
 import foodScreen from '../screens/foodScreen'
 import Ionicons from "@expo/vector-icons/Ionicons"
-import FoodScreen from '../screens/foodScreen';
-import MyScreen from '../screens/MyScreen';
-import AppNavi from '../navigation/MyStack'
+import ProfileStack from '../navigation/ProfileStack';
+import FoodStack from '../navigation/FoodStack';
+
 
 
 
@@ -28,12 +28,12 @@ export default class TapBar extends Component {
             tabBarIcon: () => <Ionicons name='home' size={20} />
         }} 
         />
-        <Tab.Screen name="Food diary" component={foodScreen}
+        <Tab.Screen name="Food Diary" component={FoodStack}
         options={{
             tabBarIcon: () => <Ionicons name='fast-food' size={20} />
         }}
          />
-         <Tab.Screen name="Profile" component={AppNavi}
+         <Tab.Screen name="Profile" component={ProfileStack}
         options={{
             tabBarIcon: () => <Ionicons name='accessibility' size={20} />
         }}

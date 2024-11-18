@@ -2,9 +2,7 @@ import React from 'react';
 import { createNativeStackNavigator } from '@react-navigation/native-stack';
 import MyScreen from '../screens/MyScreen';  
 import NotesScreen from '../screens/NotesScreen'; 
-import BreakfastScreen from '../screens/BreakfastScreen'
-import DinnerScreen from '../screens/DinnerScreen' 
-import LunchScreen from '../screens/LunchScreen'
+
 
 
 
@@ -13,30 +11,14 @@ const Stack = createNativeStackNavigator();
 const MyStack = () => {
   return (
     <Stack.Navigator>
-      {/* Profile Screen (MyScreen) */}
+      {/* Profile Screen */}
       <Stack.Screen name="MyScreen" component={MyScreen}
        options={{ headerShown: false }} />
 
       {/* Notes Screen */}
       <Stack.Screen name="NotesScreen" component={NotesScreen}
       options={{ title: 'My notes' }} />
-      
-      <Stack.Screen 
-        name="Breakfast" component={BreakfastScreen}
-        options={{headerShown: false }}
-      />
-
-      <Stack.Screen 
-        name="Lunch" 
-        component={LunchScreen}
-        options={{headerShown: false  }}
-      />
-      <Stack.Screen 
-        name="Dinner" 
-        component={DinnerScreen}
-        options={{ headerShown: false  }}
-      />
-
+    
    
     </Stack.Navigator>
   )
