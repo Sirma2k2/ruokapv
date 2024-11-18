@@ -1,20 +1,21 @@
 import React, {useState} from 'react';
 import { View, Text, TouchableOpacity, StyleSheet } from 'react-native';
 import { useTheme } from '../components/ThemeContext'; // Import the useTheme hook
+import { Searchbar } from 'react-native-paper';
 
 const DinnerScreen = ({ navigation }) => {
   const { theme } = useTheme(); // Access the theme from context
  
   const [activeView, setActiveView] = useState('home');  
 
+  const [searchDinner, setSearchDinner] = React.useState('')
+
   
   const handleCreateMealPress = () => {
     setActiveView('createMeal');
   };
 
-  const handleAddFoodPress = () => {
-    setActiveView('addFood');
-  };
+;
 
   const handleBackToHome = () => {
     setActiveView('home');
@@ -26,19 +27,18 @@ const DinnerScreen = ({ navigation }) => {
       {activeView === 'home' && (
         <>
           <Text style={[styles.header, { color: theme.text.color }]}>Build Your dinner</Text>
+
+          <Searchbar
+            placeholder="Search food"
+            onChangeText={setSearchDinner}
+            value={searchDinner}
+                />
           
           <TouchableOpacity
             style={[styles.button, { backgroundColor: theme.buttonBackgroundColor }]}
             onPress={handleCreateMealPress} // This triggers the "Create meal" action
           >
             <Text style={[styles.buttonText, { color: theme.buttonText.color }]}>Create meal</Text>
-          </TouchableOpacity>
-
-          <TouchableOpacity
-            style={[styles.button, { backgroundColor: theme.buttonBackgroundColor }]}
-            onPress={handleAddFoodPress} // This triggers the "Add food" action
-          >
-            <Text style={[styles.buttonText, { color: theme.buttonText.color }]}>Add food</Text>
           </TouchableOpacity>
         </>
       )}
@@ -53,20 +53,6 @@ const DinnerScreen = ({ navigation }) => {
             onPress={handleBackToHome} // Go back to the main screen
           >
             <Text style={[styles.buttonText, { color: theme.buttonText.color }]}>Back to Menu</Text>
-          </TouchableOpacity>
-        </>
-      )}
-
-      {activeView === 'addFood' && (
-        <>
-          <Text style={[styles.header, { color: theme.text.color }]}>Add Food Items</Text>
-          {/* Here, you can render your form or UI for adding food */}
-          
-          <TouchableOpacity
-            style={[styles.button, { backgroundColor: theme.buttonBackgroundColor }]}
-            onPress={handleBackToHome} // Go back to the main screen
-          >
-            <Text style={[styles.buttonText, { color: theme.buttonText.color }]}>Go back</Text>
           </TouchableOpacity>
         </>
       )}

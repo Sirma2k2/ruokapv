@@ -1,25 +1,27 @@
 import React, { useState } from 'react';
-import { View, Text, TouchableOpacity, StyleSheet } from 'react-native';
+import { View, Text, TouchableOpacity, StyleSheet, Modal } from 'react-native';
 import { useTheme } from '../components/ThemeContext'; // Import the useTheme hook
+import { Searchbar } from 'react-native-paper';
 
 const BreakfastScreen = () => {
   const { theme } = useTheme(); // Access the theme from context
 
  
-  const [activeView, setActiveView] = useState('home');  
+  const [activeView, setActiveView] = useState('home')  
+  const [searchBreakfast, setSearchBreakfast] = React.useState('')
+ // const [modalVisible, setModalVisible] = useState(false)
 
   
   const handleCreateMealPress = () => {
     setActiveView('createMeal');
   };
 
-  const handleAddFoodPress = () => {
-    setActiveView('addFood');
-  };
+;
 
   const handleBackToHome = () => {
     setActiveView('home');
   };
+
 
   return (
     <View style={[styles.container, { backgroundColor: theme.container.backgroundColor }]}>
@@ -27,19 +29,19 @@ const BreakfastScreen = () => {
       {activeView === 'home' && (
         <>
           <Text style={[styles.header, { color: theme.text.color }]}>Build Your Breakfast</Text>
+
+          <Searchbar
+            placeholder="Search food"
+            onChangeText={setSearchBreakfast}
+            value={searchBreakfast}
+                />
+        
           
           <TouchableOpacity
             style={[styles.button, { backgroundColor: theme.buttonBackgroundColor }]}
             onPress={handleCreateMealPress} // This triggers the "Create meal" action
           >
             <Text style={[styles.buttonText, { color: theme.buttonText.color }]}>Create meal</Text>
-          </TouchableOpacity>
-
-          <TouchableOpacity
-            style={[styles.button, { backgroundColor: theme.buttonBackgroundColor }]}
-            onPress={handleAddFoodPress} // This triggers the "Add food" action
-          >
-            <Text style={[styles.buttonText, { color: theme.buttonText.color }]}>Add food</Text>
           </TouchableOpacity>
         </>
       )}
@@ -58,19 +60,6 @@ const BreakfastScreen = () => {
         </>
       )}
 
-      {activeView === 'addFood' && (
-        <>
-          <Text style={[styles.header, { color: theme.text.color }]}>Add Food Items</Text>
-          {/* Here, you can render your form or UI for adding food */}
-          
-          <TouchableOpacity
-            style={[styles.button, { backgroundColor: theme.buttonBackgroundColor }]}
-            onPress={handleBackToHome} // Go back to the main screen
-          >
-            <Text style={[styles.buttonText, { color: theme.buttonText.color }]}>Go back</Text>
-          </TouchableOpacity>
-        </>
-      )}
     </View>
   )
 }
@@ -97,7 +86,19 @@ const styles = StyleSheet.create({
   },
   buttonText: {
     fontSize: 18,    
-  }
+  },
+  modalContent: {
+    backgroundColor: 'white',
+    padding: 20,
+    marginHorizontal: 20,
+    borderRadius: 10,
+  },
+  modalContent: {
+    backgroundColor: 'white',
+    padding: 20,
+    marginHorizontal: 20,
+    borderRadius: 10,
+  },
 })
 
 export default BreakfastScreen;
