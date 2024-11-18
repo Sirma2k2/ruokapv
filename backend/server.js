@@ -71,6 +71,16 @@ app.post('/add-user', async(req,res) => {
   }
 })
 
+app.get('/get-food', async(req,res)=> {
+  try { 
+    const result = await pool.query('SELECT ruokanimi, maarag, kalorit FROM ruoka')
+    res.json(result.rows)
+
+  } catch (error) {
+    console.error('Error fetching data', error)
+    res.status(500).send('Error fetching data')
+  }
+})
 // Palvelimen käynnistys
 app.listen(port, () => {
   console.log(`Server is running at http://localhost:${port}`);
