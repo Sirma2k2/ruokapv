@@ -14,3 +14,27 @@ export function useData () {
 
     return { getData, saveData }
 }
+
+
+
+async function storeData() { // Tallennus
+    try {
+      await AsyncStorage.setItem('user',
+         JSON.stringify({ name: 'John', age: 30 }));
+      console.log('Data tallennettu');
+    } catch (error) {
+      console.error('Virhe tallennuksessa:', error);
+    }}
+  
+  async function readData() { // Lukeminen
+    try {
+      const value = await AsyncStorage.getItem('user');
+      if (value !== null) {
+        const user = JSON.parse(value);
+        console.log('Tallennettu käyttäjä:', user);
+      } else {
+        console.log('Ei dataa löytynyt');
+      }
+    } catch (error) {
+      console.error('Virhe lukemisessa:', error);
+    }}

@@ -1,5 +1,5 @@
-import React, { useState } from 'react';
-import { View, Text, TouchableOpacity, StyleSheet } from 'react-native';
+import React, { useState, useEffect } from 'react';
+import { View, Text, TouchableOpacity, StyleSheet, FlatList } from 'react-native';
 import { useTheme } from '../components/ThemeContext'; 
 import { Searchbar } from 'react-native-paper';
 
@@ -7,6 +7,28 @@ const LunchScreen = () => {
   const { theme } = useTheme(); // Access the theme from context
   const [activeTab, setActiveTab] = useState('addFood'); // Track the active tab
   const [searchLunch, setSearchLunch] = useState(''); // State for the search bar
+
+
+  const [previousMeals, setPreviousMeals] = useState([]);
+
+  const getPreviousMeals = async () => {
+    try {
+      const response = await fetch('http://localhost:3000/get-food');
+      if (response.ok) {
+        const data = await response.json();
+        setPreviousMeals(data);
+      } else {
+        console.error('Failed to fetch food history');
+      }
+    } catch (error) {
+      console.error('Error fetching data', error);
+    }
+  }
+
+  // Fetch previous meals when the component mounts
+  useEffect(() => {
+    getPreviousMeals();
+  }, []);
 
   return (
     <View style={[styles.container, { backgroundColor: theme.container.backgroundColor }]}>
@@ -48,11 +70,28 @@ const LunchScreen = () => {
         </>
       )}
 
+
+
+
+
       {activeTab === 'createMeal' && (
         <>
+
           <Text style={[styles.header, { color: theme.text.color }]}>Create Your Meal</Text>
           {/* Add your form or additional UI for meal creation here */}
-          <Text style={{ color: theme.text.color }}>Form or UI for creating a meal goes here</Text>
+          
+          <FlatList
+          data={previousMeals}
+          keyExtractor={(item) => item.id.toString()}
+          renderItem={({ item }) => (
+            <View style={styles.mealItem}>
+              <Text style={styles.mealText}>{item.name}</Text>
+            </View>
+          )}
+          >
+
+          </FlatList>
+
         </>
       )}
     </View>
