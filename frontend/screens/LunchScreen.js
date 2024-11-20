@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { View, Text, TouchableOpacity, StyleSheet, FlatList } from 'react-native';
+import { View, Text, TouchableOpacity, StyleSheet, Modal, FlatList } from 'react-native';
 import { useTheme } from '../components/ThemeContext'; 
 import { ActivityIndicator, Searchbar } from 'react-native-paper';
 
@@ -7,43 +7,44 @@ const LunchScreen = () => {
   const { theme } = useTheme(); // Access the theme from context
   const [activeTab, setActiveTab] = useState('addFood'); // Track the active tab
   const [searchLunch, setSearchLunch] = useState(''); // State for the search bar
-  const [foodResults, setFoodResults] = useState([])
-  const [loading, setLoading] = useState(false)
-  const [error, setError] = useState('')
+  const [modalVisible, setModalVisible] = useState(false); // For Modal visibility
 
+  // States for food results, loading, and error handling
+  const [foodResults, setFoodResults] = useState([]);
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState('');
 
-
+  // Fetch food data based on search query
   const searchFood = async (query) => {
-    if (!query) return
-    setLoading(true)
-    setError('')
+    if (!query) return;
+    setLoading(true);
+    setError('');
 
     try {
-      const response = await fetch(`http://localhost:3000/api/searchFood?query=${query}`)
-
+      const response = await fetch(`http://localhost:3000/api/searchFood?query=${query}`);
       if (response.ok) {
-        const data = await response.json()
-        setFoodResults(data)
+        const data = await response.json();
+        setFoodResults(data);
       } else {
-        setError('No products found')
+        setError('No products found');
       }
-      setLoading(false)
+      setLoading(false);
     } catch (error) {
-      setError('Failed to fetch food data')
-      setLoading(false)
+      setError('Failed to fetch food data');
+      setLoading(false);
     }
-  }
+  };
+
   useEffect(() => {
     if (searchLunch.length > 2) {
-      searchFood(searchLunch)
+      searchFood(searchLunch);
     } else {
-      setFoodResults([])
+      setFoodResults([]);
     }
-  }, [searchLunch])
+  }, [searchLunch]);
 
-
+  // State and logic to fetch previous meals
   const [previousMeals, setPreviousMeals] = useState([]);
-
   const getPreviousMeals = async () => {
     try {
       const response = await fetch('http://localhost:3000/get-food');
@@ -56,9 +57,8 @@ const LunchScreen = () => {
     } catch (error) {
       console.error('Error fetching data', error);
     }
-  }
+  };
 
-  // Fetch previous meals when the component mounts
   useEffect(() => {
     getPreviousMeals();
   }, []);
@@ -101,6 +101,34 @@ const LunchScreen = () => {
             value={searchLunch}
           />
           
+          {/* Modal for showing nutrition info */}
+          <TouchableOpacity
+            style={styles.openModalButton}
+            onPress={() => setModalVisible(true)}
+          >
+            <Text style={styles.buttonText}>Show Nutrition Info</Text>
+          </TouchableOpacity>
+
+          {/* Modal */}
+          <Modal
+            animationType="slide"
+            transparent={true}
+            visible={modalVisible}
+            onRequestClose={() => setModalVisible(!modalVisible)}
+          >
+            <View style={styles.modalOverlay}>
+              <View style={styles.modalContent}>
+                <Text style={styles.modalText}>...</Text>
+                <TouchableOpacity
+                  style={styles.closeModalButton}
+                  onPress={() => setModalVisible(false)}
+                >
+                  <Text style={styles.buttonText}>Save food</Text>
+                </TouchableOpacity>
+              </View>
+            </View>
+          </Modal>
+          
           {/* Show loading indicator */}
           {loading && <ActivityIndicator size="large" color="#ff0" />}
 
@@ -109,9 +137,9 @@ const LunchScreen = () => {
 
           {/* Display the search results */}
           <FlatList
-          data={foodResults}
-          keyExtractor={(item, index) => index.toString()}
-          renderItem={({ item }) => (
+            data={foodResults}
+            keyExtractor={(item, index) => index.toString()}
+            renderItem={({ item }) => (
               <View style={styles.foodItem}>
                 <Text style={{ color: theme.text.color }}>
                   {item.product_name || 'No name'}
@@ -128,28 +156,19 @@ const LunchScreen = () => {
         </>
       )}
 
-
-
-
-
       {activeTab === 'createMeal' && (
         <>
-
           <Text style={[styles.header, { color: theme.text.color }]}>Create Your Meal</Text>
-          {/* Add your form or additional UI for meal creation here */}
-          
+          {/* Render previous meals */}
           <FlatList
-          data={previousMeals}
-          keyExtractor={(item) => item.id.toString()}
-          renderItem={({ item }) => (
-            <View style={styles.mealItem}>
-              <Text style={styles.mealText}>{item.name}</Text>
-            </View>
-          )}
-          >
-
-          </FlatList>
-
+            data={previousMeals}
+            keyExtractor={(item) => item.id.toString()}
+            renderItem={({ item }) => (
+              <View style={styles.mealItem}>
+                <Text style={styles.mealText}>{item.name}</Text>
+              </View>
+            )}
+          />
         </>
       )}
     </View>
@@ -194,6 +213,49 @@ const styles = StyleSheet.create({
     fontWeight: 'bold',
     textAlign: 'center',
   },
+
+  searchBar: {
+    marginHorizontal: 20,
+    marginBottom: 20,
+    width: '90%',
+  },
+  openModalButton: {
+    backgroundColor: '#007AFF',
+    padding: 10,
+    borderRadius: 5,
+    alignItems: 'center',
+    marginBottom: 20,
+  },
+  closeModalButton: {
+    backgroundColor: '#FF3B30',
+    padding: 10,
+    borderRadius: 5,
+    alignItems: 'center',
+    marginTop: 20,
+  },
+  buttonText: {
+    color: '#fff',
+    fontWeight: 'bold',
+  },
+  modalOverlay: {
+    flex: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
+    backgroundColor: 'rgba(0, 0, 0, 0.5)',
+  },
+  modalContent: {
+    backgroundColor: 'white',
+    padding: 20,
+    borderRadius: 10,
+    alignItems: 'center',
+    width: '80%',
+  },
+  modalText: {
+    fontSize: 18,
+    marginBottom: 15,
+    textAlign: 'center',
+  },
+
   foodItem: {
     borderWidth: 1,
     borderColor: 'gray',
@@ -202,7 +264,18 @@ const styles = StyleSheet.create({
     marginVertical: 5,
     width: '80%',
     backgroundColor: '#f0f0f0',
-  }
+  },
+  mealItem: {
+    padding: 10,
+    marginVertical: 5,
+    backgroundColor: '#e9e9e9',
+    borderRadius: 5,
+    width: '80%',
+  },
+  mealText: {
+    fontSize: 16,
+    color: '#333',
+  },
 });
 
 export default LunchScreen;
