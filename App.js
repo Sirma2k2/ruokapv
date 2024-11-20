@@ -12,6 +12,7 @@ import { ThemeProvider, useTheme } from './frontend/components/ThemeContext'; //
 
 
 
+
 export default function App() {
 
 
@@ -19,8 +20,6 @@ export default function App() {
   return (
     <NavigationContainer>
     <ThemeProvider>
-
-
       {Platform.OS === 'android' && <TaskBar />}
      <TapBar />
     </ThemeProvider >
