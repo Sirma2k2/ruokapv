@@ -1,13 +1,67 @@
-import React, { useState } from 'react';
-import { View, Text, TouchableOpacity, StyleSheet, Modal } from 'react-native';
+import React, { useEffect, useState } from 'react';
+import { View, Text, TouchableOpacity, StyleSheet, Modal, FlatList } from 'react-native';
 import { useTheme } from '../components/ThemeContext'; 
-import { Searchbar } from 'react-native-paper';
+import { ActivityIndicator, Searchbar } from 'react-native-paper';
 
 const LunchScreen = () => {
   const { theme } = useTheme(); // Access the theme from context
   const [activeTab, setActiveTab] = useState('addFood'); // Track the active tab
   const [searchLunch, setSearchLunch] = useState(''); // State for the search bar
-  const [modalVisible, setModalVisible] = useState(false)
+  const [modalVisible, setModalVisible] = useState(false); // For Modal visibility
+
+  // States for food results, loading, and error handling
+  const [foodResults, setFoodResults] = useState([]);
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState('');
+
+  // Fetch food data based on search query
+  const searchFood = async (query) => {
+    if (!query) return;
+    setLoading(true);
+    setError('');
+
+    try {
+      const response = await fetch(`http://localhost:3000/api/searchFood?query=${query}`);
+      if (response.ok) {
+        const data = await response.json();
+        setFoodResults(data);
+      } else {
+        setError('No products found');
+      }
+      setLoading(false);
+    } catch (error) {
+      setError('Failed to fetch food data');
+      setLoading(false);
+    }
+  };
+
+  useEffect(() => {
+    if (searchLunch.length > 2) {
+      searchFood(searchLunch);
+    } else {
+      setFoodResults([]);
+    }
+  }, [searchLunch]);
+
+  // State and logic to fetch previous meals
+  const [previousMeals, setPreviousMeals] = useState([]);
+  const getPreviousMeals = async () => {
+    try {
+      const response = await fetch('http://localhost:3000/get-food');
+      if (response.ok) {
+        const data = await response.json();
+        setPreviousMeals(data);
+      } else {
+        console.error('Failed to fetch food history');
+      }
+    } catch (error) {
+      console.error('Error fetching data', error);
+    }
+  };
+
+  useEffect(() => {
+    getPreviousMeals();
+  }, []);
 
   return (
     <View style={[styles.container, { backgroundColor: theme.container.backgroundColor }]}>
@@ -46,11 +100,13 @@ const LunchScreen = () => {
             onChangeText={setSearchLunch}
             value={searchLunch}
           />
-           <TouchableOpacity
+          
+          {/* Modal for showing nutrition info */}
+          <TouchableOpacity
             style={styles.openModalButton}
             onPress={() => setModalVisible(true)}
           >
-            <Text style={styles.buttonText}>show nutritions </Text>
+            <Text style={styles.buttonText}>Show Nutrition Info</Text>
           </TouchableOpacity>
 
           {/* Modal */}
@@ -58,10 +114,7 @@ const LunchScreen = () => {
             animationType="slide"
             transparent={true}
             visible={modalVisible}
-            onRequestClose={() => {
-              Alert.alert('Modal has been closed.');
-              setModalVisible(!modalVisible);
-            }}
+            onRequestClose={() => setModalVisible(!modalVisible)}
           >
             <View style={styles.modalOverlay}>
               <View style={styles.modalContent}>
@@ -75,14 +128,47 @@ const LunchScreen = () => {
               </View>
             </View>
           </Modal>
+          
+          {/* Show loading indicator */}
+          {loading && <ActivityIndicator size="large" color="#ff0" />}
+
+          {/* Show error message if there is one */}
+          {error && <Text style={{ color: 'red' }}>{error}</Text>}
+
+          {/* Display the search results */}
+          <FlatList
+            data={foodResults}
+            keyExtractor={(item, index) => index.toString()}
+            renderItem={({ item }) => (
+              <View style={styles.foodItem}>
+                <Text style={{ color: theme.text.color }}>
+                  {item.product_name || 'No name'}
+                </Text>
+                <Text style={{ color: theme.text.color }}>
+                  {item.brands || 'No brand'}
+                </Text>
+                <Text style={{ color: theme.text.color }}>
+                  Quantity: {item.quantity || 'N/A'}
+                </Text>
+              </View>
+            )}
+          />
         </>
       )}
 
       {activeTab === 'createMeal' && (
         <>
           <Text style={[styles.header, { color: theme.text.color }]}>Create Your Meal</Text>
-          {/* Add your form or additional UI for meal creation here */}
-          <Text style={{ color: theme.text.color }}>Form or UI for creating a meal goes here</Text>
+          {/* Render previous meals */}
+          <FlatList
+            data={previousMeals}
+            keyExtractor={(item) => item.id.toString()}
+            renderItem={({ item }) => (
+              <View style={styles.mealItem}>
+                <Text style={styles.mealText}>{item.name}</Text>
+              </View>
+            )}
+          />
         </>
       )}
     </View>
@@ -127,6 +213,7 @@ const styles = StyleSheet.create({
     fontWeight: 'bold',
     textAlign: 'center',
   },
+
   searchBar: {
     marginHorizontal: 20,
     marginBottom: 20,
@@ -167,6 +254,27 @@ const styles = StyleSheet.create({
     fontSize: 18,
     marginBottom: 15,
     textAlign: 'center',
+  },
+
+  foodItem: {
+    borderWidth: 1,
+    borderColor: 'gray',
+    borderRadius: 5,
+    padding: 10,
+    marginVertical: 5,
+    width: '80%',
+    backgroundColor: '#f0f0f0',
+  },
+  mealItem: {
+    padding: 10,
+    marginVertical: 5,
+    backgroundColor: '#e9e9e9',
+    borderRadius: 5,
+    width: '80%',
+  },
+  mealText: {
+    fontSize: 16,
+    color: '#333',
   },
 });
 

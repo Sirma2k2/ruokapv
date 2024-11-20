@@ -2,6 +2,8 @@ import React, { useState, useEffect } from 'react';
 import { View, Text, FlatList, StyleSheet, ScrollView } from 'react-native';
 import PieChart from '../components/PieChart'; // piechart.js josta tulee data
 import { useTheme } from '../components/ThemeContext'; 
+import Ionicons from 'react-native-vector-icons/Ionicons';
+
 
 const HomeScreen = () => {
   const [foodHistory, setFoodHistory] = useState([]) // hardcoded 
@@ -45,30 +47,39 @@ const HomeScreen = () => {
   }, [foodHistory]);
 
   return (
-    <ScrollView>
     <View style={[styles.container, { backgroundColor: theme.container.backgroundColor }]}>
       <Text style={[styles.subtitle, { color: theme.text.color }]}>Meal diary</Text>
-      <FlatList
-        data={foodHistory}
-        keyExtractor={(item) => item.id}
-        renderItem={({ item }) => (
-          <View style={[styles.item, { borderBottomColor: theme.borderColor }]}>
-            <Text style={{ color: theme.text.color }}>
-              {item.date}: {item.name}, {item.amount}g, {item.calories} calories
-            </Text>
-          </View>
-        )}
-      />
-      <Text style={[styles.averageText, { color: theme.text.color }]}>
-        The calories of your average meal: {averageCalories.toFixed(2)} calories
-      </Text>
-      <Text style={[styles.totalText, { color: theme.text.color}]}>
-        Total calories consumed: {totalCalories.toFixed(2)} calories {}
-      </Text>
-      <Text style={[styles.pieTitle, { color: theme.text.color }]}>Your last five meals</Text>
-      <PieChart data={foodHistory} />
+      {foodHistory.length === 0 ? (
+        <View style={styles.emptyContainer}>
+          <Text style={[styles.emptyText, { color: theme.text.color }]}>
+            Oops, nothing added yet. Go to the diary to get started on your journey! 
+            <Ionicons name="arrow-forward" size={30} color={theme.text.color} />
+          </Text>
+        </View>
+      ) : (
+        <ScrollView>
+          <FlatList
+            data={foodHistory}
+            keyExtractor={(item) => item.id}
+            renderItem={({ item }) => (
+              <View style={[styles.item, { borderBottomColor: theme.borderColor }]}>
+                <Text style={{ color: theme.text.color }}>
+                  {item.date}: {item.name}, {item.amount}g, {item.calories} calories
+                </Text>
+              </View>
+            )}
+          />
+          <Text style={[styles.averageText, { color: theme.text.color }]}>
+            The calories of your average meal: {averageCalories.toFixed(2)} calories
+          </Text>
+          <Text style={[styles.totalText, { color: theme.text.color}]}>
+            Total calories consumed: {totalCalories.toFixed(2)} calories {}
+          </Text>
+          <Text style={[styles.pieTitle, { color: theme.text.color }]}>Your last five meals</Text>
+          <PieChart data={foodHistory} />
+        </ScrollView>
+      )}
     </View>
-    </ScrollView>
   );
 };
 
@@ -80,6 +91,8 @@ const styles = StyleSheet.create({
   averageText: { marginTop: 20, fontSize: 18, fontWeight: 'bold' },
   totalText: { marginTop: 10, fontSize: 18, fontWeight: 'bold'},
   pieTitle: { marginTop: 20, fontSize: 22, fontWeight: 'bold', textAlign: 'center' },
+  emptyContainer: { flex: 1, justifyContent: 'center', alignItems: 'center', marginTop: 20 },
+  emptyText: { fontSize: 18, fontWeight: 'bold', textAlign: 'center' },
 });
 
 export default HomeScreen;
