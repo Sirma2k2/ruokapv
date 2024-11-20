@@ -18,14 +18,10 @@ export default class TapBar extends Component {
                     tabBarShowLabel: true,
                     tabBarActiveTintColor: "blue",
                     headerStyle: {
-                        height: 30, 
-                        justifyContent: 'center',
-                        alignItems: 'center',
+                        height: 30,         
                     },
                     headerTitleStyle: {
                         fontSize: 13,
-                        justifyContent: 'center',
-                        alignItems: 'center',
                     },
             }}>
                 <Tab.Screen name="Home" component={HomeScreen}
