@@ -41,6 +41,28 @@ const LunchScreen = () => {
     }
   }, [searchLunch])
 
+
+  const [previousMeals, setPreviousMeals] = useState([]);
+
+  const getPreviousMeals = async () => {
+    try {
+      const response = await fetch('http://localhost:3000/get-food');
+      if (response.ok) {
+        const data = await response.json();
+        setPreviousMeals(data);
+      } else {
+        console.error('Failed to fetch food history');
+      }
+    } catch (error) {
+      console.error('Error fetching data', error);
+    }
+  }
+
+  // Fetch previous meals when the component mounts
+  useEffect(() => {
+    getPreviousMeals();
+  }, []);
+
   return (
     <View style={[styles.container, { backgroundColor: theme.container.backgroundColor }]}>
       {/* Top Tab Bar */}
@@ -106,11 +128,28 @@ const LunchScreen = () => {
         </>
       )}
 
+
+
+
+
       {activeTab === 'createMeal' && (
         <>
+
           <Text style={[styles.header, { color: theme.text.color }]}>Create Your Meal</Text>
           {/* Add your form or additional UI for meal creation here */}
-          <Text style={{ color: theme.text.color }}>Form or UI for creating a meal goes here</Text>
+          
+          <FlatList
+          data={previousMeals}
+          keyExtractor={(item) => item.id.toString()}
+          renderItem={({ item }) => (
+            <View style={styles.mealItem}>
+              <Text style={styles.mealText}>{item.name}</Text>
+            </View>
+          )}
+          >
+
+          </FlatList>
+
         </>
       )}
     </View>
