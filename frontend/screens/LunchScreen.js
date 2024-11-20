@@ -1,12 +1,45 @@
-import React, { useState } from 'react';
-import { View, Text, TouchableOpacity, StyleSheet } from 'react-native';
+import React, { useEffect, useState } from 'react';
+import { View, Text, TouchableOpacity, StyleSheet, FlatList } from 'react-native';
 import { useTheme } from '../components/ThemeContext'; 
-import { Searchbar } from 'react-native-paper';
+import { ActivityIndicator, Searchbar } from 'react-native-paper';
 
 const LunchScreen = () => {
   const { theme } = useTheme(); // Access the theme from context
   const [activeTab, setActiveTab] = useState('addFood'); // Track the active tab
   const [searchLunch, setSearchLunch] = useState(''); // State for the search bar
+  const [foodResults, setFoodResults] = useState([])
+  const [loading, setLoading] = useState(false)
+  const [error, setError] = useState('')
+
+
+
+  const searchFood = async (query) => {
+    if (!query) return
+    setLoading(true)
+    setError('')
+
+    try {
+      const response = await fetch(`http://localhost:3000/api/searchFood?query=${query}`)
+
+      if (response.ok) {
+        const data = await response.json()
+        setFoodResults(data)
+      } else {
+        setError('No products found')
+      }
+      setLoading(false)
+    } catch (error) {
+      setError('Failed to fetch food data')
+      setLoading(false)
+    }
+  }
+  useEffect(() => {
+    if (searchLunch.length > 2) {
+      searchFood(searchLunch)
+    } else {
+      setFoodResults([])
+    }
+  }, [searchLunch])
 
   return (
     <View style={[styles.container, { backgroundColor: theme.container.backgroundColor }]}>
@@ -44,6 +77,31 @@ const LunchScreen = () => {
             placeholder="Search food"
             onChangeText={setSearchLunch}
             value={searchLunch}
+          />
+          
+          {/* Show loading indicator */}
+          {loading && <ActivityIndicator size="large" color="#ff0" />}
+
+          {/* Show error message if there is one */}
+          {error && <Text style={{ color: 'red' }}>{error}</Text>}
+
+          {/* Display the search results */}
+          <FlatList
+          data={foodResults}
+          keyExtractor={(item, index) => index.toString()}
+          renderItem={({ item }) => (
+              <View style={styles.foodItem}>
+                <Text style={{ color: theme.text.color }}>
+                  {item.product_name || 'No name'}
+                </Text>
+                <Text style={{ color: theme.text.color }}>
+                  {item.brands || 'No brand'}
+                </Text>
+                <Text style={{ color: theme.text.color }}>
+                  Quantity: {item.quantity || 'N/A'}
+                </Text>
+              </View>
+            )}
           />
         </>
       )}
@@ -97,6 +155,15 @@ const styles = StyleSheet.create({
     fontWeight: 'bold',
     textAlign: 'center',
   },
+  foodItem: {
+    borderWidth: 1,
+    borderColor: 'gray',
+    borderRadius: 5,
+    padding: 10,
+    marginVertical: 5,
+    width: '80%',
+    backgroundColor: '#f0f0f0',
+  }
 });
 
 export default LunchScreen;
