@@ -14,6 +14,29 @@ const port = 3000;
 app.use(cors());
 app.use(express.json());
 
+
+
+app.get('/api/searchFood', async (req, res) => {
+  const query = req.query.query;
+
+  if (!query) {
+    return res.status(400).send({ error: 'Query parameter is required' });
+  }
+
+  try {
+    const response = await fetch(`https://world.openfoodfacts.org/cgi/search.pl?search_terms=${query}&search_simple=1&action=process&json=1`);
+    const data = await response.json();
+    
+    if (data.products) {
+      res.json(data.products); // Lähetetään hakutulokset takaisin frontendille
+    } else {
+      res.status(404).send({ error: 'No products found' });
+    }
+  } catch (error) {
+    res.status(500).send({ error: 'Failed to fetch food data' });
+  }
+});
+
 // API-reitti, joka hakee tietoja tietokannasta
 app.get('/api/ruokadata', async (req, res) => {
   try {
