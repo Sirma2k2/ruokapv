@@ -98,16 +98,19 @@ const NotesScreen = () => {
       <TextInput
         value={description}
         onChangeText={(text) => setDescription(text)}
-        multiline
         style={[styles.input, styles.descriptionInput]}
         theme={{ colors: { background: '#e0e0e0' } }}
       />
 
-      {/* Save Button */}
-      <Button style={styles.button} title="Add Note" onPress={addNote} />
+    {/* Save Button */}
+    <TouchableOpacity style={styles.button} onPress={addNote}>
+        <Text style={styles.buttonText}>Add Note</Text>
+    </TouchableOpacity>
 
-      {/* View Saved Notes Button */}
-      <Button title="View Saved Notes" onPress={toggleModal} />
+    {/* View Saved Notes Button */}
+    <TouchableOpacity style={styles.button} onPress={toggleModal}>
+        <Text style={styles.buttonText}>View Saved Notes</Text>
+    </TouchableOpacity>
 
       {/* Notes Modal */}
       <Modal
@@ -126,10 +129,12 @@ const NotesScreen = () => {
                   <Text style={styles.noteText}>Title: {note.title}</Text>
                   <Text style={styles.noteText}>Description: {note.description}</Text>
                   <Text style={styles.noteText}>Date: {note.date}</Text>
-                  <Button
-                    title="Delete note"
+                  <TouchableOpacity
+                    style={styles.button}
                     onPress={() => deleteNote(index)}
-                  />
+                  >
+                    <Text style={styles.buttonText}>delete note</Text>
+                    </TouchableOpacity>
                 </View>
               ))
             ) : (
@@ -137,7 +142,9 @@ const NotesScreen = () => {
             )}
 
             {/* Close Modal Button */}
-            <Button title="Close" onPress={toggleModal} />
+            <TouchableOpacity style={styles.button} onPress={toggleModal}>
+        <Text style={styles.buttonText}>Close</Text>
+            </TouchableOpacity>
           </View>
         </View>
       </Modal>
@@ -168,7 +175,14 @@ const styles = StyleSheet.create({
     height: 100,
   },
   button: {
-    marginTop: 10,
+    alignItems: 'center',
+    justifyContent: 'center',
+    paddingVertical: 12,
+    paddingHorizontal: 32,
+    borderRadius: 4,
+    marginVertical: 10,
+    borderWidth: 2, 
+    borderColor: 'blue',
   },
   modalOverlay: {
     flex: 1,
