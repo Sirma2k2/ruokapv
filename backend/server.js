@@ -3,6 +3,7 @@ const cors = require('cors'); // Varmista, että tuodaan cors
 
 const pool = require('./database'); // Tuodaan tietokantayhteys
 const dotenv = require('dotenv');
+const ax = require('axios');
 
 dotenv.config();
 
@@ -70,6 +71,28 @@ app.post('/add-user', async(req,res) => {
     res.status(500).json({ error: 'Failed to add user to the database' })
   }
 })
+
+
+app.get('/search/:keyword', async (req, res) => {
+  const { keyword } = req.params;
+  try {
+      const response = await ax.get(`${"https://www.themealdb.com/api/json/v1/1"}/search.php?s=${keyword}`);
+      
+      console.log(response.data);
+
+      if (response.data.meals && response.data.meals.length > 0) {
+          const meal = response.data.meals[0];
+          res.json({
+              strMeal: meal.strMeal,
+              strMealThumb: meal.strMealThumb
+          });
+      } else {
+          res.status(404).json({ message: "No meals found for this keyword." + keyword });
+      }
+  } catch (error) {
+      res.status(500).json({ message: "Failed to fetch meals by keyword", error: error.message });
+  }
+});
 
 app.get('/get-food', async(req,res)=> {
   try { 
