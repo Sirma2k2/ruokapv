@@ -124,7 +124,7 @@ const DinnerScreen = () => {
                 {item.product_name || 'No name'}
               </Text>
               <Text style={{ color:theme.text.color}}>
-                {item.brand || 'No brand'}
+                {item.brands || 'No brand'}
               </Text>
               <Text style={{ color:theme.text.color}}>
                 Määrä: {item.quantity || 'N/A' }
