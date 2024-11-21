@@ -1,13 +1,46 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { View, Text, TouchableOpacity, StyleSheet, Modal, Alert } from 'react-native';
 import { useTheme } from '../components/ThemeContext'; // Import the useTheme hook
-import { Searchbar } from 'react-native-paper';
+import { ActivityIndicator, Searchbar } from 'react-native-paper';
+import { FlatList } from 'react-native-web';
 
 const BreakfastScreen = () => {
   const { theme } = useTheme(); // Access the theme from context
   const [activeTab, setActiveTab] = useState('addFood'); // Track the active tab
   const [searchBreakfast, setSearchBreakfast] = useState(''); // State for the search bar
   const [modalVisible, setModalVisible] = useState(false)
+  
+  const [foodResults, setFoodResults] = useState([])
+  const [loading, setLoading] = useState(false)
+  const [error, setError] = useState('')
+
+  const searchFood = async (query) => {
+    if (!query) return;
+    setLoading(true);
+    setError('');
+
+    try {
+      const response = await fetch(`http://localhost:3000/api/searchFood?query=${query}`);
+      if (response.ok) {
+        const data = await response.json();
+        setFoodResults(data);
+      } else {
+        setError('No products found');
+      }
+      setLoading(false);
+    } catch (error) {
+      setError('Failed to fetch food data');
+      setLoading(false);
+    }
+  };
+
+  useEffect(() => {
+    if (searchBreakfast.length > 2) {
+      searchFood(searchBreakfast);
+    } else {
+      setFoodResults([]);
+    }
+  }, [searchBreakfast]);
 
   return (
     <View style={[styles.container, { backgroundColor: theme.container.backgroundColor }]}>
@@ -76,6 +109,42 @@ const BreakfastScreen = () => {
               </View>
             </View>
           </Modal>
+
+          { /*show loading indicator*/}
+          {loading && <ActivityIndicator size="large" color="#ff0"/> } 
+          {/* Show error message if there is one */}
+          {error && <Text style={{color: 'red'}}>{error}</Text>}
+
+          { /*display the search results*/}
+          <FlatList
+          data={foodResults}
+          keyExtractor={(item, index) => index.toString()}
+          renderItem={({ item}) => (
+            <View style={styles.foodItem}>
+              <Text style={{ color:theme.text.color}}>
+                {item.product_name || 'No name'}
+              </Text>
+              <Text style={{ color:theme.text.color}}>
+                {item.brands || 'No brand'}
+              </Text>
+              <Text style={{ color:theme.text.color}}>
+                Määrä: {item.quantity || 'N/A' }
+              </Text>
+              <Text style={{ color:theme.text.color}}>
+                Proteiini:{item.nutriments?.proteins_100g || 'N/A' } g
+              </Text>
+              <Text style={{color:theme.text.color}}>
+                Hiilihydraatit: {item.nutriments?.carbohydrates_100g || 'N/A'} g
+              </Text>
+              <Text style={{color:theme.text.color}} >
+                Rasva: {item.nutriments?.fat_100g || 'N/A'} g
+              </Text>
+              <Text style={{color:theme.text.color}} >
+                Kalorit: {item.nutriments?.["energy-kcal_100g"] || 'N/A'} g
+              </Text>
+              </View>
+          )}
+          />
         </>
       )}
 
@@ -169,6 +238,26 @@ const styles = StyleSheet.create({
     marginBottom: 15,
     textAlign: 'center',
   },
+  foodItem: {
+    borderWidth: 1,
+    borderColor: 'gray',
+    borderRadius: 5,
+    padding: 10,
+    marginVertical: 5,
+    width: '80%',
+    backgroundColor: '#f0f0f0',
+  },
+  mealItem: {
+    padding: 10,
+    marginVertical: 5,
+    backgroundColor: '#e9e9e9',
+    borderRadius: 5,
+    width: '80%',
+  },
+  mealText: {
+    fontSize: 16,
+    color: '#333',
+  }
 });
 
 export default BreakfastScreen;
