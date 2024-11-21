@@ -150,6 +150,7 @@ const LunchScreen = () => {
                 <Text style={{ color: theme.text.color }}>
                   Määrä: {item.quantity || 'N/A'}
                 </Text>
+          
                 <Text style={{ color:theme.text.color }}>
                   Proteiini: {item.nutriments?.proteins_100g || 'N/A'} g
                 </Text>
