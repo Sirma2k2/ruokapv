@@ -148,7 +148,19 @@ const LunchScreen = () => {
                   {item.brands || 'No brand'}
                 </Text>
                 <Text style={{ color: theme.text.color }}>
-                  Quantity: {item.quantity || 'N/A'}
+                  Määrä: {item.quantity || 'N/A'}
+                </Text>
+                <Text style={{ color:theme.text.color }}>
+                  Proteiini: {item.nutriments?.proteins_100g || 'N/A'} g
+                </Text>
+                <Text style={{ color: theme.text.color }}>
+                  Hiilihydraatit: { item.nutriments?.carbohydrates_100g || 'N/A'} g
+                </Text>
+                <Text style={{ color: theme.text.color}}>
+                  Rasva: { item.nutriments?.fat_100g || 'N/a'} g
+                </Text>
+                <Text style={{ color: theme.text.color }}>
+                  Kalorit: { item.nutriments?.["energy-kcal"] || 'N/A'} kcal
                 </Text>
               </View>
             )}
