@@ -134,13 +134,13 @@ const BreakfastScreen = () => {
                 Proteiini:{item.nutriments?.proteins_100g || 'N/A' } g
               </Text>
               <Text style={{color:theme.text.color}}>
-                {item.nutriments?.carbohydrates_100g || 'N/A'} g
+                Hiilihydraatit: {item.nutriments?.carbohydrates_100g || 'N/A'} g
               </Text>
               <Text style={{color:theme.text.color}} >
-                {item.nutriments?.fat_100g || 'N/A'} g
+                Rasva: {item.nutriments?.fat_100g || 'N/A'} g
               </Text>
               <Text style={{color:theme.text.color}} >
-                {item.nutriments?.["energy-kcal_100g"] || 'N/A'} g
+                Kalorit: {item.nutriments?.["energy-kcal_100g"] || 'N/A'} g
               </Text>
               </View>
           )}
