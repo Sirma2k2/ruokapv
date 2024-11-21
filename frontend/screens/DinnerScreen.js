@@ -127,19 +127,19 @@ const DinnerScreen = () => {
                 {item.brands || 'No brand'}
               </Text>
               <Text style={{ color:theme.text.color}}>
-                Määrä: {item.quantity || 'N/A' }
+                Amount: {item.quantity || 'N/A' }
               </Text>
               <Text style={{ color:theme.text.color}}>
-                Proteiini:{item.nutriments?.proteins_100g || 'N/A' } g
+                Protein:{item.nutriments?.proteins_100g || 'N/A' } g
               </Text>
               <Text style={{color:theme.text.color}}>
-                Hiilihydraatit: {item.nutriments?.carbohydrates_100g || 'N/A'} g
+                Carbohydrates: {item.nutriments?.carbohydrates_100g || 'N/A'} g
               </Text>
               <Text style={{color:theme.text.color}} >
-                Rasva: {item.nutriments?.fat_100g || 'N/A'} g
+                Fat: {item.nutriments?.fat_100g || 'N/A'} g
               </Text>
               <Text style={{color:theme.text.color}} >
-               Kalorit: {item.nutriments?.["energy-kcal_100g"] || 'N/A'} g
+               Calories: {item.nutriments?.["energy-kcal_100g"] || 'N/A'} g
               </Text>
               </View>
           )}
