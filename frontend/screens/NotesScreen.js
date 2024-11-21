@@ -104,12 +104,12 @@ const NotesScreen = () => {
 
     {/* Save Button */}
     <TouchableOpacity style={styles.button} onPress={addNote}>
-        <Text style={styles.buttonText}>Add Note</Text>
+        <Text>Add Note</Text>
     </TouchableOpacity>
 
     {/* View Saved Notes Button */}
     <TouchableOpacity style={styles.button} onPress={toggleModal}>
-        <Text style={styles.buttonText}>View Saved Notes</Text>
+        <Text>View Saved Notes</Text>
     </TouchableOpacity>
 
       {/* Notes Modal */}
@@ -133,7 +133,7 @@ const NotesScreen = () => {
                     style={styles.button}
                     onPress={() => deleteNote(index)}
                   >
-                    <Text style={styles.buttonText}>delete note</Text>
+                    <Text>delete note</Text>
                     </TouchableOpacity>
                 </View>
               ))
@@ -143,7 +143,7 @@ const NotesScreen = () => {
 
             {/* Close Modal Button */}
             <TouchableOpacity style={styles.button} onPress={toggleModal}>
-        <Text style={styles.buttonText}>Close</Text>
+        <Text>Close</Text>
             </TouchableOpacity>
           </View>
         </View>
