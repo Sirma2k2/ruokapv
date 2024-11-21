@@ -8,6 +8,7 @@ const LunchScreen = () => {
   const [activeTab, setActiveTab] = useState('addFood'); // Track the active tab
   const [searchLunch, setSearchLunch] = useState(''); // State for the search bar
   const [modalVisible, setModalVisible] = useState(false); // For Modal visibility
+  const [selectedFood, setSelectedFood] = useState(null)
 
   // States for food results, loading, and error handling
   const [foodResults, setFoodResults] = useState([]);
@@ -63,6 +64,11 @@ const LunchScreen = () => {
     getPreviousMeals();
   }, []);
 
+  const saveFoodMeal = (food) => {
+    console.log('Ruoka tallenettu ateriaan:', food)
+      setModalVisible(false)
+    
+  }
   return (
     <View style={[styles.container, { backgroundColor: theme.container.backgroundColor }]}>
       {/* Top Tab Bar */}
@@ -100,35 +106,7 @@ const LunchScreen = () => {
             onChangeText={setSearchLunch}
             value={searchLunch}
           />
-          
-          {/* Modal for showing nutrition info */}
-          <TouchableOpacity
-            style={styles.openModalButton}
-            onPress={() => setModalVisible(true)}
-          >
-            <Text style={styles.buttonText}>Show Nutrition Info</Text>
-          </TouchableOpacity>
 
-          {/* Modal */}
-          <Modal
-            animationType="slide"
-            transparent={true}
-            visible={modalVisible}
-            onRequestClose={() => setModalVisible(!modalVisible)}
-          >
-            <View style={styles.modalOverlay}>
-              <View style={styles.modalContent}>
-                <Text style={styles.modalText}>...</Text>
-                <TouchableOpacity
-                  style={styles.closeModalButton}
-                  onPress={() => setModalVisible(false)}
-                >
-                  <Text style={styles.buttonText}>Save food</Text>
-                </TouchableOpacity>
-              </View>
-            </View>
-          </Modal>
-          
           {/* Show loading indicator */}
           {loading && <ActivityIndicator size="large" color="#ff0" />}
 
@@ -140,13 +118,20 @@ const LunchScreen = () => {
             data={foodResults}
             keyExtractor={(item, index) => index.toString()}
             renderItem={({ item }) => (
-              <View style={styles.foodItem}>
+              <TouchableOpacity
+                style={styles.foodItem}
+                onPress={() => {
+                  setSelectedFood(item);
+                  setModalVisible(true);
+                }}
+              >
                 <Text style={{ color: theme.text.color }}>
                   {item.product_name || 'No name'}
                 </Text>
                 <Text style={{ color: theme.text.color }}>
                   {item.brands || 'No brand'}
                 </Text>
+
                 <Text style={{ color: theme.text.color }}>
                   Määrä: {item.quantity || 'N/A'}
                 </Text>
@@ -163,9 +148,52 @@ const LunchScreen = () => {
                 <Text style={{ color: theme.text.color }}>
                   Kalorit: { item.nutriments?.["energy-kcal"] || 'N/A'} kcal
                 </Text>
-              </View>
+            
+
+              </TouchableOpacity>
+
             )}
           />
+
+          {/* Modal for showing nutrition info */}
+          <Modal
+            animationType="slide"
+            transparent={true}
+            visible={modalVisible}
+            onRequestClose={() => setModalVisible(!modalVisible)}
+          >
+            <View style={styles.modalOverlay}>
+              <View style={styles.modalContent}>
+                {selectedFood ? (
+                  <>
+                    <Text style={styles.modalText}>
+                      Name: {selectedFood.product_name || 'N/A'}
+                    </Text>
+                    <Text style={styles.modalText}>
+                      Brand: {selectedFood.brands || 'N/A'}
+                    </Text>
+                    <Text style={styles.modalText}>
+                      Quantity: {selectedFood.quantity || 'N/A'}
+                    </Text>
+                    <TouchableOpacity
+                      style={styles.button}
+                      onPress={() => saveFoodMeal(selectedFood)}
+                    >
+                      <Text >Save food</Text>
+                    </TouchableOpacity>
+                  </>
+                ) : (
+                  <Text style={styles.modalText}>No food selected</Text>
+                )}
+                <TouchableOpacity
+                  style={styles.button}
+                  onPress={() => setModalVisible(false)}
+                >
+                  <Text>Close</Text>
+                </TouchableOpacity>
+              </View>
+            </View>
+          </Modal>
         </>
       )}
 
@@ -232,23 +260,15 @@ const styles = StyleSheet.create({
     marginBottom: 20,
     width: '90%',
   },
-  openModalButton: {
-    backgroundColor: '#007AFF',
-    padding: 10,
-    borderRadius: 5,
+  button: {
     alignItems: 'center',
-    marginBottom: 20,
-  },
-  closeModalButton: {
-    backgroundColor: '#FF3B30',
-    padding: 10,
-    borderRadius: 5,
-    alignItems: 'center',
-    marginTop: 20,
-  },
-  buttonText: {
-    color: '#fff',
-    fontWeight: 'bold',
+    justifyContent: 'center',
+    paddingVertical: 12,
+    paddingHorizontal: 32,
+    borderRadius: 4,
+    marginVertical: 10,
+    borderWidth: 2, 
+    borderColor: 'blue',
   },
   modalOverlay: {
     flex: 1,
