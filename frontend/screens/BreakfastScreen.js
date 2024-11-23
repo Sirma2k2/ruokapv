@@ -9,7 +9,8 @@ const BreakfastScreen = () => {
   const [activeTab, setActiveTab] = useState('addFood'); // Track the active tab
   const [searchBreakfast, setSearchBreakfast] = useState(''); // State for the search bar
   const [modalVisible, setModalVisible] = useState(false)
-  
+  const [selectedFood, setSelectedFood] = useState(null)
+
   const [foodResults, setFoodResults] = useState([])
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState('')
@@ -41,6 +42,11 @@ const BreakfastScreen = () => {
       setFoodResults([]);
     }
   }, [searchBreakfast]);
+
+  const saveFoodMeal = (food) => {
+    console.log('Ruoka tallenettu ateriaan:', food)
+    setModalVisible(false)
+  }
 
   return (
     <View style={[styles.container, { backgroundColor: theme.container.backgroundColor }]}>
@@ -80,71 +86,107 @@ const BreakfastScreen = () => {
             value={searchBreakfast}
             style={styles.searchBar}
           />
-          <TouchableOpacity
-            style={styles.openModalButton}
-            onPress={() => setModalVisible(true)}
-          >
-            <Text style={styles.buttonText}>show nutritions </Text>
-          </TouchableOpacity>
+          {/* Show loading indicator */}
+          {loading && <ActivityIndicator size="large" color="#ff0" />}
 
-          {/* Modal */}
+          {/* Show error message if there is one */}
+          {error && <Text style={{ color: 'red' }}>{error}</Text>}
+
+          {/* Display the search results */}
+          <FlatList
+            data={foodResults}
+            keyExtractor={(item, index) => index.toString()}
+            renderItem={({ item }) => (
+              <TouchableOpacity
+                style={styles.foodItem}
+                onPress={() => {
+                  setSelectedFood(item);
+                  setModalVisible(true);
+                }}
+              >
+                <Text style={{ color: theme.text.color }}>
+                  {item.product_name || 'No name'}
+                </Text>
+                <Text style={{ color: theme.text.color }}>
+                  {item.brands || 'No brand'}
+                </Text>
+
+                <Text style={{ color: theme.text.color }}>
+                  Amount: {item.quantity || 'N/A'}
+                </Text>
+
+                <Text style={{ color: theme.text.color }}>
+                  Protein: {item.nutriments?.proteins_100g || 'N/A'} g
+                </Text>
+                <Text style={{ color: theme.text.color }}>
+                  Carbohydrates: {item.nutriments?.carbohydrates_100g || 'N/A'} g
+                </Text>
+                <Text style={{ color: theme.text.color }}>
+                  Fat: {item.nutriments?.fat_100g || 'N/a'} g
+                </Text>
+                <Text style={{ color: theme.text.color }}>
+                  Calories: {item.nutriments?.["energy-kcal"] || 'N/A'} kcal
+                </Text>
+
+
+              </TouchableOpacity>
+
+            )}
+          />
+
+          {/* Modal for showing nutrition info */}
           <Modal
             animationType="slide"
             transparent={true}
             visible={modalVisible}
-            onRequestClose={() => {
-              Alert.alert('Modal has been closed.');
-              setModalVisible(!modalVisible);
-            }}
+            onRequestClose={() => setModalVisible(!modalVisible)}
           >
             <View style={styles.modalOverlay}>
               <View style={styles.modalContent}>
-                <Text style={styles.modalText}>...</Text>
+                {selectedFood ? (
+                  <>
+                    <Text style={styles.modalText}>
+                      Name: {selectedFood.product_name || 'N/A'}
+                    </Text>
+                    <Text style={styles.modalText}>
+                      Brand: {selectedFood.brands || 'N/A'}
+                    </Text>
+                    <Text style={styles.modalText}>
+                      Quantity: {selectedFood.quantity || 'N/A'}
+                    </Text>
+                    <Text style={styles.modalText}>
+                      Protein: {selectedFood.nutriments?.proteins_100g || 'N/A'}
+                    </Text>
+                    <Text style={styles.modalText}>
+                      Carbohydrates: {selectedFood.nutriments?.carbohydrates_100g || 'N/A'}
+                    </Text>
+                    <Text style={styles.modalText}>
+                      Fat: {selectedFood.nutriments?.fat_100g || 'N/A'}
+                    </Text>
+
+                    <Text style={styles.modalText}>
+                      Calories: {selectedFood.nutriments?.['energy-kcal'] || 'N/A'} kcal
+                    </Text>
+                    
+                    <TouchableOpacity
+                      style={styles.button}
+                      onPress={() => saveFoodMeal(selectedFood)}
+                    >
+                      <Text >Save food</Text>
+                    </TouchableOpacity>
+                  </>
+                ) : (
+                  <Text style={styles.modalText}>No food selected</Text>
+                )}
                 <TouchableOpacity
-                  style={styles.closeModalButton}
+                  style={styles.button}
                   onPress={() => setModalVisible(false)}
                 >
-                  <Text style={styles.buttonText}>Save food</Text>
+                  <Text>Close</Text>
                 </TouchableOpacity>
               </View>
             </View>
           </Modal>
-
-          { /*show loading indicator*/}
-          {loading && <ActivityIndicator size="large" color="#ff0"/> } 
-          {/* Show error message if there is one */}
-          {error && <Text style={{color: 'red'}}>{error}</Text>}
-
-          { /*display the search results*/}
-          <FlatList
-          data={foodResults}
-          keyExtractor={(item, index) => index.toString()}
-          renderItem={({ item}) => (
-            <View style={styles.foodItem}>
-              <Text style={{ color:theme.text.color}}>
-                {item.product_name || 'No name'}
-              </Text>
-              <Text style={{ color:theme.text.color}}>
-                {item.brands || 'No brand'}
-              </Text>
-              <Text style={{ color:theme.text.color}}>
-                Amount: {item.quantity || 'N/A' }
-              </Text>
-              <Text style={{ color:theme.text.color}}>
-                Protein:{item.nutriments?.proteins_100g || 'N/A' } g
-              </Text>
-              <Text style={{color:theme.text.color}}>
-                Carbohydrates: {item.nutriments?.carbohydrates_100g || 'N/A'} g
-              </Text>
-              <Text style={{color:theme.text.color}} >
-                Fat: {item.nutriments?.fat_100g || 'N/A'} g
-              </Text>
-              <Text style={{color:theme.text.color}} >
-                Calories: {item.nutriments?.["energy-kcal_100g"] || 'N/A'} g
-              </Text>
-              </View>
-          )}
-          />
         </>
       )}
 
@@ -160,9 +202,9 @@ const BreakfastScreen = () => {
 };
 
 const styles = StyleSheet.create({
-  container: { 
-    flex: 1, 
-    justifyContent: 'flex-start', 
+  container: {
+    flex: 1,
+    justifyContent: 'flex-start',
     alignItems: 'center',
   },
   tabBar: {
@@ -190,10 +232,10 @@ const styles = StyleSheet.create({
     color: '#007AFF', // Active tab text color
     fontWeight: 'bold',
   },
-  header: { 
-    fontSize: 24, 
-    marginTop: 40, 
-    marginBottom: 20, 
+  header: {
+    fontSize: 24,
+    marginTop: 40,
+    marginBottom: 20,
     fontWeight: 'bold',
     textAlign: 'center',
   },
@@ -202,23 +244,15 @@ const styles = StyleSheet.create({
     marginBottom: 20,
     width: '90%',
   },
-  openModalButton: {
-    backgroundColor: '#007AFF',
-    padding: 10,
-    borderRadius: 5,
+  button: {
     alignItems: 'center',
-    marginBottom: 20,
-  },
-  closeModalButton: {
-    backgroundColor: '#FF3B30',
-    padding: 10,
-    borderRadius: 5,
-    alignItems: 'center',
-    marginTop: 20,
-  },
-  buttonText: {
-    color: '#fff',
-    fontWeight: 'bold',
+    justifyContent: 'center',
+    paddingVertical: 12,
+    paddingHorizontal: 32,
+    borderRadius: 4,
+    marginVertical: 10,
+    borderWidth: 2,
+    borderColor: 'blue',
   },
   modalOverlay: {
     flex: 1,
