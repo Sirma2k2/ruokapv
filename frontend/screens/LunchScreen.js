@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { View, Text, TouchableOpacity, StyleSheet, Modal, FlatList } from 'react-native';
-import { useTheme } from '../components/ThemeContext'; 
+import { useTheme } from '../components/ThemeContext';
 import { ActivityIndicator, Searchbar } from 'react-native-paper';
 
 const LunchScreen = () => {
@@ -66,8 +66,8 @@ const LunchScreen = () => {
 
   const saveFoodMeal = (food) => {
     console.log('Ruoka tallenettu ateriaan:', food)
-      setModalVisible(false)
-    
+    setModalVisible(false)
+
   }
   return (
     <View style={[styles.container, { backgroundColor: theme.container.backgroundColor }]}>
@@ -133,22 +133,22 @@ const LunchScreen = () => {
                 </Text>
 
                 <Text style={{ color: theme.text.color }}>
-                 Amount: {item.quantity || 'N/A'}
+                  Amount: {item.quantity || 'N/A'}
                 </Text>
-          
-                <Text style={{ color:theme.text.color }}>
+
+                <Text style={{ color: theme.text.color }}>
                   Protein: {item.nutriments?.proteins_100g || 'N/A'} g
                 </Text>
                 <Text style={{ color: theme.text.color }}>
-                  Carbohydrates: { item.nutriments?.carbohydrates_100g || 'N/A'} g
-                </Text>
-                <Text style={{ color: theme.text.color}}>
-                  Fat: { item.nutriments?.fat_100g || 'N/a'} g
+                  Carbohydrates: {item.nutriments?.carbohydrates_100g || 'N/A'} g
                 </Text>
                 <Text style={{ color: theme.text.color }}>
-                  Calories: { item.nutriments?.["energy-kcal"] || 'N/A'} kcal
+                  Fat: {item.nutriments?.fat_100g || 'N/a'} g
                 </Text>
-            
+                <Text style={{ color: theme.text.color }}>
+                  Calories: {item.nutriments?.["energy-kcal"] || 'N/A'} kcal
+                </Text>
+
 
               </TouchableOpacity>
 
@@ -174,6 +174,19 @@ const LunchScreen = () => {
                     </Text>
                     <Text style={styles.modalText}>
                       Quantity: {selectedFood.quantity || 'N/A'}
+                    </Text>
+                    <Text style={styles.modalText}>
+                      Protein: {selectedFood.nutriments?.proteins_100g || 'N/A'}
+                    </Text>
+                    <Text style={styles.modalText}>
+                      Carbohydrates: {selectedFood.nutriments?.carbohydrates_100g || 'N/A'}
+                    </Text>
+                    <Text style={styles.modalText}>
+                      Fat: {selectedFood.nutriments?.fat_100g || 'N/A'}
+                    </Text>
+
+                    <Text style={styles.modalText}>
+                      Calories: {selectedFood.nutriments?.['energy-kcal'] || 'N/A'} kcal
                     </Text>
                     <TouchableOpacity
                       style={styles.button}
@@ -217,10 +230,10 @@ const LunchScreen = () => {
 };
 
 const styles = StyleSheet.create({
-  container: { 
-    flex: 1, 
-    justifyContent: 'flex-start', 
-    alignItems: 'center' 
+  container: {
+    flex: 1,
+    justifyContent: 'flex-start',
+    alignItems: 'center'
   },
   tabBar: {
     flexDirection: 'row',
@@ -247,10 +260,10 @@ const styles = StyleSheet.create({
     color: '#007AFF', // Active tab text color
     fontWeight: 'bold',
   },
-  header: { 
-    fontSize: 24, 
-    marginTop: 40, 
-    marginBottom: 20, 
+  header: {
+    fontSize: 24,
+    marginTop: 40,
+    marginBottom: 20,
     fontWeight: 'bold',
     textAlign: 'center',
   },
@@ -267,7 +280,7 @@ const styles = StyleSheet.create({
     paddingHorizontal: 32,
     borderRadius: 4,
     marginVertical: 10,
-    borderWidth: 2, 
+    borderWidth: 2,
     borderColor: 'blue',
   },
   modalOverlay: {
