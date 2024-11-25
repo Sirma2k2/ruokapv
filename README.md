@@ -33,5 +33,7 @@ Avaa projektin kansio ja asenna tarvittavat riippuvuudet seuraavilla komennoilla
 - npm install react-native-web@~0.19.10
 - npm install react-navigation-tabs@^2.11.2
 
+  TAI yksikertaisesti npm install
+
 -Kehitystyökalujen Asennus
 - npm install @babel/core@^7.20.0 --save-dev
