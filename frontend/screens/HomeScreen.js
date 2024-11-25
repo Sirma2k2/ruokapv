@@ -64,7 +64,7 @@ const HomeScreen = () => {
   return (
     <View style={[styles.container, { backgroundColor: theme.container.backgroundColor }]}>
       <TouchableOpacity style={styles.clearButton} onPress={clearCredentials}>
-        <Text style={styles.buttonText}>Clear Credentials</Text>
+        <Text style={styles.buttonText}> Button to Clear Credentials from Memory</Text>
       </TouchableOpacity>
 
       <Text style={[styles.subtitle, { color: theme.text.color }]}>Meal diary</Text>
@@ -115,6 +115,7 @@ const styles = StyleSheet.create({
   pieTitle: { marginTop: 20, fontSize: 22, fontWeight: 'bold', textAlign: 'center' },
   emptyContainer: { flex: 1, justifyContent: 'center', alignItems: 'center', marginTop: 20 },
   emptyText: { fontSize: 18, fontWeight: 'bold', textAlign: 'center' },
+  clearButton: { padding: 10, backgroundColor: 'gray', borderRadius: 5, margin: 10 },
 });
 
 export default HomeScreen;
