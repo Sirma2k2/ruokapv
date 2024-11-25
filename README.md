@@ -1,4 +1,4 @@
-# Ohjeet riippuvuuksien lataamiseen React Native -projektille 31.10.2024
+# Ohjeet riippuvuuksien lataamiseen React Native -projektille 25.11.2024
 
 Tässä tiedostossa on ohjeet tarvittavien riippuvuuksien asentamiseen React Native -projektiin, joka käyttää Expo-ympäristöä ja React Navigation -kirjastoa.
 
@@ -12,28 +12,35 @@ Ennen kuin aloitat, varmista, että sinulla on asennettuna:
 ## 2. Riippuvuuksien asentaminen
 Avaa projektin kansio ja asenna tarvittavat riippuvuudet seuraavilla komennoilla:
 
-- npm install expo-secure-store --legacy-peer-deps
-- npm install @expo/metro-runtime@~3.2.3
-- npm install @react-native-async-storage/async-storage@^2.0.0
-- npm install @react-navigation/bottom-tabs@^6.6.1
-- npm install @react-navigation/native@^6.1.18
-- npm install @react-navigation/native-stack@^6.11.0
-- npm install expo@~51.0.28
-- npm install expo-status-bar@~1.12.1
-- npm install react@18.2.0
-- npm install react-dom@18.2.0
-- npm install react-native@0.74.5
-- npm install react-native-chart-kit@^6.12.0
-- npm install react-native-paper@^5.12.5
-- npm install react-native-reanimated@^3.16.1
-- npm install react-native-safe-area-context@^4.13.1
-- npm install react-native-screens@^3.35.0
-- npm install react-native-svg@^15.8.0
-- npm install react-native-svg-charts@^5.4.0
-- npm install react-native-web@~0.19.10
-- npm install react-navigation-tabs@^2.11.2
+- npm install
 
-  TAI yksikertaisesti npm install
+ "@expo/metro-runtime": "4.0.0",
+    "@react-native-async-storage/async-storage": "1.23.1",
+    "@react-native-community/datetimepicker": "8.2.0",
+    "@react-native-picker/picker": "^2.9.0",
+    "@react-navigation/bottom-tabs": "^7.0.7",
+    "@react-navigation/native": "^7.0.4",
+    "@react-navigation/native-stack": "7.1.1",
+    "@react-navigation/stack": "^7.0.7",
+    "expo": "52.0.11",
+    "expo-checkbox": "4.0.0",
+    "expo-secure-store": "14.0.0",
+    "expo-status-bar": "2.0.0",
+    "react": "18.3.1",
+    "react-dom": "18.3.1",
+    "react-native": "0.76.3",
+    "react-native-animatable": "^1.4.0",
+    "react-native-gesture-handler": "^2.21.2",
+    "react-native-paper": "^5.12.5",
+    "react-native-picker-select": "^9.3.1",
+    "react-native-reanimated": "3.16.2",
+    "react-native-safe-area-context": "^4.12.0",
+    "react-native-screens": "^4.1.0",
+    "react-native-svg": "15.8.0",
+    "react-native-web": "~0.19.13",
+    "react-native-wheel-picker": "^1.2.0"
+
+  
 
 -Kehitystyökalujen Asennus
 - npm install @babel/core@^7.20.0 --save-dev
