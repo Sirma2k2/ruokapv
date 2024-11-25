@@ -12,12 +12,9 @@ const useAuth = () => {
             console.log('Checking authentication status...');
 
             // Check if SecureStore is available for mobile platforms
-            if (!(await SecureStore.isAvailableAsync())) { // this whole block is for web testing purposes and will be removed in production
-                console.warn('SecureStore is not available, skipping authentication check.');
-                //setIsLoggedIn(true); // Assume logged in if SecureStore isn't available
-                setLoading(false);
-                return;
-            }
+           
+            //setIsLoggedIn(true); // Jos tämä rivi on pääällä pääsee ohittamaan kirjautumisen vaikka webin takia
+           
 
             const storedLoginStatus = await SecureStore.getItemAsync('isLoggedIn');
             const storedFirstLaunch = await SecureStore.getItemAsync('isFirstLaunch');
