@@ -2,6 +2,7 @@ import React, { useEffect, useState } from 'react';
 import { View, Text, TouchableOpacity, StyleSheet, FlatList, Modal } from 'react-native';
 import { useTheme } from '../components/ThemeContext'; // Import the useTheme hook
 import { ActivityIndicator, Searchbar } from 'react-native-paper';
+import * as Animatable from 'react-native-animatable';
 
 
 const DinnerScreen = () => {
@@ -79,6 +80,9 @@ const DinnerScreen = () => {
       {/* Render content based on the active tab */}
       {activeTab === 'addFood' && (
         <>
+          <Text style={[styles.subHeader, { color: theme.text.color }]}>
+          "In the end, we are all just ingredients. It's what you make of us that matters." 
+          </Text>
           <Text style={[styles.header, { color: theme.text.color }]}>Build Your Dinner</Text>
           <Searchbar
             placeholder="Search food"
@@ -96,6 +100,7 @@ const DinnerScreen = () => {
             data={foodResults}
             keyExtractor={(item, index) => index.toString()}
             renderItem={({ item }) => (
+              <Animatable.View animation="fadeIn" duration={400}>
               <TouchableOpacity
                 style={styles.foodItem}
                 onPress={() => {
@@ -129,6 +134,7 @@ const DinnerScreen = () => {
 
 
               </TouchableOpacity>
+              </Animatable.View>
 
             )}
           />
@@ -236,6 +242,12 @@ const styles = StyleSheet.create({
     marginBottom: 20,
     fontWeight: 'bold',
     textAlign: 'center',
+  },
+  subHeader: {
+    fontSize: 18,
+    textAlign: 'center',
+    marginBottom: 10,
+    fontStyle: 'italic',
   },
   searchBar: {
     marginHorizontal: 20,
