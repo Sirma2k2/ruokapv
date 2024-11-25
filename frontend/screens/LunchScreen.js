@@ -108,7 +108,7 @@ const LunchScreen = () => {
           />
 
           {/* Show loading indicator */}
-          {loading && <ActivityIndicator size="large" color="#ff0" />}
+          {loading && <ActivityIndicator size={50} color="#ff0" />}
 
           {/* Show error message if there is one */}
           {error && <Text style={{ color: 'red' }}>{error}</Text>}

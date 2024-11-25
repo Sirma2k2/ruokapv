@@ -1,38 +1,74 @@
-// import { useState, useEffect } from 'react';
-// import * as SecureStore from 'expo-secure-store';
-// //useAuth hook for checking if the user is logged in
-// const useAuth = () => {
-//     const [isLoggedIn, setIsLoggedIn] = useState(null);
-//     const [isFirstLaunch, setIsFirstLaunch] = useState(null);
+import { useState, useEffect } from 'react';
+import * as SecureStore from 'expo-secure-store'; // For secure storage on mobile
 
-//     useEffect(() => {
-//         const checkAuthStatus = async () => {
-//             // Check if the user is logged in
-//             const storedLoginStatus = await SecureStore.getItemAsync('isLoggedIn');
-//             const storedFirstLaunch = await SecureStore.getItemAsync('isFirstLaunch');
+// useAuth hook for checking if the user is logged in
+const useAuth = () => {
+    const [isLoggedIn, setIsLoggedIn] = useState(null);
+    const [isFirstLaunch, setIsFirstLaunch] = useState(null);
+    const [loading, setLoading] = useState(true);
 
-//             setIsLoggedIn(storedLoginStatus === 'true');
-//             setIsFirstLaunch(storedFirstLaunch === null);
+    useEffect(() => {
+        const checkAuthStatus = async () => {
+            console.log('Checking authentication status...');
 
-//             if (storedFirstLaunch === null) {
-//                 await SecureStore.setItemAsync('isFirstLaunch', 'false'); // Mark as not first launch after checking
-//             }
-//         };
+            // Check if SecureStore is available for mobile platforms
+            if (!(await SecureStore.isAvailableAsync())) { // this whole block is for web testing purposes and will be removed in production
+                console.warn('SecureStore is not available, skipping authentication check.');
+                //setIsLoggedIn(true); // Assume logged in if SecureStore isn't available
+                setLoading(false);
+                return;
+            }
 
-//         checkAuthStatus();
-//     }, []);
+            const storedLoginStatus = await SecureStore.getItemAsync('isLoggedIn');
+            const storedFirstLaunch = await SecureStore.getItemAsync('isFirstLaunch');
 
-//     const login = async () => {
-//         await SecureStore.setItemAsync('isLoggedIn', 'true');
-//         setIsLoggedIn(true);
-//     };
+            setIsLoggedIn(storedLoginStatus === 'true');
+            setIsFirstLaunch(storedFirstLaunch === null);
 
-//     const logout = async () => {
-//         await SecureStore.setItemAsync('isLoggedIn', 'false');
-//         setIsLoggedIn(false);
-//     };
+            if (storedFirstLaunch === null) {
+                await SecureStore.setItemAsync('isFirstLaunch', 'false');
+            }
 
-//     return { isLoggedIn, isFirstLaunch, login, logout };
-// };
+            setLoading(false);
+        };
 
-// export default useAuth;
+        checkAuthStatus();
+    }, []);
+
+    const login = async () => {
+        // For both mobile and web, use SecureStore (if available)
+        await SecureStore.setItemAsync('isLoggedIn', 'true');
+        setIsLoggedIn(true);
+    };
+
+    const logout = async () => {
+        // For both mobile and web, use SecureStore (if available)
+        await SecureStore.setItemAsync('isLoggedIn', 'false');
+        setIsLoggedIn(false);
+    };
+
+    // Function to completely clear credentials (for both web and mobile)
+    const clearCredentials = async () => {
+        console.log('Clearing credentials...');
+        try {
+            // For mobile, use SecureStore
+            await SecureStore.deleteItemAsync('isLoggedIn');
+            await SecureStore.deleteItemAsync('isFirstLaunch');
+
+            // For web, use localStorage
+            if (typeof localStorage !== 'undefined') {
+                console.log('Clearing credentials from localStorage on web');
+                localStorage.removeItem('isLoggedIn');
+                localStorage.removeItem('isFirstLaunch');
+            }
+
+            console.log('Credentials cleared');
+        } catch (error) {
+            console.error('Error clearing credentials:', error);
+        }
+    };
+
+    return { isLoggedIn, isFirstLaunch, login, logout, loading, clearCredentials };
+};
+
+export default useAuth;
