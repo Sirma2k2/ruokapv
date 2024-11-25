@@ -1,6 +1,7 @@
 import React from 'react';
 import { View, Text, TouchableOpacity, StyleSheet } from 'react-native';
 import { useTheme } from '../components/ThemeContext'; // Import the useTheme hook
+import Ionicons from '@expo/vector-icons/Ionicons';
 
 const FoodScreen = ({ navigation }) => {
 
@@ -16,6 +17,7 @@ const FoodScreen = ({ navigation }) => {
         onPress={() => navigation.navigate('Breakfast')}
       >
         <Text style={[styles.buttonText, { color: theme.buttonText.color }]}>Breakfast</Text>
+        <Ionicons name="sunny" size={24} color={theme.iconColor} style={styles.icon} />
       </TouchableOpacity>
 
       <TouchableOpacity 
@@ -23,6 +25,7 @@ const FoodScreen = ({ navigation }) => {
         onPress={() => navigation.navigate('Lunch')}
       >
         <Text style={[styles.buttonText, { color: theme.buttonText.color }]}>Lunch</Text>
+        <Ionicons name="restaurant" size={24} color={theme.iconColor} style={styles.icon} />
       </TouchableOpacity>
 
       <TouchableOpacity 
@@ -30,6 +33,7 @@ const FoodScreen = ({ navigation }) => {
         onPress={() => navigation.navigate('Dinner')}
       >
         <Text style={[styles.buttonText, { color: theme.buttonText.color }]}>Dinner</Text>
+        <Ionicons name="moon" size={24} color={theme.iconColor} style={styles.icon} />
       </TouchableOpacity>
     </View>
   );
@@ -42,9 +46,9 @@ const styles = StyleSheet.create({
     alignItems: 'center' 
   },
   header: { 
-    fontSize: 24, 
+    fontSize: 28, 
     marginTop: 40, 
-    marginBottom: 20, 
+    marginBottom: 30, 
     fontWeight: 'bold' 
   },
   button: {
@@ -52,13 +56,19 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
     paddingVertical: 12,
     paddingHorizontal: 32,
-    borderRadius: 4,
+    borderRadius: 25,
     marginVertical: 10,
     borderWidth: 2, 
-    borderColor: 'blue', 
+    borderColor: 'blue',
+  
   },
   buttonText: {
-    fontSize: 18,    
+    fontSize: 18,
+    fontWeight: '600',
+    marginLeft: 10,     
+  }, 
+  icon: {
+    marginRight: 10,
   }
 });
 

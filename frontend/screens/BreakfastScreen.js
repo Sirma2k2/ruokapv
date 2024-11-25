@@ -2,7 +2,7 @@ import React, { useEffect, useState } from 'react';
 import { View, Text, TouchableOpacity, StyleSheet, Modal, Alert } from 'react-native';
 import { useTheme } from '../components/ThemeContext'; // Import the useTheme hook
 import { ActivityIndicator, Searchbar } from 'react-native-paper';
-import { FlatList } from 'react-native-web';
+import { FlatList } from 'react-native';
 
 const BreakfastScreen = () => {
   const { theme } = useTheme(); // Access the theme from context
