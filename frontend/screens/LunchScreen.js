@@ -3,9 +3,10 @@ import { View, Text, TouchableOpacity, StyleSheet, Modal, FlatList } from 'react
 import { useTheme } from '../components/ThemeContext';
 import { ActivityIndicator, Searchbar } from 'react-native-paper';
 import * as Animatable from 'react-native-animatable';
+import Ionicons from '@expo/vector-icons/Ionicons';
 
 
-const LunchScreen = () => {
+const LunchScreen = ({navigation}) => {
   const { theme } = useTheme(); // Access the theme from context
   const [activeTab, setActiveTab] = useState('addFood'); // Track the active tab
   const [searchLunch, setSearchLunch] = useState(''); // State for the search bar
@@ -217,122 +218,29 @@ const LunchScreen = () => {
         </>
       )}
 
-      {activeTab === 'createMeal' && (
-        <>
-          <Text style={[styles.header, { color: theme.text.color }]}>Create Your Meal</Text>
-          <Text style={{ color: theme.text.color }}>Your meals: </Text>
-          <Searchbar
-            placeholder="Search meals"
-            onChangeText={setSearchLunch}
-            value={searchLunch}
-          />
-          {/* Show loading indicator */}
-          {loading && <ActivityIndicator size="large" color="#ff0" />}
+    
+{activeTab === 'createMeal' && (
+  <>
+    <Text style={[styles.header, { color: theme.text.color }]}> My Meals</Text>
 
-          {/* Show error message if there is one */}
-          {error && <Text style={{ color: 'red' }}>{error}</Text>}
+    <Searchbar 
+    placeholder='Search my meals'
+    ></Searchbar>
+    
+    <TouchableOpacity 
+      style={[styles.button, { backgroundColor: theme.buttonBackgroundColor }]} 
+      onPress={() => navigation.navigate('Meals')}
+    >
+      <Text style={[styles.buttonText, { color: theme.buttonText.color }]}>Create a new meal</Text>
+      <Ionicons name="fast-food" size={24} color={theme.iconColor} style={styles.icon} />
+    </TouchableOpacity>
 
-          {/* Display the search results */}
-          <FlatList
-            data={foodResults}
-            keyExtractor={(item, index) => index.toString()}
-            renderItem={({ item }) => (
-              <Animatable.View animation="fadeIn" duration={400}>
-              <TouchableOpacity
-                style={styles.foodItem}
-                onPress={() => {
-                  setSelectedFood(item);
-                  setModalVisible(true);
-                }}
-              >
-                <Text style={{ color: theme.text.color }}>
-                  {item.product_name || 'No name'}
-                </Text>
-                <Text style={{ color: theme.text.color }}>
-                  {item.brands || 'No brand'}
-                </Text>
-
-                <Text style={{ color: theme.text.color }}>
-                  Amount: {item.quantity || 'N/A'}
-                </Text>
-
-                <Text style={{ color: theme.text.color }}>
-                  Protein: {item.nutriments?.proteins_100g || 'N/A'} g
-                </Text>
-                <Text style={{ color: theme.text.color }}>
-                  Carbohydrates: {item.nutriments?.carbohydrates_100g || 'N/A'} g
-                </Text>
-                <Text style={{ color: theme.text.color }}>
-                  Fat: {item.nutriments?.fat_100g || 'N/a'} g
-                </Text>
-                <Text style={{ color: theme.text.color }}>
-                  Calories: {item.nutriments?.["energy-kcal"] || 'N/A'} kcal
-                </Text>
-
-
-              </TouchableOpacity>
-              </Animatable.View>
-
-            )}
-          />
-
-          {/* Modal for showing nutrition info */}
-          <Modal
-            animationType="slide"
-            transparent={true}
-            visible={modalVisible}
-            onRequestClose={() => setModalVisible(!modalVisible)}
-          >
-            <View style={styles.modalOverlay}>
-              <View style={styles.modalContent}>
-                {selectedFood ? (
-                  <>
-                    <Text style={styles.modalText}>
-                      Name: {selectedFood.product_name || 'N/A'}
-                    </Text>
-                    <Text style={styles.modalText}>
-                      Brand: {selectedFood.brands || 'N/A'}
-                    </Text>
-                    <Text style={styles.modalText}>
-                      Quantity: {selectedFood.quantity || 'N/A'}
-                    </Text>
-                    <Text style={styles.modalText}>
-                      Protein: {selectedFood.nutriments?.proteins_100g || 'N/A'}
-                    </Text>
-                    <Text style={styles.modalText}>
-                      Carbohydrates: {selectedFood.nutriments?.carbohydrates_100g || 'N/A'}
-                    </Text>
-                    <Text style={styles.modalText}>
-                      Fat: {selectedFood.nutriments?.fat_100g || 'N/A'}
-                    </Text>
-
-                    <Text style={styles.modalText}>
-                      Calories: {selectedFood.nutriments?.['energy-kcal'] || 'N/A'} kcal
-                    </Text>
-                    <TouchableOpacity
-                      style={styles.button}
-                      onPress={() => saveFoodMeal(selectedFood)}
-                    >
-                      <Text >Save meal</Text>
-                    </TouchableOpacity>
-                  </>
-                ) : (
-                  <Text style={styles.modalText}>No food selected</Text>
-                )}
-                <TouchableOpacity
-                  style={styles.button}
-                  onPress={() => setModalVisible(false)}
-                >
-                  <Text>Close</Text>
-                </TouchableOpacity>
-              </View>
-            </View>
-          </Modal>
-        </>
-      )}
+  </>
+)}
     </View>
-  );
-};
+  )
+}
+
 
 const styles = StyleSheet.create({
   container: {
