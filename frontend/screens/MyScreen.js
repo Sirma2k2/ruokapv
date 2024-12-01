@@ -9,8 +9,15 @@ import {
 } from "react-native";
 import * as SecureStore from "expo-secure-store";
 import RNPickerSelect from "react-native-picker-select";
+import Ionicons from "react-native-vector-icons/Ionicons";
+import { useTheme } from "../components/ThemeContext"; 
+import SettingsModal from "../components/SettingsModal";
+import { useNavigation } from '@react-navigation/native';
 
-const MyScreen = () => {  // VIELÄ KEHITYKSESSÄ
+
+const MyScreen = () => {
+  const navigation = useNavigation();
+
   const [userData, setUserData] = useState({
     name: "",
     email: "",
@@ -22,40 +29,45 @@ const MyScreen = () => {  // VIELÄ KEHITYKSESSÄ
     goal: "",
   });
 
+  const { theme, toggleTheme } = useTheme();
+  const [settingsVisible, setSettingsVisible] = useState(false);
+  const [switchValues, setSwitchValues] = useState({
+    option1: false,
+    option2: false,
+    option3: false,
+  });
+
+  const toggleSettingsVisible = () => {
+    setSettingsVisible(!settingsVisible);
+  };
+
+  const handleSwitchChange = (key) => (newValue) => {
+    setSwitchValues((prev) => ({ ...prev, [key]: newValue }));
+  };
+
   const loadUserData = async () => {
     try {
       const storedData = await SecureStore.getItemAsync("userData");
-      console.log("Stored data:", storedData); // Log the stored data to check
-  
       if (storedData) {
         const parsedData = JSON.parse(storedData);
-  
-        // Log parsedData to verify its structure
-        console.log("Parsed data:", parsedData);
-  
-        // Map the stored data keys to your expected state keys
         const mappedData = {
-          name: parsedData.knimi || "", // "knimi" is stored as the name
+          name: parsedData.knimi || "",
           email: parsedData.email || "",
-          age: parsedData.ika || "", // "ika" is stored as the age
-          weight: parsedData.paino || "", // "paino" is stored as weight
-          height: parsedData.pituus || "", // "pituus" is stored as height
-          activityLevel: parsedData.aktiviteetti || "", // "aktiviteetti" is stored as activity level
-          dietType: parsedData.tyyppi || "", // "tyyppi" is stored as diet type
-          goal: parsedData.tavoite || "", // "tavoite" is stored as goal
+          age: parsedData.ika || "",
+          weight: parsedData.paino || "",
+          height: parsedData.pituus || "",
+          activityLevel: parsedData.aktiviteetti || "",
+          dietType: parsedData.tyyppi || "",
+          goal: parsedData.tavoite || "",
         };
-  
-        console.log("Mapped user data:", mappedData); // Log mapped data to verify
-        setUserData(mappedData); // Set the mapped data to the state
+        setUserData(mappedData);
       }
     } catch (error) {
       console.error("Error retrieving user data:", error);
     }
   };
-  
-  
 
-  useEffect(() => {// when something changes, this is called
+  useEffect(() => {
     loadUserData();
   }, []);
 
@@ -66,7 +78,7 @@ const MyScreen = () => {  // VIELÄ KEHITYKSESSÄ
   const handleSaveChanges = async () => {
     try {
       const updatedData = { ...userData };
-      await SecureStore.setItemAsync("userData", JSON.stringify(updatedData)); // Save updated data
+      await SecureStore.setItemAsync("userData", JSON.stringify(updatedData));
       alert("Profile updated successfully!");
     } catch (error) {
       console.error("Error saving user data:", error);
@@ -74,7 +86,6 @@ const MyScreen = () => {  // VIELÄ KEHITYKSESSÄ
     }
   };
 
-  // Values for the pickers
   const activityLevels = [
     { label: "Low", value: "low" },
     { label: "Medium", value: "medium" },
@@ -94,119 +105,140 @@ const MyScreen = () => {  // VIELÄ KEHITYKSESSÄ
   ];
 
   return (
-    <ScrollView style={styles.container}>
-      <Text style={styles.title}>My Profile</Text>
+    <ScrollView style={[styles.container, { backgroundColor: theme.container.backgroundColor }]}>
 
-      {/* Name */}
+<TouchableOpacity style={styles.Notes} onPress={() => {
+        console.log("navigate to notes");
+        navigation.navigate('NotesScreen');
+      }}>
+      <Ionicons name="document-text" size={30} color={theme.text.color} />
+      </TouchableOpacity>
+      <SettingsModal
+        visible={settingsVisible}
+        toggleVisible={toggleSettingsVisible}
+        switchValues={switchValues}
+        handleSwitchChange={handleSwitchChange}
+        toggleTheme={toggleTheme}
+      />
+      <TouchableOpacity
+        style={styles.settingsIcon}
+        onPress={toggleSettingsVisible}
+      >
+        <Ionicons name="menu" size={30} color={theme.text.color} />
+      </TouchableOpacity>
+
+      <Text style={[styles.title, theme.text]}>My Profile</Text>
+
+      {/* Form Fields */}
       <View style={styles.inputGroup}>
-        <Text style={styles.label}>Name</Text>
+        <Text style={[styles.label, theme.text]}>Name</Text>
         <TextInput
-          style={styles.input}
+          style={[styles.input, { color: theme.text.color }]}
           value={userData.name}
-          editable={false} // Read-only
+          editable={false}
         />
       </View>
 
-      {/* Email */}
       <View style={styles.inputGroup}>
-        <Text style={styles.label}>Email</Text>
+        <Text style={[styles.label, theme.text]}>Email</Text>
         <TextInput
-          style={styles.input}
+          style={[styles.input, { color: theme.text.color }]}
           value={userData.email}
-          editable={false} // Read-only
+          editable={false}
         />
       </View>
 
-      {/* Age */}
       <View style={styles.inputGroup}>
-        <Text style={styles.label}>Age</Text>
+        <Text style={[styles.label, theme.text]}>Age</Text>
         <TextInput
-          style={styles.input}
+          style={[styles.input, { color: theme.text.color }]}
           value={userData.age}
-          editable={false} // Read-only
+          editable={false}
         />
       </View>
 
-      {/* Weight */}
       <View style={styles.inputGroup}>
-        <Text style={styles.label}>Weight (kg)</Text>
+        <Text style={[styles.label, theme.text]}>Weight (kg)</Text>
         <TextInput
-          style={styles.input}
+          style={[styles.input, { color: theme.text.color }]}
           keyboardType="numeric"
           value={userData.weight}
           onChangeText={handleInputChange("weight")}
         />
       </View>
 
-      {/* Height */}
       <View style={styles.inputGroup}>
-        <Text style={styles.label}>Height (cm)</Text>
+        <Text style={[styles.label, theme.text]}>Height (cm)</Text>
         <TextInput
-          style={styles.input}
+          style={[styles.input, { color: theme.text.color }]}
           keyboardType="numeric"
           value={userData.height}
           onChangeText={handleInputChange("height")}
         />
       </View>
 
-      {/* Activity Level */}
       <View style={styles.inputGroup}>
-        <Text style={styles.label}>Activity Level</Text>
+        <Text style={[styles.label, theme.text]}>Activity Level</Text>
         <RNPickerSelect
           placeholder={{ label: "Select activity level", value: null }}
           value={userData.activityLevel}
           onValueChange={handleInputChange("activityLevel")}
           items={activityLevels}
-          style={pickerStyle}
+          style={{
+            inputIOS: [styles.input, { color: theme.text.color }],
+            inputAndroid: [styles.input, { color: theme.text.color }],
+          }}
         />
       </View>
 
-      {/* Diet Type */}
       <View style={styles.inputGroup}>
-        <Text style={styles.label}>Diet Type</Text>
+        <Text style={[styles.label, theme.text]}>Diet Type</Text>
         <RNPickerSelect
           placeholder={{ label: "Select diet type", value: null }}
           value={userData.dietType}
           onValueChange={handleInputChange("dietType")}
           items={dietTypes}
-          style={pickerStyle}
+          style={{
+            inputIOS: [styles.input, { color: theme.text.color }],
+            inputAndroid: [styles.input, { color: theme.text.color }],
+          }}
         />
       </View>
 
-      {/* Goal */}
       <View style={styles.inputGroup}>
-        <Text style={styles.label}>Goal</Text>
+        <Text style={[styles.label, theme.text]}>Goal</Text>
         <RNPickerSelect
           placeholder={{ label: "Select goal", value: null }}
           value={userData.goal}
           onValueChange={handleInputChange("goal")}
           items={goals}
-          style={pickerStyle}
+          style={{
+            inputIOS: [styles.input, { color: theme.text.color }],
+            inputAndroid: [styles.input, { color: theme.text.color }],
+          }}
         />
       </View>
 
-      {/* Save Button */}
-      <TouchableOpacity style={styles.saveButton} onPress={handleSaveChanges}>
-        <Text style={styles.saveButtonText}>Save Changes</Text>
+      <TouchableOpacity
+        style={[styles.saveButton,  { backgroundColor: theme?.container?.backgroundColor || "#ffffff" },
+        ]}
+        onPress={handleSaveChanges}
+      >
+        <Text style={[styles.saveButtonText, theme.buttonText]}>Save Changes</Text>
       </TouchableOpacity>
     </ScrollView>
   );
 };
 
-const pickerStyle = {
-  inputAndroid: { fontSize: 18, padding: 10, borderWidth: 1, borderRadius: 8, borderColor: "#ddd", backgroundColor: "#fff", marginBottom: 20,},
-  inputIOS: { fontSize: 18, padding: 10, borderWidth: 1, borderRadius: 8, borderColor: "#ddd", backgroundColor: "#fff", marginBottom: 20,},
-};
-
 const styles = StyleSheet.create({
-  container: { flex: 1, padding: 20, backgroundColor: "#f0f0f0" },
+  container: { flex: 1, padding: 20 },
   title: {
     fontSize: 24,
     fontWeight: "bold",
     textAlign: "center",
     marginBottom: 20,
   },
-  label: { fontSize: 16, marginBottom: 5, color: "#333" },
+  label: { fontSize: 16, marginBottom: 5 },
   inputGroup: { marginBottom: 20 },
   input: {
     backgroundColor: "#fff",
@@ -216,16 +248,22 @@ const styles = StyleSheet.create({
     borderWidth: 1,
   },
   saveButton: {
-    backgroundColor: "#007bff",
     padding: 20,
     borderRadius: 8,
     marginBottom: 20,
   },
   saveButtonText: {
     textAlign: "center",
-    color: "#fff",
     fontSize: 16,
     fontWeight: "bold",
+  },
+  settingsIcon: {
+    position: "absolute",
+    top: 10,
+    right: 30,
+    zIndex: 1,
+    margin: 5,
+    padding: 5,
   },
 });
 

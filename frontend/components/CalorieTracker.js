@@ -4,6 +4,10 @@ const CalorieTracker = () => {
     const [totalCalories, setTotalCalories] = useState(); // Example total calories per day
     const [consumedCalories, setConsumedCalories] = useState();
 
+
+
+
+    
     const handleAddCalories = (calories) => {
         setConsumedCalories(consumedCalories + calories);
     };
