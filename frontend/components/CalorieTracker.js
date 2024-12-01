@@ -1,8 +1,8 @@
 import React, { useState } from 'react';
 import { View, Text, StyleSheet } from 'react-native';
 const CalorieTracker = () => {
-    const [totalCalories, setTotalCalories] = useState(2000); // Example total calories per day
-    const [consumedCalories, setConsumedCalories] = useState(0);
+    const [totalCalories, setTotalCalories] = useState(); // Example total calories per day
+    const [consumedCalories, setConsumedCalories] = useState();
 
     const handleAddCalories = (calories) => {
         setConsumedCalories(consumedCalories + calories);
