@@ -12,7 +12,6 @@ export default function App() {
 
     return (
         <ThemeProvider>
-            {/* NavigationContainer wraps the entire app */}
             <NavigationContainer>
                 {isLoggedIn ? (
                     <>

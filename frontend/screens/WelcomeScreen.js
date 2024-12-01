@@ -67,7 +67,7 @@ const WelcomeScreen = ({ onLogin }) => {
             {/* Sign Up button that navigates to SignUpScreen */}
             <TouchableOpacity 
                 style={styles.switchButton} 
-                onPress={() => navigation.navigate('SignUp')} // Navigate to the SignUp screen
+                onPress={() => navigation.navigate('SignUp')} 
             >
                 <Text style={styles.buttonText}>Sign Up</Text>
             </TouchableOpacity>
