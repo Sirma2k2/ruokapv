@@ -5,6 +5,7 @@ import { ActivityIndicator, Searchbar } from 'react-native-paper';
 import * as Animatable from 'react-native-animatable';
 import Ionicons from '@expo/vector-icons/Ionicons';
 
+import ServerIp from '../hooks/Global';
 
 const LunchScreen = ({navigation}) => {
   const { theme } = useTheme(); // Access the theme from context
@@ -25,7 +26,7 @@ const LunchScreen = ({navigation}) => {
     setError('');
 
     try {
-      const response = await fetch(`http://localhost:3000/api/searchFood?query=${query}`);
+      const response = await fetch(ServerIp + `/api/searchFood?query=${query}`);
       if (response.ok) {
         const data = await response.json();
         setFoodResults(data);
@@ -51,7 +52,7 @@ const LunchScreen = ({navigation}) => {
   const [previousMeals, setPreviousMeals] = useState([]);
   const getPreviousMeals = async () => {
     try {
-      const response = await fetch('http://localhost:3000/get-food');
+      const response = await fetch(ServerIp + '/get-food');
       if (response.ok) {
         const data = await response.json();
         setPreviousMeals(data);

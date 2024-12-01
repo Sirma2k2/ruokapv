@@ -78,8 +78,10 @@ const validateForm = () => {
         tyyppi: userData.dietType === 'balanced' ? 1 : userData.dietType === 'keto' ? 2 : 3, // Diet Type: 1 for balanced, 2 for keto, 3 for vegan
         tavoite: userData.goal === 'lose' ? 1 : userData.goal === 'maintain' ? 2 : 3 // Goal: 1 for lose, 2 for maintain, 3 for gain
       };
-    console.log('User Data:', userData);
+
+    navigation.navigate('MyScreen', { userData }); // tärkeä osa, navigoi eteenpäin ja vie datan mukanaan
     setLogged(userData);
+    
   };
 
   // Values for the pickers
