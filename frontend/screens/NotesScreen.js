@@ -58,7 +58,6 @@ const NotesScreen = () => {
   }
   
 
-
   const toggleModal = () => {
     setModalVisible(!modalVisible)
   }

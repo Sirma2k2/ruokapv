@@ -45,7 +45,7 @@ const MyScreen = () => {
     console.log('User Data:', userData);
 
     try {
-      const response = await fetch('http://localhost:3000/add-user', {
+      const response = await fetch('http://localhost:3000/add-user', { // tästä pois add user ja korvaa hakemalla käyttäjä
         method: 'POST', 
         headers: { 
           'content-type': 'application/json',

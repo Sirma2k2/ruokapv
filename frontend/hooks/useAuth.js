@@ -20,11 +20,11 @@ const useAuth = () => {
             const storedFirstLaunch = await SecureStore.getItemAsync('isFirstLaunch');
 
             setIsLoggedIn(storedLoginStatus === 'true');
-            setIsFirstLaunch(storedFirstLaunch === null);
+            // setIsFirstLaunch(storedFirstLaunch === null);
 
-            if (storedFirstLaunch === null) {
-                await SecureStore.setItemAsync('isFirstLaunch', 'false');
-            }
+            // if (storedFirstLaunch === null) {
+            //     await SecureStore.setItemAsync('isFirstLaunch', 'false');
+            // }
 
             setLoading(false);
         };
@@ -50,13 +50,13 @@ const useAuth = () => {
         try {
             // For mobile, use SecureStore
             await SecureStore.deleteItemAsync('isLoggedIn');
-            await SecureStore.deleteItemAsync('isFirstLaunch');
+            // await SecureStore.deleteItemAsync('isFirstLaunch');
 
             // For web, use localStorage
             if (typeof localStorage !== 'undefined') {
                 console.log('Clearing credentials from localStorage on web');
                 localStorage.removeItem('isLoggedIn');
-                localStorage.removeItem('isFirstLaunch');
+                // localStorage.removeItem('isFirstLaunch');
             }
 
             console.log('Credentials cleared');
@@ -65,7 +65,8 @@ const useAuth = () => {
         }
     };
 
-    return { isLoggedIn, isFirstLaunch, login, logout, loading, clearCredentials };
+    return { isLoggedIn, login, logout, loading, clearCredentials };
 };
 
 export default useAuth;
+
