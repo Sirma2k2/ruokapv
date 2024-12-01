@@ -1,71 +1,66 @@
 import { useState, useEffect } from 'react';
-import * as SecureStore from 'expo-secure-store'; // For secure storage on mobile
+import * as SecureStore from 'expo-secure-store';
 
-// useAuth hook for checking if the user is logged in, this component is resposible for handling the authentication status of the user and offline usage
 const useAuth = () => {
-    const [isLoggedIn, setIsLoggedIn] = useState(null);
-    const [isFirstLaunch, setIsFirstLaunch] = useState(null);
-    const [loading, setLoading] = useState(true);
+    const [isLoggedIn, setIsLoggedIn] = useState(null); // Initially, null to check if the user is being authenticated
+    const [loading, setLoading] = useState(true); // Used to show a loading screen while checking the auth status
 
+    // Check the auth status when the app is loaded
     useEffect(() => {
         const checkAuthStatus = async () => {
-            console.log('Checking authentication status...');
-
-           
-            setIsLoggedIn(true); // Jos tämä rivi on pääällä pääsee ohittamaan kirjautumisen vaikka webin takia
-           
-
-            const storedLoginStatus = await SecureStore.getItemAsync('isLoggedIn');
-           // const storedFirstLaunch = await SecureStore.getItemAsync('isFirstLaunch');
-
-            setIsLoggedIn(storedLoginStatus === 'true');
-            // setIsFirstLaunch(storedFirstLaunch === null);
-
-            // if (storedFirstLaunch === null) {
-            //     await SecureStore.setItemAsync('isFirstLaunch', 'false');
-            // }
-
-            setLoading(false);
-        };
-
+            try {
+                const storedLoginStatus = await SecureStore.getItemAsync('isLoggedIn');
+                // Set the login status based on what is stored in SecureStore
+                setIsLoggedIn(storedLoginStatus === 'true'); 
+            } catch (error) {
+                console.error('Error reading login status', error);
+                setIsLoggedIn(false); // Default to false if error occurs
+            } finally {
+                setLoading(false); // Once the check is complete, stop the loading
+            }
+        };  
         checkAuthStatus();
     }, []);
 
     const login = async () => {
-        // For both mobile and web, use SecureStore (if available)
-        await SecureStore.setItemAsync('isLoggedIn', 'true');
-        setIsLoggedIn(true);
+        try {
+            // When login is successful, store the login status in SecureStore and update the state
+            await SecureStore.setItemAsync('isLoggedIn', 'true');
+            setIsLoggedIn(true); // Update state to true after successful login
+        } catch (error) {
+            console.error('Error logging in', error);
+        }
     };
 
     const logout = async () => {
-        // For both mobile and web, use SecureStore (if available)
-        await SecureStore.setItemAsync('isLoggedIn', 'false');
-        setIsLoggedIn(false);
+        try {
+            // Clear the login status and update state to false
+            await SecureStore.setItemAsync('isLoggedIn', 'false');
+            setIsLoggedIn(false); // Update state to false after logout
+        } catch (error) {
+            console.error('Error logging out', error);
+        }
     };
 
-    // Function to completely clear credentials (for both web and mobile)
-    const clearCredentials = async () => { // testing function for clearing credentials
-        console.log('Clearing credentials...');
+    // Function to clear credentials from SecureStore
+    const clearCredentials = async () => { // This is for logging out and testing purposes
         try {
-            // For mobile, use SecureStore
+            // Remove any sensitive user data from SecureStore
+            await SecureStore.deleteItemAsync('userData');
             await SecureStore.deleteItemAsync('isLoggedIn');
-            // await SecureStore.deleteItemAsync('isFirstLaunch');
-
-            // For web, use localStorage
-            if (typeof localStorage !== 'undefined') {
-                console.log('Clearing credentials from localStorage on web');
-                localStorage.removeItem('isLoggedIn');
-                // localStorage.removeItem('isFirstLaunch');
-            }
-
-            console.log('Credentials cleared');
+            console.log('User credentials cleared');
         } catch (error) {
-            console.error('Error clearing credentials:', error);
+            console.error('Error clearing credentials', error);
         }
-    }; // end of testing function for clearing credentials
+    }; // End of testing function for clearing credentials
 
-    return { isLoggedIn, login, logout, loading, clearCredentials };
+    return {
+        isLoggedIn,
+        login,
+        logout,
+        clearCredentials,
+        loading,
+    };
 };
 
 export default useAuth;
-

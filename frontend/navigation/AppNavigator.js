@@ -3,7 +3,7 @@ import { createStackNavigator } from '@react-navigation/stack';
 import WelcomeScreen from '../screens/WelcomeScreen';
 import SignUpScreen from '../screens/SignUpPage';
 import HomeScreen from '../screens/HomeScreen';
-
+import TapBar from '../components/TapBar';
 const Stack = createStackNavigator();
 
 const AppNavigator = ({ onLogin }) => { // Make sure onLogin is passed to AppNavigator
@@ -13,7 +13,7 @@ const AppNavigator = ({ onLogin }) => { // Make sure onLogin is passed to AppNav
                 {props => <WelcomeScreen {...props} onLogin={onLogin} />}
             </Stack.Screen>
             <Stack.Screen name="SignUp" component={SignUpScreen} />
-            <Stack.Screen name="HomeScreen" component={HomeScreen} />
+            <Stack.Screen name="Home" component={TapBar} />
         </Stack.Navigator>
     );
 };

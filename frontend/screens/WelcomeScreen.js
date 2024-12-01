@@ -23,7 +23,7 @@ const WelcomeScreen = ({ onLogin }) => {
         checkLoginStatus();
     }, [onLogin]);
 
-    const handleLogin = async () => {
+    const handleLogin = async () => { // BACKEND LOGIIIKKA TÄHÄN 
         // Handle login logic here (either hardcoded or API call)
         if (!email || !password) {
             setErrorMessage('Email and password are required');

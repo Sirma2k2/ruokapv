@@ -1,11 +1,18 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Text, TouchableOpacity, View, StyleSheet, ScrollView, TextInput } from 'react-native';
 import { useNavigation } from '@react-navigation/native';
 import RNPickerSelect from 'react-native-picker-select';  // Import the new picker library
 import * as SecureStore from 'expo-secure-store'; // Import SecureStore
+import useAuth from '../hooks/useAuth'; 
+import * as Updates from 'expo-updates';
+
 
 const SignUpPage = () => {
   const navigation = useNavigation();
+  const {isLoggedIn } = useAuth();  // Get the login function from useAuth
+  const [isLoading, setIsLoading] = useState(false);
+
+
   const [userData, setUserData] = useState({
     name: '',
     email: '',
@@ -17,76 +24,90 @@ const SignUpPage = () => {
     goal: ''
   });
 
+
+  useEffect(() => {
+  }, [isLoggedIn, navigation]);
+
   const handleInputChange = (name) => (value) => {
     setUserData((prev) => ({ ...prev, [name]: value }));
   };
 
   const setLogged = async (userData) => {
-    // For both mobile and web, use SecureStore (if available)
-    await SecureStore.setItemAsync('isLoggedIn', 'true');
-    console.log("Logging in");
-    navigation.navigate('HomeScreen', { userData }); // tärkeä osa, navigoi eteenpäin ja vie datan mukanaan
-};
-const validateForm = () => {
-  const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-  if (!emailRegex.test(userData.email)) {
-    alert('Please enter a valid email address.');
-    return false;
-  }
+    try {
+      // Store user data and login status in SecureStore
+      await SecureStore.setItemAsync('userData', JSON.stringify(userData));
+      await SecureStore.setItemAsync('isLoggedIn', 'true');
+      console.log("User logged in:", userData);
+      alert('Signed up successfully!');
+      await new Promise(resolve => setTimeout(resolve, 800)); // delay for 0.8 seconds so the user can see the alert
+      Updates.reloadAsync(); // Reload the app after successful login
+     // setIsLoggedInState(true); // Update local state after successful login
+    } catch (error) {
+      console.error("Error storing user data:", error);
+      alert('An error occurred while signing up. Please try again.');
+    }
+  };
 
-  if (!userData.name) {
-    alert('Please enter your name.');
-    return false;
-  }
-  if (!userData.age) {
-    alert('Please select your age.');
-    return false;
-  }
-  if (!userData.weight) {
-    alert('Please select your weight.');
-    return false;
-  }
-  if (!userData.height) {
-    alert('Please select your height.');
-    return false;
-  }
-  if (!userData.activityLevel) {
-    alert('Please select an activity level.');
-    return false;
-  }
-  if (!userData.dietType) {
-    alert('Please select a diet type.');
-    return false;
-  }
-  if (!userData.goal) {
-    alert('Please select a goal.');
-    return false;
-  }
-  return true;
-};
+  const validateForm = () => {
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    if (!emailRegex.test(userData.email)) {
+      alert('Please enter a valid email address.');
+      return false;
+    }
 
-  const handleSubmit = () => { // all backend logic will be added here
+    if (!userData.name) {
+      alert('Please enter your name.');
+      return false;
+    }
+    if (!userData.age) {
+      alert('Please select your age.');
+      return false;
+    }
+    if (!userData.weight) {
+      alert('Please select your weight.');
+      return false;
+    }
+    if (!userData.height) {
+      alert('Please select your height.');
+      return false;
+    }
+    if (!userData.activityLevel) {
+      alert('Please select an activity level.');
+      return false;
+    }
+    if (!userData.dietType) {
+      alert('Please select a diet type.');
+      return false;
+    }
+    if (!userData.goal) {
+      alert('Please select a goal.');
+      return false;
+    }
+    return true;
+  };
+
+  const handleSubmit = () => {
     if (!validateForm()) return; // Validate the form before submitting
-    alert('Signed up successfully!'); // Alert the user that the data has been submitted
-    const userDataForBackend = { // myscreenin mukainen data
-        knimi: userData.name, // User's name
-        email: userData.email, // User's email
-        ika: parseInt(userData.age), // Age: integer
-        paino: parseInt(userData.weight), // Weight: integer
-        pituus: parseInt(userData.height), // Height: integer
-        aktiviteetti: userData.activityLevel === 'low' ? 1 : userData.activityLevel === 'medium' ? 2 : 3, // Activity Level: 1 for low, 2 for medium, 3 for high
-        tyyppi: userData.dietType === 'balanced' ? 1 : userData.dietType === 'keto' ? 2 : 3, // Diet Type: 1 for balanced, 2 for keto, 3 for vegan
-        tavoite: userData.goal === 'lose' ? 1 : userData.goal === 'maintain' ? 2 : 3 // Goal: 1 for lose, 2 for maintain, 3 for gain
-      };
-    console.log('User Data:', userData);
-    setLogged(userData);
+
+    const userDataForBackend = {
+        knimi: userData.name,
+        email: userData.email,
+        ika: parseInt(userData.age),
+        paino: parseInt(userData.weight),
+        pituus: parseInt(userData.height),
+        aktiviteetti: userData.activityLevel === 'low' ? 1 : userData.activityLevel === 'medium' ? 2 : 3,
+        tyyppi: userData.dietType === 'balanced' ? 1 : userData.dietType === 'keto' ? 2 : 3,
+        tavoite: userData.goal === 'lose' ? 1 : userData.goal === 'maintain' ? 2 : 3
+    };
+
+    console.log('User Data:', userDataForBackend);
+    setLogged(userDataForBackend); // Pass login function here
   };
 
   // Values for the pickers
   const ageValues = Array.from({ length: 100 }, (_, i) => i + 10); // 10 to 100 years
   const weightValues = Array.from({ length: 200 }, (_, i) => i + 30); // 30kg to 230kg
   const heightValues = Array.from({ length: 150 }, (_, i) => i + 120); // 120cm to 270cm
-
 
   return (
     <ScrollView style={styles.container}>
@@ -99,6 +120,8 @@ const validateForm = () => {
           placeholder="Enter your email"
           value={userData.email}
           onChangeText={handleInputChange('email')}
+          accessibilityLabel="Email input"
+
         />
       </View>
 
@@ -208,25 +231,25 @@ const validateForm = () => {
 };
 
 const pickerStyle = {
-    inputAndroid: {
-      fontSize: 18,
-      padding: 10,
-      borderWidth: 1,
-      borderRadius: 8,
-      borderColor: '#ddd',
-      backgroundColor: '#fff',
-      marginBottom: 20,
-    },
-   inputIOS: {
-      fontSize: 18,
-      padding: 10,
-      borderWidth: 1,
-      borderRadius: 8,
-      borderColor: '#ddd',
-      backgroundColor: '#fff',
-      marginBottom: 20,
-    },
-  };
+  inputAndroid: {
+    fontSize: 18,
+    padding: 10,
+    borderWidth: 1,
+    borderRadius: 8,
+    borderColor: '#ddd',
+    backgroundColor: '#fff',
+    marginBottom: 20,
+  },
+ inputIOS: {
+    fontSize: 18,
+    padding: 10,
+    borderWidth: 1,
+    borderRadius: 8,
+    borderColor: '#ddd',
+    backgroundColor: '#fff',
+    marginBottom: 20,
+  },
+};
 
 const styles = StyleSheet.create({
   container: { flex: 1, padding: 20, backgroundColor: '#f0f0f0' },
