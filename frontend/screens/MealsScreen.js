@@ -46,8 +46,44 @@ const MealsScreen = () => {
     }
   }, [searchMeals])
 
-  const saveFoodMeal = (food) => {
+  function extractServingSize(servingSizeStr) {
+    const match = servingSizeStr.match(/(\d+)/);
+    if (match) {
+        return parseInt(match[1], 10);
+    }
+    return null;
+}
+
+  const saveFoodMeal = async(food) => {
     console.log('Uusi ateria luotu:', food);
+
+    try {
+      const response = await fetch(ServerIp + '/api/add-food', {
+        method: 'POST', 
+        headers: { 
+          'content-type': 'application/json',
+        }, 
+        body: JSON.stringify({
+          knimi: 'kovakoodinimi',
+          ruokanimi: food.abbreviated_product_name,
+          maarag: extractServingSize(food.serving_size),
+          kalorit: food.nutriments?.['energy-kcal']
+          //img: food.image_small_url
+        }),
+      })
+      if (response.ok) {
+        console.log('Successfully added')
+        alert('Tallennettu onnistuneeti')
+      } else { 
+        console.log('Failed: ', response.status)
+        alert('Virhe tallentamisessa')
+        
+      }
+      } catch(error) {
+        
+        console.error('Error:', error)
+      }
+
     setModalVisible(false)
   }
 
@@ -193,7 +229,7 @@ const MealsScreen = () => {
 
       <TouchableOpacity
         style={styles.button}
-        onPress={() => saveMeal(selectedFood)}
+        onPress={() => saveFoodMeal(selectedFood)}
       >
         <Text>Save meal</Text>
       </TouchableOpacity>
