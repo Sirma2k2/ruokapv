@@ -2,11 +2,13 @@ import React, { useState } from 'react';
 import { Text, TouchableOpacity, View, StyleSheet, ScrollView, TextInput } from 'react-native';
 import { useNavigation } from '@react-navigation/native';
 import RNPickerSelect from 'react-native-picker-select';  // Import the new picker library
+import * as SecureStore from 'expo-secure-store'; // Import SecureStore
 
 const SignUpPage = () => {
   const navigation = useNavigation();
   const [userData, setUserData] = useState({
     name: '',
+    email: '',
     age: '20',  // Default age set to 20
     weight: '60',  // Default weight set to 60
     height: '170',  // Default height set to 170 cm
@@ -19,10 +21,56 @@ const SignUpPage = () => {
     setUserData((prev) => ({ ...prev, [name]: value }));
   };
 
-  const handleSubmit = () => { // all backend logic will be added here
+  const setLogged = async (userData) => {
+    // For both mobile and web, use SecureStore (if available)
+    await SecureStore.setItemAsync('isLoggedIn', 'true');
+    console.log("Logging in");
+    navigation.navigate('HomeScreen', { userData }); // tärkeä osa, navigoi eteenpäin ja vie datan mukanaan
+};
+const validateForm = () => {
+  const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+  if (!emailRegex.test(userData.email)) {
+    alert('Please enter a valid email address.');
+    return false;
+  }
 
+  if (!userData.name) {
+    alert('Please enter your name.');
+    return false;
+  }
+  if (!userData.age) {
+    alert('Please select your age.');
+    return false;
+  }
+  if (!userData.weight) {
+    alert('Please select your weight.');
+    return false;
+  }
+  if (!userData.height) {
+    alert('Please select your height.');
+    return false;
+  }
+  if (!userData.activityLevel) {
+    alert('Please select an activity level.');
+    return false;
+  }
+  if (!userData.dietType) {
+    alert('Please select a diet type.');
+    return false;
+  }
+  if (!userData.goal) {
+    alert('Please select a goal.');
+    return false;
+  }
+  return true;
+};
+
+  const handleSubmit = () => { // all backend logic will be added here
+    if (!validateForm()) return; // Validate the form before submitting
+    alert('Signed up successfully!'); // Alert the user that the data has been submitted
     const userDataForBackend = { // myscreenin mukainen data
         knimi: userData.name, // User's name
+        email: userData.email, // User's email
         ika: parseInt(userData.age), // Age: integer
         paino: parseInt(userData.weight), // Weight: integer
         pituus: parseInt(userData.height), // Height: integer
@@ -31,7 +79,7 @@ const SignUpPage = () => {
         tavoite: userData.goal === 'lose' ? 1 : userData.goal === 'maintain' ? 2 : 3 // Goal: 1 for lose, 2 for maintain, 3 for gain
       };
     console.log('User Data:', userData);
-    navigation.navigate('HomeScreen', { userData }); // tärkeä osa, navigoi eteenpäin ja vie datan mukanaan
+    setLogged(userData);
   };
 
   // Values for the pickers
@@ -43,6 +91,16 @@ const SignUpPage = () => {
   return (
     <ScrollView style={styles.container}>
       <Text style={styles.title}>Sign Up</Text>
+
+      <View style={styles.inputGroup}>
+        <Text style={styles.label}>Email</Text>
+        <TextInput
+          style={styles.input}
+          placeholder="Enter your email"
+          value={userData.email}
+          onChangeText={handleInputChange('email')}
+        />
+      </View>
 
       {/* Name Input */}
       <View style={styles.inputGroup}>
