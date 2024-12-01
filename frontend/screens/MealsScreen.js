@@ -6,6 +6,8 @@ import { FlatList } from 'react-native';
 import * as Animatable from 'react-native-animatable';
 import { Picker } from '@react-native-picker/picker';
 
+import ServerIp from '../hooks/Global';
+
 const MealsScreen = () => {
   const { theme } = useTheme(); // Access the theme from context
   const [searchMeals, setSearchMeals] = useState('');
@@ -22,7 +24,7 @@ const MealsScreen = () => {
     setError('');
 
     try {
-      const response = await fetch(`http://localhost:3000/api/searchFood?query=${query}`);
+      const response = await fetch(ServerIp + `/api/searchFood?query=${query}`);
       if (response.ok) {
         const data = await response.json()
         setFoodResults(data);
@@ -44,8 +46,44 @@ const MealsScreen = () => {
     }
   }, [searchMeals])
 
-  const saveFoodMeal = (food) => {
+  function extractServingSize(servingSizeStr) {
+    const match = servingSizeStr.match(/(\d+)/);
+    if (match) {
+        return parseInt(match[1], 10);
+    }
+    return null;
+}
+
+  const saveFoodMeal = async(food) => {
     console.log('Uusi ateria luotu:', food);
+
+    try {
+      const response = await fetch(ServerIp + '/api/add-food', {
+        method: 'POST', 
+        headers: { 
+          'content-type': 'application/json',
+        }, 
+        body: JSON.stringify({
+          knimi: 'kovakoodinimi',
+          ruokanimi: food.abbreviated_product_name,
+          maarag: extractServingSize(food.serving_size),
+          kalorit: food.nutriments?.['energy-kcal']
+          //img: food.image_small_url
+        }),
+      })
+      if (response.ok) {
+        console.log('Successfully added')
+        alert('Tallennettu onnistuneeti')
+      } else { 
+        console.log('Failed: ', response.status)
+        alert('Virhe tallentamisessa')
+        
+      }
+      } catch(error) {
+        
+        console.error('Error:', error)
+      }
+
     setModalVisible(false)
   }
 
@@ -191,7 +229,7 @@ const MealsScreen = () => {
 
       <TouchableOpacity
         style={styles.button}
-        onPress={() => saveMeal(selectedFood)}
+        onPress={() => saveFoodMeal(selectedFood)}
       >
         <Text>Save meal</Text>
       </TouchableOpacity>

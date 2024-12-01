@@ -6,6 +6,8 @@ import Ionicons from 'react-native-vector-icons/Ionicons';
 import * as SecureStore from 'expo-secure-store'; // Import SecureStore for testing purposes
 import * as Updates from 'expo-updates';
 
+import ServerIp from '../hooks/Global';
+
 const HomeScreen = () => {
   const [foodHistory, setFoodHistory] = useState([]); // hardcoded 
   const [averageCalories, setAverageCalories] = useState(0);
@@ -16,7 +18,7 @@ const HomeScreen = () => {
   useEffect(() => {
     const fetchFoodHistory = async () => {
       try {
-        const response = await fetch('http://localhost:3000/get-food');
+        const response = await fetch(ServerIp + '/get-food');
 
         if (response.ok) {
           const data = await response.json();
