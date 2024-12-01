@@ -4,6 +4,7 @@ import PieChart from '../components/PieChart'; // piechart.js josta tulee data
 import { useTheme } from '../components/ThemeContext'; 
 import Ionicons from 'react-native-vector-icons/Ionicons';
 import * as SecureStore from 'expo-secure-store'; // Import SecureStore for testing purposes
+import * as Updates from 'expo-updates';
 
 import ServerIp from '../hooks/Global';
 
@@ -50,6 +51,9 @@ const HomeScreen = () => {
       await SecureStore.deleteItemAsync('user'); // Clear user credentials
       await SecureStore.deleteItemAsync('isLoggedIn'); // Clear login status
       console.log('Credentials cleared');
+      alert('Logging out...'); // Alert the user that they are being logged out
+      await new Promise(resolve => setTimeout(resolve, 800)); // delay for 0.8 seconds so the user can see the alert
+      Updates.reloadAsync(); // Reload the app after clearing credentials
     } catch (error) {
       console.error('Error clearing credentials:', error);
     }
@@ -65,8 +69,9 @@ const HomeScreen = () => {
 
   return (
     <View style={[styles.container, { backgroundColor: theme.container.backgroundColor }]}>
+      {/* Sign out button with icon */}
       <TouchableOpacity style={styles.clearButton} onPress={clearCredentials}>
-        <Text style={styles.buttonText}> Button to Clear Credentials from Memory</Text>
+        <Ionicons name="log-out-outline" size={30} color={theme.text.color} />
       </TouchableOpacity>
 
       <Text style={[styles.subtitle, { color: theme.text.color }]}>Meal diary</Text>
@@ -109,15 +114,16 @@ const HomeScreen = () => {
 
 const styles = StyleSheet.create({
   container: { flex: 1, padding: 20, margin: 1 },
-  title: { fontSize: 24, textAlign: 'center',  margin: 10, fontWeight: 'bold' },
+  title: { fontSize: 24, textAlign: 'center', margin: 10, fontWeight: 'bold' },
   subtitle: { fontSize: 20, marginVertical: 10, fontWeight: '600' },
   item: { padding: 10, borderBottomWidth: 1 },
   averageText: { marginTop: 20, fontSize: 18, fontWeight: 'bold' },
-  totalText: { marginTop: 10, fontSize: 18, fontWeight: 'bold'},
+  totalText: { marginTop: 10, fontSize: 18, fontWeight: 'bold' },
   pieTitle: { marginTop: 20, fontSize: 22, fontWeight: 'bold', textAlign: 'center' },
   emptyContainer: { flex: 1, justifyContent: 'center', alignItems: 'center', marginTop: 20 },
   emptyText: { fontSize: 18, fontWeight: 'bold', textAlign: 'center' },
-  clearButton: { padding: 10, backgroundColor: 'gray', borderRadius: 5, margin: 10 },
+  clearButton: { padding: 10, backgroundColor: 'transparent', borderRadius: 5, alignSelf: 'flex-end', justifyContent: 'center', alignItems: 'center' },
+  buttonText: { color: 'blue', textAlign: 'center' }
 });
 
 export default HomeScreen;
