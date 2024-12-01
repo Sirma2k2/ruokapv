@@ -7,6 +7,8 @@ import { useNavigation } from '@react-navigation/native';
 import SettingsModal from '../components/SettingsModal';
 //import { application } from 'express';
 
+import ServerIp from '../hooks/Global';
+
 const MyScreen = () => {
   const navigation = useNavigation();
   const [userData, setUserData] = useState({
@@ -45,7 +47,7 @@ const MyScreen = () => {
     console.log('User Data:', userData);
 
     try {
-      const response = await fetch('http://localhost:3000/add-user', {
+      const response = await fetch(ServerIp + '/add-user', {
         method: 'POST', 
         headers: { 
           'content-type': 'application/json',
@@ -71,9 +73,7 @@ const MyScreen = () => {
       } catch(error) {
         
         console.error('Error:', error)
-        
-      
-    }
+      }
   };
 
   const setLog = () => {

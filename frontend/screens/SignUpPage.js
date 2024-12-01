@@ -29,10 +29,9 @@ const SignUpPage = () => {
         aktiviteetti: userData.activityLevel === 'low' ? 1 : userData.activityLevel === 'medium' ? 2 : 3, // Activity Level: 1 for low, 2 for medium, 3 for high
         tyyppi: userData.dietType === 'balanced' ? 1 : userData.dietType === 'keto' ? 2 : 3, // Diet Type: 1 for balanced, 2 for keto, 3 for vegan
         tavoite: userData.goal === 'lose' ? 1 : userData.goal === 'maintain' ? 2 : 3 // Goal: 1 for lose, 2 for maintain, 3 for gain
-      }; console.log('User Data:', userData);
+      };
 
-    console.log('User Data:', userData);
-    navigation.navigate('HomeScreen', { userData }); // tärkeä osa, navigoi eteenpäin ja vie datan mukanaan
+    navigation.navigate('MyScreen', { userData }); // tärkeä osa, navigoi eteenpäin ja vie datan mukanaan
   };
 
   // Values for the pickers
