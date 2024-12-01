@@ -13,7 +13,7 @@ Ennen kuin aloitat, varmista, että sinulla on asennettuna:
 Avaa projektin kansio ja asenna tarvittavat riippuvuudet seuraavilla komennoilla:
 
 - npm install
-
+   - "expo-updates": "^0.26.9",
    - "@expo/metro-runtime": "4.0.0",
    - "@react-native-async-storage/async-storage": "1.23.1",
    - "@react-native-community/datetimepicker": "8.2.0",
