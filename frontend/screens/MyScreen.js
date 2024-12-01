@@ -43,7 +43,7 @@ const MyScreen = () => {
     setUserData((prev) => ({ ...prev, [name]: value }));
   };
 
-  const handleSubmit = async() => {
+  const handleSubmit = async() => { // turha funktio, ei käytetä enään käyttäjän lisäämiseen
     console.log('User Data:', userData);
 
     try {
@@ -65,7 +65,7 @@ const MyScreen = () => {
       if (response.ok) {
         console.log('Successfully added')
         alert('Käyttäjä lisätty onnistuneesti')
-      } else {
+      } else { 
         console.log('Failed: ', response.status)
         alert('Virhe käyttäjän lisäämisessä')
         

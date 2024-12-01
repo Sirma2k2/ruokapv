@@ -9,7 +9,6 @@ const Stack = createStackNavigator();
 const AppNavigator = ({ onLogin }) => { // Make sure onLogin is passed to AppNavigator
     return (
         <Stack.Navigator initialRouteName="Welcome">
-            {/* Use a render function to pass props and onLogin */}
             <Stack.Screen name="Welcome">
                 {props => <WelcomeScreen {...props} onLogin={onLogin} />}
             </Stack.Screen>
