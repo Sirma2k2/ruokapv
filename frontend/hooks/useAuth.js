@@ -13,7 +13,7 @@ const useAuth = () => {
 
             // Check if SecureStore is available for mobile platforms
            
-            //setIsLoggedIn(true); // Jos tämä rivi on pääällä pääsee ohittamaan kirjautumisen vaikka webin takia
+            setIsLoggedIn(true); // Jos tämä rivi on pääällä pääsee ohittamaan kirjautumisen vaikka webin takia
            
 
             const storedLoginStatus = await SecureStore.getItemAsync('isLoggedIn');
