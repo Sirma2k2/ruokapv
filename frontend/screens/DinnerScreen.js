@@ -4,6 +4,7 @@ import { useTheme } from '../components/ThemeContext'; // Import the useTheme ho
 import { ActivityIndicator, Searchbar } from 'react-native-paper';
 import * as Animatable from 'react-native-animatable';
 import Ionicons from '@expo/vector-icons/Ionicons';
+import ServerIp from '../hooks/Global';
 
 
 const DinnerScreen = ({ navigation }) => {
@@ -23,7 +24,7 @@ const DinnerScreen = ({ navigation }) => {
     setError('');
 
     try {
-      const response = await fetch(`http://localhost:3000/api/searchFood?query=${query}`);
+      const response = await fetch(ServerIp + `/api/searchFood?query=${query}`);
       if (response.ok) {
         const data = await response.json();
         setFoodResults(data);
@@ -89,6 +90,7 @@ const DinnerScreen = ({ navigation }) => {
             placeholder="Search food"
             onChangeText={setSearchDinner}
             value={searchDinner}
+            style={styles.searchBar}
           />
           {/* Show loading indicator */}
           {loading && <ActivityIndicator size="large" color="#ff0" />}
