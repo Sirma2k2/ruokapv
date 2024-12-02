@@ -2,7 +2,7 @@ import * as SecureStore from 'expo-secure-store';
 
 const key = "userData"
 
-export function useData () {
+export function useData () { //backend tähän kanssa
     const saveData = async (value) => {
         await SecureStore.setItemAsync(key, JSON.stringify(value))
     }

@@ -93,8 +93,8 @@ const MealsScreen = () => {
   }
 
   return (
-    <View style={{ flex: 1, padding: 16 }}>
-      <Text style={[styles.header, { color: theme.text.color }]}>Create a Meal</Text>
+<View style={[theme.container, { padding: 16 }]}>
+  <Text style={[styles.header, { color: theme.text.color }]}>Create a Meal</Text>
 
       <Text style={[styles.label, theme.text]}>Meal name</Text>
       <TextInput
@@ -181,32 +181,19 @@ const MealsScreen = () => {
         visible={modalVisible}
         onRequestClose={() => setModalVisible(false)}
       >
-        <View style={styles.modalOverlay}>
-          <View style={styles.modalContent}>
+        <View style={[styles.modalOverlay, { backgroundColor: theme.modalOverlay.backgroundColor }]}>
+          <View style={[styles.modalContent, { backgroundColor: theme.modalContainer.backgroundColor }]}>
             {selectedFood ? (
               <>
-                <Text style={styles.modalText}>
+                <Text style={[styles.modalText, { color: theme.text.color }]}>
                   Name: {selectedFood.product_name || 'N/A'}
                 </Text>
-                <Text style={styles.modalText}>
+                <Text style={[styles.modalText, { color: theme.text.color }]}>
                   Brand: {selectedFood.brands || 'N/A'}
                 </Text>
-                <Text style={styles.modalText}>
-                      Quantity: {selectedFood.quantity || 'N/A'}
-                    </Text>
-                    <Text style={styles.modalText}>
-                      Protein: {selectedFood.nutriments?.proteins_100g || 'N/A'}
-                    </Text>
-                    <Text style={styles.modalText}>
-                      Carbohydrates: {selectedFood.nutriments?.carbohydrates_100g || 'N/A'}
-                    </Text>
-                    <Text style={styles.modalText}>
-                      Fat: {selectedFood.nutriments?.fat_100g || 'N/A'}
-                    </Text>
-
-                    <Text style={styles.modalText}>
-                      Calories: {selectedFood.nutriments?.['energy-kcal'] || 'N/A'} kcal
-                    </Text>                
+                <Text style={[styles.modalText, { color: theme.text.color }]}>
+                  Quantity: {selectedFood.quantity || 'N/A'}
+                </Text>
                 <TouchableOpacity
                   style={styles.button}
                   onPress={() => saveFoodMeal(selectedFood)}
@@ -215,7 +202,7 @@ const MealsScreen = () => {
                 </TouchableOpacity>
               </>
             ) : (
-              <Text style={styles.modalText}>No food selected</Text>
+              <Text style={[styles.modalText, { color: theme.text.color }]}>No food selected</Text>
             )}
             <TouchableOpacity
               style={styles.button}

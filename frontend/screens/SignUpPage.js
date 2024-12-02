@@ -86,7 +86,7 @@ const SignUpPage = () => {
     return true;
   };
 
-  const handleSubmit = () => {
+  const handleSubmit = () => { // BACKEND LOGIIKKA TÄHÄN POHJA ON JO VALMIINA!!!!
     if (!validateForm()) return; // Validate the form before submitting
 
     const userDataForBackend = {
