@@ -76,24 +76,54 @@ app.get('/get-user', async( req,res)=> {
     res.status(500).send('database query failed')
   }
 })
+// API-reitti POST-pyynnölle (lisää käyttäjä)
+app.post('/add-user', async(req,res) => { 
+  const {knimi, email, pword, ika, paino, pituus, aktiviteetti, tyyppi, tavoite } = req.body
 
-app.post('/add-user', async(req,res) => {
-  const {knimi, ika, paino, pituus, aktiviteetti, tyyppi, tavoite } = req.body
-
-  if(!knimi || !ika || !paino || !pituus || !aktiviteetti || !tyyppi || !tavoite) {
+  if(!knimi || !email || !pword || !ika || !paino || !pituus || !aktiviteetti || !tyyppi || !tavoite) {
     return res.status(400).json({ error: 'something missing'})
   }
-  try { 
-    const query = 'INSERT INTO users(knimi, ika, paino, pituus, aktiviteetti, tyyppi, tavoite) VALUES($1, $2, $3, $4, $5, $6, $7)'
-    const values = [knimi, ika, paino, pituus, aktiviteetti, tyyppi, tavoite || null]
-    await pool.query(query, values)
-    res.status(201).json({ message: 'user added successfully' })
-  } catch(err) {
+
+  try {
+
+    const query1 = 'SELECT email FROM users WHERE email = $1 OR knimi = $2';
+    const values1 = [email, knimi];
+
+    if ((await pool.query(query1, values1)).rowCount === 0){
+      console.log("knimi ja email vapaa");
+      const query = 'INSERT INTO users(knimi, ika, paino, pituus, aktiviteetti, tyyppi, tavoite, email, pword) VALUES($1, $2, $3, $4, $5, $6, $7, $8, $9)'
+      const values = [knimi, ika, paino, pituus, aktiviteetti, tyyppi, tavoite, email, pword]
+      await pool.query(query, values)
+      return res.status(201).json({ message: 'user added successfully' })
+    }else {
+      console.log("knimi tai email jo käytössä");
+      return res.status(600).json({message: "nimi tai email jo käytössä"});
+    }
+
+  }catch(err){
     console.error('Error inserting user to the database', err)
     res.status(500).json({ error: 'Failed to add user to the database' })
   }
-})
 
+});
+
+app.post('/login', async(req,res)=> {
+  const {email, pword} = req.body;
+
+  try {
+    const query = 'SELECT * FROM users WHERE email = $1 AND pword = $2';
+    const values = [email, pword];
+    const result = await pool.query(query, values);
+    if (result.rowCount != 0){
+      return res.status(201).json(result);
+    }else{
+      return res.status(202).json({ message: 'väärät tunukset'})
+    }
+  } catch(err){
+    console.error('Query error', err)
+    res.status(500).send('database query failed')
+  }
+})
 
 app.get('/get-food', async(req,res)=> {
   try { 
@@ -104,7 +134,7 @@ app.get('/get-food', async(req,res)=> {
     console.error('Error fetching data', error)
     res.status(500).send('Error fetching data')
   }
-})
+});
 // Palvelimen käynnistys
 app.listen(port, () => {
   console.log(`Server is running at http://localhost:${port}`);

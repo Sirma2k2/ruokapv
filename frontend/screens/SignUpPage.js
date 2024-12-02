@@ -6,6 +6,7 @@ import * as SecureStore from 'expo-secure-store'; // Import SecureStore
 import useAuth from '../hooks/useAuth'; 
 import * as Updates from 'expo-updates';
 
+import ServerIp from '../hooks/Global';
 
 const SignUpPage = () => {
   const navigation = useNavigation();
@@ -16,6 +17,7 @@ const SignUpPage = () => {
   const [userData, setUserData] = useState({
     name: '',
     email: '',
+    pword: '',
     age: '20',  // Default age set to 20
     weight: '60',  // Default weight set to 60
     height: '170',  // Default height set to 170 cm
@@ -32,7 +34,7 @@ const SignUpPage = () => {
     setUserData((prev) => ({ ...prev, [name]: value }));
   };
 
-  const setLogged = async (userData) => {
+  const setLogged = async () => {
     try {
       // Store user data and login status in SecureStore
       await SecureStore.setItemAsync('userData', JSON.stringify(userData));
@@ -54,7 +56,10 @@ const SignUpPage = () => {
       alert('Please enter a valid email address.');
       return false;
     }
-
+    if (!userData.pword) {
+      alert('Please enter a password.');
+      return false;
+    }
     if (!userData.name) {
       alert('Please enter your name.');
       return false;
@@ -86,9 +91,10 @@ const SignUpPage = () => {
     return true;
   };
 
-  const handleSubmit = () => { // BACKEND LOGIIKKA TÄHÄN POHJA ON JO VALMIINA!!!!
+  const handleSubmit = async() => { // BACKEND LOGIIKKA TÄHÄN POHJA ON JO VALMIINA!!!! //MISSÄ HITOSSA!?!?!? toi on nyt kahesti sama pätkä tossa ku en saa nätimmin toimii-paulus
     if (!validateForm()) return; // Validate the form before submitting
 
+    /*
     const userDataForBackend = {
         knimi: userData.name,
         email: userData.email,
@@ -99,10 +105,43 @@ const SignUpPage = () => {
         tyyppi: userData.dietType === 'balanced' ? 1 : userData.dietType === 'keto' ? 2 : 3,
         tavoite: userData.goal === 'lose' ? 1 : userData.goal === 'maintain' ? 2 : 3
     };
+    */
 
-    console.log('User Data:', userDataForBackend);
-    setLogged(userDataForBackend); // Pass login function here
+    try {
+      const response = await fetch(ServerIp + '/add-user', {
+        method: 'POST', 
+        headers: { 
+          'content-type': 'application/json',
+        }, 
+        body: JSON.stringify({
+          knimi: userData.name,
+          email: userData.email,
+          pword: userData.pword,
+          ika: userData.age, 
+          paino: userData.weight,
+          pituus: userData.height,
+          aktiviteetti: userData.activityLevel === 'low' ? 1: userData.activityLevel === 'medium' ? 2: 3,
+          tyyppi: userData.dietType === 'balanced' ? 1 : userData.dietType === 'keto' ? 2 : 3, 
+          tavoite: userData.goal === 'lose' ? 1 : userData.goal === 'maintain' ? 2 : 3,
+        }),
+      });
+      if (response.status === 201) {
+        console.log('Successfully added')
+        alert('Käyttäjä lisätty onnistuneesti')
+      } else {
+        console.log('Failed: ', response.status, ' ', response.headers)
+        alert('Virhe käyttäjän lisäämisessä')
+        return;
+      }
+    } catch(error) {
+        
+      console.error('Error:', error)
+    }
+
+    //console.log('User Data:', userDataForBackend);
+    setLogged(); // Pass login function here
   };
+
 
   // Values for the pickers
   const ageValues = Array.from({ length: 100 }, (_, i) => i + 10); // 10 to 100 years
@@ -121,6 +160,19 @@ const SignUpPage = () => {
           value={userData.email}
           onChangeText={handleInputChange('email')}
           accessibilityLabel="Email input"
+
+        />
+      </View>
+
+      {/*Salasana input*/}
+      <View style={styles.inputGroup}>
+        <Text style={styles.label}>Password</Text>
+        <TextInput
+          style={styles.input}
+          placeholder="Enter your password"
+          value={userData.pword}
+          onChangeText={handleInputChange('pword')}
+          accessibilityLabel="Password input"
 
         />
       </View>

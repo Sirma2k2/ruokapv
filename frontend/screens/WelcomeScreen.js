@@ -3,6 +3,8 @@ import { View, Text, TextInput, StyleSheet, TouchableOpacity } from 'react-nativ
 import * as SecureStore from 'expo-secure-store'; // Import SecureStore
 import { useNavigation } from '@react-navigation/native'; // Import useNavigation hook
 
+import ServerIp from '../hooks/Global';
+
 const WelcomeScreen = ({ onLogin }) => {
     const [email, setEmail] = useState('');
     const [password, setPassword] = useState('');
@@ -25,20 +27,37 @@ const WelcomeScreen = ({ onLogin }) => {
 
     const handleLogin = async () => { // BACKEND LOGIIIKKA TÄHÄN, HARDCODE CREDIDENTIALS VOI LAITTAA KOMMENTTIIN KUN TOIMII !!!
         // Handle login logic here (either hardcoded or API call)
+
         if (!email || !password) {
-            setErrorMessage('Email and password are required');
+            console.log('Email and password are required');
             return;
         }
 
-        const hardcodedCredentials = { email: "test@example.com", password: "1234" };
+        try {
+            console.log("yrittää kirjautua");
+            const response = await fetch(ServerIp + '/login', {
+              method: 'POST', 
+              headers: { 
+                'content-type': 'application/json',
+              }, 
+              body: JSON.stringify({
+                email: email,
+                pword: password,
+              }),
+            });
+            if (response.status === 201) {
+              console.log('logged in');
+              await SecureStore.setItemAsync('user', JSON.stringify({ email }));
+              onLogin(); // Notify parent about successful login
+            } else {
+              console.log('Failed: ', response.status, ' ', response.headers);
+              alert('error');
+              return;
+            }
+          } catch(error) {
+            console.error('Error:', error)
+          }  
 
-        if (email === hardcodedCredentials.email && password === hardcodedCredentials.password) {
-            console.log("Login successful!");
-            await SecureStore.setItemAsync('user', JSON.stringify({ email }));
-            onLogin(); // Notify parent about successful login
-        } else {
-            setErrorMessage('Invalid email or password');
-        }
     };
 
     return (
