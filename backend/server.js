@@ -115,19 +115,25 @@ app.post('/login', async(req,res)=> {
     const values = [email, pword];
     const result = await pool.query(query, values);
     if (result.rowCount != 0){
-      return res.status(201).json(result);
+      console.log(result.rows);
+      return res.status(201).json({data: result.rows});
     }else{
-      return res.status(202).json({ message: 'väärät tunukset'})
+      return res.status(401).json({ message: 'väärät tunukset'})
     }
   } catch(err){
     console.error('Query error', err)
     res.status(500).send('database query failed')
   }
-})
+});
 
 app.get('/get-food', async(req,res)=> {
+  const knimi = req.headers.knimi;
+  console.log("knimi: ",knimi)
+  const query = 'SELECT ruokanimi, maarag, kalorit FROM ruoka WHERE knimi = $1';
+  const value = [knimi];
+
   try { 
-    const result = await pool.query('SELECT ruokanimi, maarag, kalorit FROM ruoka')
+    const result = await pool.query(query, value);
     res.json(result.rows)
 
   } catch (error) {

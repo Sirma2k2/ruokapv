@@ -18,7 +18,14 @@ const HomeScreen = () => {
   useEffect(() => {
     const fetchFoodHistory = async () => {
       try {
-        const response = await fetch(ServerIp + '/get-food');
+        const userData = await SecureStore.getItemAsync('userData');
+        const parsedData = JSON.parse(userData); // Parse the JSON string
+        const nimi = parsedData[0]?.knimi;
+        const response = await fetch(ServerIp + '/get-food', {
+          headers: { 
+            knimi: nimi,
+          }
+        });
 
         if (response.ok) {
           const data = await response.json();
@@ -41,7 +48,7 @@ const HomeScreen = () => {
     };
     fetchFoodHistory();
   }, []);
-
+  
   const clearCredentials = async () => { // again this function is for testing purposes and will be removed in production. will not work in web
     if(Platform.OS === 'web') {
       console.warn('This feature is not available on web, please use the browser console to clear credentials');

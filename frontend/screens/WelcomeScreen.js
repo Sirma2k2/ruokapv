@@ -25,7 +25,7 @@ const WelcomeScreen = ({ onLogin }) => {
         checkLoginStatus();
     }, [onLogin]);
 
-    const handleLogin = async () => { // BACKEND LOGIIIKKA TÄHÄN, HARDCODE CREDIDENTIALS VOI LAITTAA KOMMENTTIIN KUN TOIMII !!!
+    const handleLogin = async () => { // BACKEND LOGIIIKKA TÄHÄN, HARDCODE CREDIDENTIALS VOI LAITTAA KOMMENTTIIN KUN TOIMII !!! //MY BAD POISTINE! -Paulus
         // Handle login logic here (either hardcoded or API call)
 
         if (!email || !password) {
@@ -45,9 +45,13 @@ const WelcomeScreen = ({ onLogin }) => {
                 pword: password,
               }),
             });
+
+            const result = await response.json();
+
             if (response.status === 201) {
               console.log('logged in');
-              await SecureStore.setItemAsync('user', JSON.stringify({ email }));
+              console.log(JSON.stringify(result.data));
+              await SecureStore.setItemAsync('userData', JSON.stringify(result.data));
               onLogin(); // Notify parent about successful login
             } else {
               console.log('Failed: ', response.status, ' ', response.headers);
