@@ -51,15 +51,15 @@ const MyScreen = () => {
       if (storedData) {
         const parsedData = JSON.parse(storedData);
         const mappedData = {
-          name: parsedData.knimi || "",
-          email: parsedData.email || "",
-          age: parsedData.ika || "",
-          weight: parsedData.paino || "",
-          height: parsedData.pituus || "",
-          activityLevel: parsedData.aktiviteetti || "",
-          dietType: parsedData.tyyppi || "",
-          goal: parsedData.tavoite || "",
-        };
+          name: parsedData[0]?.knimi || "",
+          email: parsedData[0]?.email || "",
+          age: parsedData[0]?.ika || "",
+          weight: parsedData[0]?.paino || "",
+          height: parsedData[0]?.pituus || "",
+          activityLevel: parsedData[0]?.aktiviteetti || "",
+          dietType: parsedData[0]?.tyyppi || "",
+          goal: parsedData[0]?.tavoite || "",
+        }; 
         setUserData(mappedData);
         return mappedData;
       }
@@ -70,6 +70,7 @@ const MyScreen = () => {
 
   useEffect(() => {
     loadUserData();
+    console.log("Loaded: ", userData);
   }, []);
 
   const handleInputChange = (name) => (value) => {
@@ -104,6 +105,8 @@ const MyScreen = () => {
     { label: "Maintain Weight", value: "maintain" },
     { label: "Gain Weight", value: "gain" },
   ];
+
+  //MUOKKAAMINEN PITÄÄ TEHÖ BACKENDIIN ERI ENDPOINTTIIN
 
   return (
     <ScrollView style={[styles.container, { backgroundColor: theme.container.backgroundColor }]}>
@@ -153,7 +156,7 @@ const MyScreen = () => {
         <Text style={[styles.label, theme.text]}>Age</Text>
         <TextInput
           style={[styles.input, { color: theme.text.color }]}
-          value={userData.age}
+          value={userData.age.toString()}
           editable={false}
         />
       </View>
@@ -163,7 +166,7 @@ const MyScreen = () => {
         <TextInput
           style={[styles.input, { color: theme.text.color }]}
           keyboardType="numeric"
-          value={userData.weight}
+          value={userData.weight.toString()}
           onChangeText={handleInputChange("weight")}
         />
       </View>
@@ -173,7 +176,7 @@ const MyScreen = () => {
         <TextInput
           style={[styles.input, { color: theme.text.color }]}
           keyboardType="numeric"
-          value={userData.height}
+          value={userData.height.toString()}
           onChangeText={handleInputChange("height")}
         />
       </View>
