@@ -49,6 +49,7 @@ const MyScreen = () => {
     try {
       const storedData = await SecureStore.getItemAsync("userData");
       if (storedData) {
+        console.log(storedData)
         const parsedData = JSON.parse(storedData);
         const mappedData = {
           name: parsedData.knimi || "",
@@ -124,7 +125,7 @@ const MyScreen = () => {
         style={styles.settingsIcon}
         onPress={toggleSettingsVisible}
       >
-        <Ionicons name="menu" size={30} color={theme.text.color} />
+        <Ionicons name="cog-sharp" size={30} color={theme.text.color} />
       </TouchableOpacity>
 
       <Text style={[styles.title, theme.text]}>My Profile</Text>
@@ -259,8 +260,8 @@ const styles = StyleSheet.create({
   },
   settingsIcon: {
     position: "absolute",
-    top: 10,
-    right: 30,
+    top: -10,
+    right: -10,
     zIndex: 1,
     margin: 5,
     padding: 5,

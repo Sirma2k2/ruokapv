@@ -2,14 +2,20 @@ import React from 'react';
 import { View, Text, TouchableOpacity, StyleSheet } from 'react-native';
 import { useTheme } from '../components/ThemeContext'; // Import the useTheme hook
 import Ionicons from '@expo/vector-icons/Ionicons';
+import CalorieTracker from '../components/CalorieTracker';
 
 const FoodScreen = ({ navigation }) => {
 
 
   const { theme } = useTheme(); // Access the theme from context
 
+  const goal = 2000;
+  const food = 2500;
+  const remaining = goal - food;
+
   return (
     <View style={[styles.container, { backgroundColor: theme.container.backgroundColor }]}>
+      <CalorieTracker  goal={goal} food={food} remaining={remaining} />
       <Text style={[styles.header, { color: theme.text.color }]}>Select Meal Type</Text>
       
       <TouchableOpacity 
@@ -47,10 +53,11 @@ const styles = StyleSheet.create({
   },
   header: { 
     fontSize: 28, 
-    marginTop: 40, 
-    marginBottom: 30, 
+    marginTop: 30, 
+    marginBottom: 24, 
     fontWeight: 'bold' 
-  },
+  },    marginTop: 20,
+
   button: {
     alignItems: 'center',
     justifyContent: 'center',
@@ -59,7 +66,7 @@ const styles = StyleSheet.create({
     borderRadius: 25,
     marginVertical: 10,
     borderWidth: 2, 
-    borderColor: 'blue',
+    borderColor: '#4169e1',
   
   },
   buttonText: {
@@ -69,7 +76,7 @@ const styles = StyleSheet.create({
   }, 
   icon: {
     marginRight: 10,
-  }
+  }, 
 });
 
 export default FoodScreen;
