@@ -18,7 +18,7 @@ import { useNavigation } from '@react-navigation/native';
 const MyScreen = () => {
   const navigation = useNavigation();
 
-  const [userData, setUserData] = useState({
+  const [userData, setUserData] = useState({ 
     name: "",
     email: "",
     age: "",
@@ -61,6 +61,7 @@ const MyScreen = () => {
           goal: parsedData.tavoite || "",
         };
         setUserData(mappedData);
+        return mappedData;
       }
     } catch (error) {
       console.error("Error retrieving user data:", error);
