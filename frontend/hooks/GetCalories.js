@@ -4,13 +4,14 @@ import React, { useEffect } from 'react'
 
 const storedLoginStatus = await SecureStore.getItemAsync('isLoggedIn');
 
+import ServerIp from '../hooks/Global';
 
 
 //this is a hook to get calories
-const GetCalories = () => {
+const GetCalories = () => { //BACKEND KUTSU OIKEIN TÄHÄN
 useEffect(() => {
     // Fetch calories from the API
-    fetch('http://localhost:3000/api/calories')
+    fetch(ServerIp + '/get-food')
         .then(response => response.json())
         .then(data => console.log(data))
         .catch(error => console.log('Error fetching calories:', error))

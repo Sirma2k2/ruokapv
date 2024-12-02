@@ -6,7 +6,7 @@ const useAuth = () => {
     const [loading, setLoading] = useState(true); // Used to show a loading screen while checking the auth status
 
     // Check the auth status when the app is loaded
-    useEffect(() => {
+    useEffect(() => { // BACKEND TÄHÄN KANSSA
         const checkAuthStatus = async () => {
             try {
                 const storedLoginStatus = await SecureStore.getItemAsync('isLoggedIn');
