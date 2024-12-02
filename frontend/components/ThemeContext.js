@@ -55,7 +55,7 @@ const lightStyles = StyleSheet.create({
 
 const darkStyles = StyleSheet.create({
     container: { flex: 1, justifyContent: 'center', alignItems: 'center', backgroundColor: '#333' },
-    text: { color: 'white' },
+    text: { color: 'black' },
     modalOverlay: { flex: 1, backgroundColor: 'rgba(0, 0, 0, 0.8)', justifyContent: 'center' },
     modalContainer: { backgroundColor: '#444', padding: 20, marginHorizontal: 40, borderRadius: 8 },
     buttonText: { color: 'white' },

@@ -277,6 +277,7 @@ const styles = StyleSheet.create({
   },
 
   subHeader: {
+    marginTop: 20,
     fontSize: 18,
     textAlign: 'center',
     marginBottom: 10,
@@ -302,7 +303,7 @@ const styles = StyleSheet.create({
     paddingVertical: 12,
     paddingHorizontal: 32,
     borderRadius: 4,
-    marginVertical: 10,
+    marginVertical: 40,
     borderWidth: 2,
     borderColor: 'blue',
   },

@@ -5,6 +5,7 @@ import { useTheme } from '../components/ThemeContext';
 import Ionicons from 'react-native-vector-icons/Ionicons';
 import * as SecureStore from 'expo-secure-store'; // Import SecureStore for testing purposes
 import * as Updates from 'expo-updates';
+import CalorieTracker from '../components/CalorieTracker';
 
 import ServerIp from '../hooks/Global';
 
@@ -71,16 +72,23 @@ const HomeScreen = () => {
       const totalCalories = foodHistory.reduce((sum, item) => sum + item.calories, 0);
       setAverageCalories(totalCalories / foodHistory.length);
       setTotalCalories(totalCalories);
+      
     }
   }, [foodHistory]);
 
+
+  const goal = 2000;
+  const food = 2500;
+  const remaining = goal - food;
+
   return (
     <View style={[styles.container, { backgroundColor: theme.container.backgroundColor }]}>
-      {/* Sign out button with icon */}
-      <TouchableOpacity style={styles.clearButton} onPress={clearCredentials}>
-        <Ionicons name="log-out-outline" size={30} color={theme.text.color} />
-      </TouchableOpacity>
-
+      <View style={styles.topContainer}>
+        <TouchableOpacity style={styles.clearButton} onPress={clearCredentials}>
+          <Ionicons name="log-out-outline" size={30} color={theme.text.color} />
+        </TouchableOpacity>
+        <CalorieTracker style={styles.calorieTrackerContainer} goal={goal} food={food} remaining={remaining} />
+      </View>
       <Text style={[styles.subtitle, { color: theme.text.color }]}>Meal diary</Text>
 
       {loading ? (
@@ -120,7 +128,7 @@ const HomeScreen = () => {
 };
 
 const styles = StyleSheet.create({
-  container: { flex: 1, padding: 20, margin: 1 },
+  container: { flex: 1, padding: 20, },
   title: { fontSize: 24, textAlign: 'center', margin: 10, fontWeight: 'bold' },
   subtitle: { fontSize: 20, marginVertical: 10, fontWeight: '600' },
   item: { padding: 10, borderBottomWidth: 1 },
@@ -129,8 +137,10 @@ const styles = StyleSheet.create({
   pieTitle: { marginTop: 20, fontSize: 22, fontWeight: 'bold', textAlign: 'center' },
   emptyContainer: { flex: 1, justifyContent: 'center', alignItems: 'center', marginTop: 20 },
   emptyText: { fontSize: 18, fontWeight: 'bold', textAlign: 'center' },
-  clearButton: { padding: 10, backgroundColor: 'transparent', borderRadius: 5, alignSelf: 'flex-end', justifyContent: 'center', alignItems: 'center' },
-  buttonText: { color: 'blue', textAlign: 'center' }
+  clearButton: { padding: 1, backgroundColor: 'transparent', borderRadius: 5, marginBottom: 10, alignSelf: 'flex-start' },
+  buttonText: { color: 'blue', textAlign: 'center' },
+  topContainer: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center' },
+  calorieTrackerContainer: { flexDirection: 'row', alignItems: 'center', },
 });
 
 export default HomeScreen;

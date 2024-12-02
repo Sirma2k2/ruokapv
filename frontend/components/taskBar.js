@@ -9,12 +9,10 @@ const TaskBar = ({darkMode}) => {
         </View>
     );
 };
-
 const styles = StyleSheet.create({
     container: {
         height: 32.5,
         backgroundColor: '#6200EE',
-
     },
     text: {
         color: '#FFFFFF',
