@@ -10,6 +10,7 @@ import ServerIp from '../hooks/Global';
 
 const MealsScreen = () => {
   const { theme } = useTheme(); // Access the theme from context
+  console.log(theme); 
   const [searchMeals, setSearchMeals] = useState('');
   const [modalVisible, setModalVisible] = useState(false);
   const [selectedFood, setSelectedFood] = useState(null);
