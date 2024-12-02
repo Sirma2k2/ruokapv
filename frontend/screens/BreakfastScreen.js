@@ -5,6 +5,7 @@ import { ActivityIndicator, Searchbar } from 'react-native-paper';
 import { FlatList } from 'react-native';
 import * as Animatable from 'react-native-animatable';
 import Ionicons from '@expo/vector-icons/Ionicons';
+import ServerIp from '../hooks/Global';
 
 const BreakfastScreen = ({ navigation }) => {
   const { theme } = useTheme(); // Access the theme from context
@@ -24,7 +25,7 @@ const BreakfastScreen = ({ navigation }) => {
     setError('');
 
     try {
-      const response = await fetch(`http://localhost:3000/api/searchFood?query=${query}`);
+      const response = await fetch(ServerIp + `/api/searchFood?query=${query}`);
       if (response.ok) {
         const data = await response.json();
         setFoodResults(data);

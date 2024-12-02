@@ -112,6 +112,7 @@ const LunchScreen = ({navigation}) => {
             placeholder="Search food"
             onChangeText={setSearchLunch}
             value={searchLunch}
+            style={styles.searchBar}
           />
 
           {/* Show loading indicator */}
