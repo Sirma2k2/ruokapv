@@ -51,7 +51,7 @@ const styles = StyleSheet.create({
         shadowRadius: 4,
         elevation: 2, // Shadow on Android
         alignSelf: 'stretch', // Ensure the container spans its parent width
-        marginHorizontal: 10,
+        marginHorizontal: 20,
         marginRight: 20,
     },
     row: {

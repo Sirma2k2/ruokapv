@@ -10,7 +10,6 @@ import ServerIp from '../hooks/Global';
 
 const MealsScreen = () => {
   const { theme } = useTheme(); // Access the theme from context
-  console.log(theme); 
   const [searchMeals, setSearchMeals] = useState('');
   const [modalVisible, setModalVisible] = useState(false);
   const [selectedFood, setSelectedFood] = useState(null);
@@ -56,7 +55,7 @@ const MealsScreen = () => {
 }
 
   const saveFoodMeal = async(food) => {
-    console.log('Uusi ateria luotu:', food);
+    console.log('New meal created:', food);
 
     try {
       const response = await fetch(ServerIp + '/api/add-food', {
@@ -74,10 +73,10 @@ const MealsScreen = () => {
       })
       if (response.ok) {
         console.log('Successfully added')
-        alert('Tallennettu onnistuneeti')
+        alert('Food saved successfully') 
       } else { 
         console.log('Failed: ', response.status)
-        alert('Virhe tallentamisessa')
+        alert('Error in saving food')
         
       }
       } catch(error) {
@@ -89,7 +88,7 @@ const MealsScreen = () => {
   }
 
   const saveMeal = (food) => {
-    console.log('Uusi ateria luotu:', food)
+    console.log('New meal created:', food)
     setModalVisible(false)
   }
 
