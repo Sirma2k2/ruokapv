@@ -4,6 +4,9 @@ const cors = require('cors'); // Varmista, että tuodaan cors
 const pool = require('./database'); // Tuodaan tietokantayhteys
 const dotenv = require('dotenv');
 
+const bcrypt = require('bcrypt'); // VOISITTEKO KÄYTTÄÄ TÄTÄ KIRJASTOA SALASANOJEN HASHAAMISEEN
+
+
 dotenv.config();
 
 const app = express(); // Määrittele app ensin
@@ -81,7 +84,7 @@ app.post('/add-user', async(req,res) => {
   const {knimi, email, pword, ika, paino, pituus, aktiviteetti, tyyppi, tavoite } = req.body
 
   if(!knimi || !email || !pword || !ika || !paino || !pituus || !aktiviteetti || !tyyppi || !tavoite) {
-    return res.status(400).json({ error: 'something missing'})
+    return res.status(400).json({ error: 'Name, email, password, age, weight, height, activity level, diet type, and goal are required' })
   }
 
   try {
@@ -94,10 +97,10 @@ app.post('/add-user', async(req,res) => {
       const query = 'INSERT INTO users(knimi, ika, paino, pituus, aktiviteetti, tyyppi, tavoite, email, pword) VALUES($1, $2, $3, $4, $5, $6, $7, $8, $9)'
       const values = [knimi, ika, paino, pituus, aktiviteetti, tyyppi, tavoite, email, pword]
       await pool.query(query, values)
-      return res.status(201).json({ message: 'user added successfully' })
+      return res.status(201).json({ message: 'User added successfully' })
     }else {
       console.log("knimi tai email jo käytössä");
-      return res.status(600).json({message: "nimi tai email jo käytössä"});
+      return res.status(600).json({message: "Name or email already in use" });
     }
 
   }catch(err){
@@ -118,7 +121,7 @@ app.post('/login', async(req,res)=> {
       console.log(result.rows);
       return res.status(201).json({data: result.rows});
     }else{
-      return res.status(401).json({ message: 'väärät tunukset'})
+      return res.status(401).json({ message: 'Incorrect credidentials' });
     }
   } catch(err){
     console.error('Query error', err)

@@ -34,7 +34,8 @@ const WelcomeScreen = ({ onLogin }) => {
         }
 
         try {
-            console.log("yrittää kirjautua");
+            console.log("Attempting to log in with email:", email);
+            alert('Attempting to log in with email:', email);
             const response = await fetch(ServerIp + '/login', {
               method: 'POST', 
               headers: { 
@@ -55,11 +56,12 @@ const WelcomeScreen = ({ onLogin }) => {
               onLogin(); // Notify parent about successful login
             } else {
               console.log('Failed: ', response.status, ' ', response.headers);
-              alert('error');
+              alert('error', response.status);
               return;
             }
           } catch(error) {
             console.error('Error:', error)
+            alert('Error:', error);
           }  
 
     };
