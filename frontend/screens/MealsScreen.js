@@ -194,6 +194,18 @@ const MealsScreen = () => {
                 <Text style={[styles.modalText, { color: theme.text.color }]}>
                   Quantity: {selectedFood.quantity || 'N/A'}
                 </Text>
+                <Text style={styles.modalText}>
+                  Protein: {selectedFood.nutriments?.proteins_100g || 'N/A'}
+                </Text>
+                <Text style={styles.modalText}>
+                    Carbohydrates: {selectedFood.nutriments?.carbohydrates_100g || 'N/A'}
+                </Text>
+                <Text style={styles.modalText}>
+                    Fat: {selectedFood.nutriments?.fat_100g || 'N/A'}
+                </Text>
+                <Text style={styles.modalText}>
+                    Calories: {selectedFood.nutriments?.['energy-kcal'] || 'N/A'} kcal
+                </Text> 
                 <TouchableOpacity
                   style={styles.button}
                   onPress={() => saveFoodMeal(selectedFood)}
