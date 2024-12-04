@@ -56,6 +56,14 @@ const SignUpPage = () => {
       alert('Please enter a valid email address.');
       return false;
     }
+    if (userData.pword.length < 8) {
+      alert('Password must be at least 8 characters long.');
+      return false;
+    }
+    if (!/[a-zA-Z]/.test(userData.pword) || !/[0-9]/.test(userData.pword)) {
+      alert('Password must contain at least one letter and one number.');
+      return false;
+    }
     if (!userData.pword) {
       alert('Please enter a password.');
       return false;

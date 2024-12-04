@@ -19,14 +19,7 @@ const HomeScreen = () => {
   useEffect(() => {
     const fetchFoodHistory = async () => {
       try {
-        const userData = await SecureStore.getItemAsync('userData');
-        const parsedData = JSON.parse(userData); // Parse the JSON string
-        const nimi = parsedData[0]?.knimi;
-        const response = await fetch(ServerIp + '/get-food', {
-          headers: { 
-            knimi: nimi,
-          }
-        });
+        const response = await fetch(ServerIp + '/get-food');
 
         if (response.ok) {
           const data = await response.json();
@@ -49,8 +42,8 @@ const HomeScreen = () => {
     };
     fetchFoodHistory();
   }, []);
-  
-  const clearCredentials = async () => { // again this function is for testing purposes and will be removed in production. will not work in web
+
+  const clearCredentials = async () => { // This became a logging out function will not work in web
     if(Platform.OS === 'web') {
       console.warn('This feature is not available on web, please use the browser console to clear credentials');
       return;
@@ -58,14 +51,14 @@ const HomeScreen = () => {
     try {
       await SecureStore.deleteItemAsync('user'); // Clear user credentials
       await SecureStore.deleteItemAsync('isLoggedIn'); // Clear login status
-      console.log('Credentials cleared');
+      console.log('Credentials cleared and logging out...'); // Log that the credentials have been cleared
       alert('Logging out...'); // Alert the user that they are being logged out
       await new Promise(resolve => setTimeout(resolve, 800)); // delay for 0.8 seconds so the user can see the alert
       Updates.reloadAsync(); // Reload the app after clearing credentials
     } catch (error) {
       console.error('Error clearing credentials:', error);
     }
-  }; // end of testing function for clearing credentials 
+  }; // end of function for clearing credentials 
 
   useEffect(() => {
     if (foodHistory.length > 0) {
@@ -85,7 +78,13 @@ const HomeScreen = () => {
     <View style={[styles.container, { backgroundColor: theme.container.backgroundColor }]}>
       <View style={styles.topContainer}>
         <TouchableOpacity style={styles.clearButton} onPress={clearCredentials}>
-          <Ionicons name="log-out-outline" size={30} color={theme.text.color} />
+        <Ionicons 
+          name="log-out-outline" 
+          size={30} 
+          color={theme.text.color} 
+          style={{ transform: [{ rotate: '180deg' }] }} 
+        />
+        <Text style={styles.logoutText}>Logout</Text>
         </TouchableOpacity>
         <CalorieTracker style={styles.calorieTrackerContainer} goal={goal} food={food} remaining={remaining} />
       </View>
@@ -140,7 +139,8 @@ const styles = StyleSheet.create({
   clearButton: { padding: 1, backgroundColor: 'transparent', borderRadius: 5, marginBottom: 10, alignSelf: 'flex-start' },
   buttonText: { color: 'blue', textAlign: 'center' },
   topContainer: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center' },
-  calorieTrackerContainer: { flexDirection: 'row', alignItems: 'center', },
+  calorieTrackerContainer: { flexDirection: 'row', alignItems: 'center',},
+  logoutText: {fontSize: 12, marginTop: -2.5,},
 });
 
 export default HomeScreen;
