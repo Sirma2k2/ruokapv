@@ -46,10 +46,56 @@ const DinnerScreen = ({ navigation }) => {
     }
   }, [searchDinner]);
 
-  const saveFoodMeal = (food) => {
-    console.log('Ruoka tallenettu ateriaan:', food)
-    setModalVisible(false)
-  }
+  const saveFoodMeal = async (food) => {
+    if (!consumedAmount || isNaN(consumedAmount) || consumedAmount <= 0) {
+      Alert.alert("Error", "Please enter a valid amount in grams.");
+      return;
+    }
+  
+    // Lasketaan ravintosisältö per syötetty määrä
+    const proteinPerGram = food.nutriments?.proteins_100g || 0;
+    const carbsPerGram = food.nutriments?.carbohydrates_100g || 0;
+    const fatPerGram = food.nutriments?.fat_100g || 0;
+    const caloriesPerGram = food.nutriments?.['energy-kcal'] || 0;
+  
+    const proteinAmount = (proteinPerGram * consumedAmount) / 100;
+    const carbsAmount = (carbsPerGram * consumedAmount) / 100;
+    const fatAmount = (fatPerGram * consumedAmount) / 100;
+    const caloriesAmount = (caloriesPerGram * consumedAmount) / 100;
+  
+    const foodData = {
+      knimi: food.product_name, 
+      ruokanimi: food.brands,
+      maarag: consumedAmount,
+      kalorit: caloriesAmount,
+      proteiini: proteinAmount,
+      hiilihydraatit: carbsAmount,
+      rasvat: fatAmount,
+    };
+  
+    try {
+      // Lähetetään POST-pyyntö
+      const response = await fetch(ServerIp + '/api/add-food', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(foodData),
+      });
+  
+      if (!response.ok) {
+        throw new Error('Failed to save food to the database');
+      }
+  
+      const result = await response.json();
+      Alert.alert("Success", result.message || "Food saved successfully!");
+      setModalVisible(false);
+      setConsumedAmount('');
+    } catch (error) {
+      console.error('Error saving food:', error);
+      Alert.alert("Error", "Failed to save food to database.");
+    }
+  };
 
   return (
     <View style={[styles.container, { backgroundColor: theme.container.backgroundColor }]}>
