@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { View, Text, TouchableOpacity, StyleSheet, FlatList, Modal } from 'react-native';
+import { View, Text, TouchableOpacity, StyleSheet, FlatList, Modal, Alert, TextInput } from 'react-native';
 import { useTheme } from '../components/ThemeContext'; // Import the useTheme hook
 import { ActivityIndicator, Searchbar } from 'react-native-paper';
 import * as Animatable from 'react-native-animatable';
@@ -13,6 +13,7 @@ const DinnerScreen = ({ navigation }) => {
   const [searchDinner, setSearchDinner] = useState(''); // State for the search bar
   const [modalVisible, setModalVisible] = useState(false)
   const [selectedFood, setSelectedFood] = useState(null)
+  const [consumedAmount, setConsumedAmount] = useState('')
 
   const [foodResults, setFoodResults] = useState([])
   const [loading, setLoading] = useState(false)
@@ -180,7 +181,8 @@ const DinnerScreen = ({ navigation }) => {
                 <Text style={{ color: theme.text.color }}>
                   Calories: {item.nutriments?.["energy-kcal"] || 'N/A'} kcal
                 </Text>
-
+                
+       
 
               </TouchableOpacity>
               </Animatable.View>
@@ -221,6 +223,15 @@ const DinnerScreen = ({ navigation }) => {
                     <Text style={styles.modalText}>
                       Calories: {selectedFood.nutriments?.['energy-kcal'] || 'N/A'} kcal
                     </Text>
+
+                    <TextInput
+                      style={styles.input}
+                      placeholder="Enter amount (grams)"
+                      keyboardType="numeric"
+                      value={consumedAmount}
+                      onChangeText={setConsumedAmount}
+                    />
+
                     <TouchableOpacity
                       style={styles.button}
                       onPress={() => saveFoodMeal(selectedFood)}
