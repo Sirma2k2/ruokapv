@@ -18,6 +18,7 @@ const SignUpPage = () => {
     name: '',
     email: '',
     pword: '',
+    cpword: '',
     age: '20',  // Default age set to 20
     weight: '60',  // Default weight set to 60
     height: '170',  // Default height set to 170 cm
@@ -58,6 +59,10 @@ const SignUpPage = () => {
     }
     if (userData.pword.length < 8) {
       alert('Password must be at least 8 characters long.');
+      return false;
+    }
+    if (userData.pword !== userData.cpword) {
+      alert('Passwords do not match.');
       return false;
     }
     if (!/[a-zA-Z]/.test(userData.pword) || !/[0-9]/.test(userData.pword)) {
@@ -181,6 +186,16 @@ const SignUpPage = () => {
           value={userData.pword}
           onChangeText={handleInputChange('pword')}
           accessibilityLabel="Password input"
+          secureTextEntry={true}
+
+        />
+        <TextInput
+          style={styles.input}
+          placeholder="Confirm Password"
+          value={userData.cpword}
+          onChangeText={handleInputChange('cpword')}
+          accessibilityLabel="Password input"
+          secureTextEntry={true}
 
         />
       </View>

@@ -4,7 +4,7 @@ const cors = require('cors'); // Varmista, että tuodaan cors
 const pool = require('./database'); // Tuodaan tietokantayhteys
 const dotenv = require('dotenv');
 
-const bcrypt = require('bcrypt'); // VOISITTEKO KÄYTTÄÄ TÄTÄ KIRJASTOA SALASANOJEN HASHAAMISEEN
+//const bcrypt = require('bcrypt'); // VOISITTEKO KÄYTTÄÄ TÄTÄ KIRJASTOA SALASANOJEN HASHAAMISEEN
 
 
 dotenv.config();
