@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { View, Text, TextInput, StyleSheet, TouchableOpacity } from 'react-native';
+import { View, Text, TextInput, StyleSheet, TouchableOpacity, ActivityIndicator } from 'react-native';
 import * as SecureStore from 'expo-secure-store'; // Import SecureStore
 import { useNavigation } from '@react-navigation/native'; // Import useNavigation hook
 
@@ -11,6 +11,7 @@ const WelcomeScreen = ({ onLogin }) => {
     const [password, setPassword] = useState('');
     const [errorMessage, setErrorMessage] = useState('');
     const navigation = useNavigation(); // Initialize navigation
+    const [loading, setLoading] = useState(false);
 
     useEffect(() => {
         // Check if the user is already logged in
@@ -26,9 +27,7 @@ const WelcomeScreen = ({ onLogin }) => {
         checkLoginStatus();
     }, [onLogin]);
 
-    const handleLogin = async () => { // BACKEND LOGIIIKKA TÄHÄN, HARDCODE CREDIDENTIALS VOI LAITTAA KOMMENTTIIN KUN TOIMII !!! //MY BAD POISTINE! -Paulus
-        // Handle login logic here (either hardcoded or API call)
-
+    const handleLogin = async () => {
         if (!email || !password) {
             alert('Email and password are required');
             console.log('Email and password are required');
@@ -36,8 +35,9 @@ const WelcomeScreen = ({ onLogin }) => {
         }
 
         try {
+            await new Promise(resolve => setTimeout(resolve, 600)); // delay for 0.6 seconds
+            setLoading(true); // Start loading
             console.log("Attempting to log in with email:", email);
-            alert('Attempting to log in with email:', email);
             const response = await fetch(ServerIp + '/login', {
               method: 'POST', 
               headers: { 
@@ -64,49 +64,57 @@ const WelcomeScreen = ({ onLogin }) => {
           } catch(error) {
             console.error('Error:', error)
             alert('Error:', error);
-          }  
-
+          } finally {
+            setLoading(false); // Stop loading
+          }
     };
 
     return (
         <View style={styles.container}>
-            <Text style ={styles.mainHeader}>Fitnessbuddy</Text>
-            <View style={styles.iconContainer}>
-                <Ionicons name="fitness" size={100} color="#007bff" />
-            </View>
-            {errorMessage ? <Text style={styles.error}>{errorMessage}</Text> : null}
-            <View style={styles.iconContainer}>
-                <Ionicons name="person-circle-outline" size={50} color="#007bff" />
-            </View>
-            <TextInput
-                style={styles.input}
-                placeholder="Email"
-                value={email}
-                onChangeText={setEmail}
-                keyboardType="email-address"
-                autoCapitalize="none"
-            />
-            <TextInput
-                style={styles.input}
-                placeholder="Password"
-                value={password}
-                onChangeText={setPassword}
-                secureTextEntry
-            />
-            <TouchableOpacity style={styles.button} onPress={handleLogin}>
-                <Text style={styles.buttonText}>Login</Text>
-            </TouchableOpacity>
+            {loading ? (
+                <ActivityIndicator size="large" color="#007bff" />
+            ) : (
+                <>
+                    <Text style={styles.mainHeader}>Fitnessbuddy</Text>
+                    <View style={styles.iconContainer}>
+                        <Ionicons name="fitness" size={100} color="#007bff" />
+                    </View>
+                    {errorMessage ? <Text style={styles.error}>{errorMessage}</Text> : null}
+                    <View style={styles.iconContainer}>
+                        <Ionicons name="person-circle-outline" size={50} color="#007bff" />
+                    </View>
+                    <TextInput
+                        style={styles.input}
+                        placeholder="Email"
+                        value={email}
+                        onChangeText={setEmail}
+                        keyboardType="email-address"
+                        autoCapitalize="none"
+                    />
+                    <TextInput
+                        style={styles.input}
+                        placeholder="Password"
+                        value={password}
+                        onChangeText={setPassword}
+                        secureTextEntry
+                    />
+                    <TouchableOpacity style={styles.button} onPress={handleLogin}>
+                        <Text style={styles.buttonText}>Login</Text>
+                    </TouchableOpacity>
 
-            {/* Sign Up button that navigates to SignUpScreen */}
-            <TouchableOpacity 
-                style={styles.switchButton} 
-                onPress={() => navigation.navigate('SignUp')} 
-            >
-                <Text style={styles.buttonText}>Sign Up</Text>
-            </TouchableOpacity>
+                    {/* Sign Up button that navigates to SignUpScreen */}
+                    <TouchableOpacity 
+                        style={styles.switchButton} 
+                        onPress={() => navigation.navigate('SignUp')} 
+                    >
+                        <Text style={styles.buttonText}>Sign Up</Text>
+                    </TouchableOpacity>
+                </>
+            )}
         </View>
     );
 };
+
 const styles = StyleSheet.create({
     container: { flex: 1, justifyContent: 'center', alignItems: 'center', padding: 16, backgroundColor: '#f5f5f5', marginTop: -20 },
     title: { fontSize: 23, marginBottom: 24, textAlign: 'center', fontWeight: 'bold', color: '#333' },
