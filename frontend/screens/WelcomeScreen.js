@@ -4,6 +4,7 @@ import * as SecureStore from 'expo-secure-store'; // Import SecureStore
 import { useNavigation } from '@react-navigation/native'; // Import useNavigation hook
 
 import ServerIp from '../hooks/Global';
+import { Ionicons } from '@expo/vector-icons'; // Import Ionicons
 
 const WelcomeScreen = ({ onLogin }) => {
     const [email, setEmail] = useState('');
@@ -29,6 +30,7 @@ const WelcomeScreen = ({ onLogin }) => {
         // Handle login logic here (either hardcoded or API call)
 
         if (!email || !password) {
+            alert('Email and password are required');
             console.log('Email and password are required');
             return;
         }
@@ -68,8 +70,14 @@ const WelcomeScreen = ({ onLogin }) => {
 
     return (
         <View style={styles.container}>
+            <Text style ={styles.mainHeader}>Fitnessbuddy</Text>
+            <View style={styles.iconContainer}>
+                <Ionicons name="fitness" size={100} color="#007bff" />
+            </View>
             {errorMessage ? <Text style={styles.error}>{errorMessage}</Text> : null}
-            <Text style={styles.title}>Login</Text>
+            <View style={styles.iconContainer}>
+                <Ionicons name="person-circle-outline" size={50} color="#007bff" />
+            </View>
             <TextInput
                 style={styles.input}
                 placeholder="Email"
@@ -100,13 +108,15 @@ const WelcomeScreen = ({ onLogin }) => {
     );
 };
 const styles = StyleSheet.create({
-    container: { flex: 1, justifyContent: 'center', alignItems: 'center', padding: 16, backgroundColor: '#f5f5f5' },
-    title: { fontSize: 28, marginBottom: 24, textAlign: 'center', fontWeight: 'bold', color: '#333' },
+    container: { flex: 1, justifyContent: 'center', alignItems: 'center', padding: 16, backgroundColor: '#f5f5f5', marginTop: -20 },
+    title: { fontSize: 23, marginBottom: 24, textAlign: 'center', fontWeight: 'bold', color: '#333' },
     input: { width: '80%', height: 50, borderColor: '#ccc', borderWidth: 1, borderRadius: 8, marginBottom: 16, paddingHorizontal: 16, backgroundColor: '#fff' },
     error: { color: 'red', marginBottom: 16, textAlign: 'center' },
     button: { width: '80%', paddingVertical: 15, borderRadius: 8, backgroundColor: '#007bff', alignItems: 'center', marginBottom: 10 },
     switchButton: { width: '80%', paddingVertical: 15, borderRadius: 8, backgroundColor: '#28a745', alignItems: 'center' },
     buttonText: { color: '#fff', fontSize: 16, fontWeight: 'bold' },
+    mainHeader: { fontSize: 40, marginBottom: 20, textAlign: 'center', fontWeight: 'bold', color: '#333' },
+    iconContainer: { alignItems: 'center', padding: 10 },
 });
 
 export default WelcomeScreen;
