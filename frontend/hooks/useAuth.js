@@ -48,6 +48,7 @@ const useAuth = () => {
             // Remove any sensitive user data from SecureStore
             await SecureStore.deleteItemAsync('userData');
             await SecureStore.deleteItemAsync('isLoggedIn');
+            setIsLoggedIn(false); // Update state to false after clearing credentials
             console.log('User credentials cleared');
         } catch (error) {
             console.error('Error clearing credentials', error);

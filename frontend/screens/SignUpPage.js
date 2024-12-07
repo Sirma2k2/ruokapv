@@ -13,7 +13,6 @@ const SignUpPage = () => {
   const {isLoggedIn } = useAuth();  // Get the login function from useAuth
   const [isLoading, setIsLoading] = useState(false);
 
-
   const [userData, setUserData] = useState({
     name: '',
     email: '',
@@ -24,9 +23,9 @@ const SignUpPage = () => {
     height: '170',  // Default height set to 170 cm
     activityLevel: '',
     dietType: '',
-    goal: ''
+    goal: '',
+    gender: '',  // Add gender state
   });
-
 
   useEffect(() => {
   }, [isLoggedIn, navigation]);
@@ -101,24 +100,15 @@ const SignUpPage = () => {
       alert('Please select a goal.');
       return false;
     }
+    if (!userData.gender) { // Add gender validation
+      alert('Please select your gender.');
+      return false;
+    }
     return true;
   };
 
   const handleSubmit = async() => { // BACKEND LOGIIKKA TÄHÄN POHJA ON JO VALMIINA!!!! //MISSÄ HITOSSA!?!?!? toi on nyt kahesti sama pätkä tossa ku en saa nätimmin toimii-paulus
     if (!validateForm()) return; // Validate the form before submitting
-
-    /*
-    const userDataForBackend = {
-        knimi: userData.name,
-        email: userData.email,
-        ika: parseInt(userData.age),
-        paino: parseInt(userData.weight),
-        pituus: parseInt(userData.height),
-        aktiviteetti: userData.activityLevel === 'low' ? 1 : userData.activityLevel === 'medium' ? 2 : 3,
-        tyyppi: userData.dietType === 'balanced' ? 1 : userData.dietType === 'keto' ? 2 : 3,
-        tavoite: userData.goal === 'lose' ? 1 : userData.goal === 'maintain' ? 2 : 3
-    };
-    */
 
     try {
       const response = await fetch(ServerIp + '/add-user', {
@@ -136,6 +126,7 @@ const SignUpPage = () => {
           aktiviteetti: userData.activityLevel === 'low' ? 1: userData.activityLevel === 'medium' ? 2: 3,
           tyyppi: userData.dietType === 'balanced' ? 1 : userData.dietType === 'keto' ? 2 : 3, 
           tavoite: userData.goal === 'lose' ? 1 : userData.goal === 'maintain' ? 2 : 3,
+          sukupuoli: userData.gender, // Add gender to the request body
         }),
       });
       if (response.status === 201) {
@@ -147,14 +138,11 @@ const SignUpPage = () => {
         return;
       }
     } catch(error) {
-        
       console.error('Error:', error)
     }
 
-    //console.log('User Data:', userDataForBackend);
     setLogged(); // Pass login function here
   };
-
 
   // Values for the pickers
   const ageValues = Array.from({ length: 100 }, (_, i) => i + 10); // 10 to 100 years
@@ -173,11 +161,9 @@ const SignUpPage = () => {
           value={userData.email}
           onChangeText={handleInputChange('email')}
           accessibilityLabel="Email input"
-
         />
       </View>
 
-      {/*Salasana input*/}
       <View style={styles.inputGroup}>
         <Text style={styles.label}>Password</Text>
         <TextInput
@@ -187,7 +173,6 @@ const SignUpPage = () => {
           onChangeText={handleInputChange('pword')}
           accessibilityLabel="Password input"
           secureTextEntry={true}
-
         />
         <TextInput
           style={styles.input}
@@ -196,11 +181,9 @@ const SignUpPage = () => {
           onChangeText={handleInputChange('cpword')}
           accessibilityLabel="Password input"
           secureTextEntry={true}
-
         />
       </View>
 
-      {/* Name Input */}
       <View style={styles.inputGroup}>
         <Text style={styles.label}>Name</Text>
         <TextInput
@@ -211,7 +194,6 @@ const SignUpPage = () => {
         />
       </View>
 
-      {/* Age Picker */}
       <View style={styles.inputGroup}>
         <Text style={styles.label}>Age</Text>
         <RNPickerSelect
@@ -223,7 +205,20 @@ const SignUpPage = () => {
         />
       </View>
 
-      {/* Weight Picker */}
+      <View style={styles.inputGroup}>
+        <Text style={styles.label}>Gender</Text>
+        <RNPickerSelect
+          placeholder={{ label: 'Select gender', value: null }}
+          value={userData.gender}
+          onValueChange={handleInputChange('gender')}
+          items={[
+            { label: 'Male', value: 'male' },
+            { label: 'Female', value: 'female' },
+          ]}
+          style={pickerStyle}
+        />
+      </View>
+
       <View style={styles.inputGroup}>
         <Text style={styles.label}>Weight (kg)</Text>
         <RNPickerSelect
@@ -235,7 +230,6 @@ const SignUpPage = () => {
         />
       </View>
 
-      {/* Height Picker */}
       <View style={styles.inputGroup}>
         <Text style={styles.label}>Height (cm)</Text>
         <RNPickerSelect
@@ -247,7 +241,6 @@ const SignUpPage = () => {
         />
       </View>
 
-      {/* Activity Level */}
       <Text style={styles.label}>Activity Level</Text>
       <View style={styles.buttonGroup}>
         {['low', 'medium', 'high'].map((level) => (
@@ -264,7 +257,6 @@ const SignUpPage = () => {
         ))}
       </View>
 
-      {/* Diet Type */}
       <Text style={styles.label}>Diet Type</Text>
       <View style={styles.buttonGroup}>
         {['balanced', 'keto', 'vegan'].map((diet) => (
@@ -281,7 +273,6 @@ const SignUpPage = () => {
         ))}
       </View>
 
-      {/* Goal */}
       <Text style={styles.label}>Goal</Text>
       <View style={styles.buttonGroup}>
         {['lose', 'maintain', 'gain'].map((goal) => (

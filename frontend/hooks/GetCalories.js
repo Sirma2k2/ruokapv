@@ -1,23 +1,43 @@
-import { View, Text } from 'react-native'
-import React, { useEffect } from 'react'
-
-
-const storedLoginStatus = await SecureStore.getItemAsync('isLoggedIn');
-
+import { useState, useEffect } from 'react';
+import * as SecureStore from 'expo-secure-store'; // Import SecureStore
 import ServerIp from '../hooks/Global';
 
+// This is a hook to get calories to not have to repeat the same code in multiple components
+const GetCalories = () => {
+  const [caloriesData, setCaloriesData] = useState({ goal: 0, food: 0, remaining: 0 });
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
 
-//this is a hook to get calories
-const GetCalories = () => { //BACKEND KUTSU OIKEIN TÄHÄN
-useEffect(() => {
-    // Fetch calories from the API
-    fetch(ServerIp + '/get-food')
-        .then(response => response.json())
-        .then(data => console.log(data))
-        .catch(error => console.log('Error fetching calories:', error))
-    }, [])
+  useEffect(() => {
+    const fetchCalories = async () => {
+      try {
+        const storedLoginStatus = await SecureStore.getItemAsync('isLoggedIn');
+        if (storedLoginStatus !== 'true') {
+          throw new Error('User is not logged in');
+        }
 
+        const response = await fetch(ServerIp + '/get-calories');
+        if (!response.ok) {
+          throw new Error('Failed to fetch calories data');
+        }
 
-}
+        const data = await response.json();
+        setCaloriesData({
+          goal: data.goal,
+          food: data.food,
+          remaining: data.goal - data.food,
+        });
+      } catch (error) {
+        setError(error.message);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchCalories();
+  }, []);
+
+  return { caloriesData, loading, error };
+};
 
 export default GetCalories;

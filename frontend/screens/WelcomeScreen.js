@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState } from 'react';
 import { View, Text, TextInput, StyleSheet, TouchableOpacity, ActivityIndicator } from 'react-native';
 import * as SecureStore from 'expo-secure-store'; // Import SecureStore
 import { useNavigation } from '@react-navigation/native'; // Import useNavigation hook
@@ -13,20 +13,6 @@ const WelcomeScreen = ({ onLogin }) => {
     const navigation = useNavigation(); // Initialize navigation
     const [loading, setLoading] = useState(false);
 
-    useEffect(() => {
-        // Check if the user is already logged in
-        const checkLoginStatus = async () => {
-            const user = await SecureStore.getItemAsync('user');
-            if (user) {
-                console.log("User is already logged in");
-                onLogin(); // Notify parent (App) to navigate to home screen
-            } else {
-                console.log("User is not logged in");
-            }
-        };
-        checkLoginStatus();
-    }, [onLogin]);
-
     const handleLogin = async () => {
         if (!email || !password) {
             alert('Email and password are required');
@@ -35,7 +21,6 @@ const WelcomeScreen = ({ onLogin }) => {
         }
 
         try {
-            await new Promise(resolve => setTimeout(resolve, 600)); // delay for 0.6 seconds
             setLoading(true); // Start loading
             console.log("Attempting to log in with email:", email);
             const response = await fetch(ServerIp + '/login', {
@@ -64,6 +49,7 @@ const WelcomeScreen = ({ onLogin }) => {
           } catch(error) {
             console.error('Error:', error)
             alert('Error:', error);
+            onLogin(); // HARDKOODATTU TAPA KIRJAUTUA KUN TIETOKANTA EI TOIMI, PITÄÄ MUISTAA POISTAA TÄMÄ RIVI
           } finally {
             setLoading(false); // Stop loading
           }

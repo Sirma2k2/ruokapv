@@ -1,21 +1,24 @@
 import React from 'react';
-import { View, Text, TouchableOpacity, StyleSheet } from 'react-native';
+import { View, Text, TouchableOpacity, StyleSheet, ActivityIndicator } from 'react-native';
 import { useTheme } from '../components/ThemeContext'; // Import the useTheme hook
 import Ionicons from '@expo/vector-icons/Ionicons';
-import CalorieTracker from '../components/CalorieTracker';
+import CalorieTracker from '../components/CalorieTracker'; // Import CalorieTracker
+import GetCalories from '../hooks/GetCalories'; // Import GetCalories hook
+
 
 const FoodScreen = ({ navigation }) => {
-
-
   const { theme } = useTheme(); // Access the theme from context
-
-  const goal = 2000;
-  const food = 2500;
-  const remaining = goal - food;
+  const { caloriesData, loading, error } = GetCalories(); // Use GetCalories hook
 
   return (
     <View style={[styles.container, { backgroundColor: theme.container.backgroundColor }]}>
-      <CalorieTracker  goal={goal} food={food} remaining={remaining} />
+      {loading ? (
+        <ActivityIndicator size="large" color={theme.text.color} />
+      ) : error ? (
+        <Text style={{ color: 'red' }}>{error}</Text>
+      ) : (
+        <CalorieTracker style={styles.calorieTrackerContainer} goal={caloriesData.goal} food={caloriesData.food} remaining={caloriesData.remaining} />
+      )}
       <Text style={[styles.header, { color: theme.text.color }]}>Select Meal Type</Text>
       
       <TouchableOpacity 
@@ -41,6 +44,7 @@ const FoodScreen = ({ navigation }) => {
         <Text style={[styles.buttonText, { color: theme.buttonText.color }]}>Dinner</Text>
         <Ionicons name="moon" size={24} color={theme.iconColor} style={styles.icon} />
       </TouchableOpacity>
+
     </View>
   );
 };
@@ -56,8 +60,7 @@ const styles = StyleSheet.create({
     marginTop: 30, 
     marginBottom: 24, 
     fontWeight: 'bold' 
-  },    marginTop: 20,
-
+  },
   button: {
     alignItems: 'center',
     justifyContent: 'center',
@@ -67,7 +70,6 @@ const styles = StyleSheet.create({
     marginVertical: 10,
     borderWidth: 2, 
     borderColor: '#4169e1',
-  
   },
   buttonText: {
     fontSize: 18,
@@ -76,7 +78,12 @@ const styles = StyleSheet.create({
   }, 
   icon: {
     marginRight: 10,
-  }, 
+  },
+  calorieTrackerContainer: { 
+    flexDirection: 'row', 
+    alignItems: 'center', 
+    marginRight: 20 
+  },
 });
 
 export default FoodScreen;

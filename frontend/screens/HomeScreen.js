@@ -6,6 +6,7 @@ import Ionicons from 'react-native-vector-icons/Ionicons';
 import * as SecureStore from 'expo-secure-store'; // Import SecureStore for testing purposes
 import * as Updates from 'expo-updates';
 import CalorieTracker from '../components/CalorieTracker';
+import GetCalories from '../hooks/GetCalories'; // Import GetCalories hook
 
 import ServerIp from '../hooks/Global';
 
@@ -13,8 +14,9 @@ const HomeScreen = () => {
   const [foodHistory, setFoodHistory] = useState([]); // hardcoded 
   const [averageCalories, setAverageCalories] = useState(0);
   const [totalCalories, setTotalCalories] = useState(0);
-  const [loading, setLoading] = useState(true); // loading state to track data fetching
   const { theme } = useTheme();  // Access the theme from context
+
+  const { caloriesData, loading, error } = GetCalories(); // Use GetCalories hook
 
   useEffect(() => {
     const fetchFoodHistory = async () => {
@@ -36,8 +38,6 @@ const HomeScreen = () => {
         }
       } catch (error) {
         console.error('Error fetching data', error);
-      } finally {
-        setLoading(false); // Once the data is fetched, set loading to false
       }
     };
     fetchFoodHistory();
@@ -69,11 +69,6 @@ const HomeScreen = () => {
     }
   }, [foodHistory]);
 
-
-  const goal = 2000;
-  const food = 2500;
-  const remaining = goal - food;
-
   return (
     <View style={[styles.container, { backgroundColor: theme.container.backgroundColor }]}>
       <View style={styles.topContainer}>
@@ -86,7 +81,13 @@ const HomeScreen = () => {
         />
         <Text style={styles.logoutText}>Logout</Text>
         </TouchableOpacity>
-        <CalorieTracker style={styles.calorieTrackerContainer} goal={goal} food={food} remaining={remaining} />
+        {loading ? (
+          <ActivityIndicator size="large" color={theme.text.color} />
+        ) : error ? (
+          <Text style={{ color: 'red' }}>{error}</Text>
+        ) : (
+          <CalorieTracker style={styles.calorieTrackerContainer} goal={caloriesData.goal} food={caloriesData.food} remaining={caloriesData.remaining} />
+        )}
       </View>
       <Text style={[styles.subtitle, { color: theme.text.color }]}>Meal diary</Text>
 
@@ -139,7 +140,7 @@ const styles = StyleSheet.create({
   clearButton: { padding: 1, backgroundColor: 'transparent', borderRadius: 5, marginBottom: 10, alignSelf: 'flex-start' },
   buttonText: { color: 'blue', textAlign: 'center' },
   topContainer: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center' },
-  calorieTrackerContainer: { flexDirection: 'row', alignItems: 'center',},
+  calorieTrackerContainer: { flexDirection: 'row', alignItems: 'center', marginRight: 20 }, // Added marginRight
   logoutText: {fontSize: 12, marginTop: -2.5,},
 });
 
