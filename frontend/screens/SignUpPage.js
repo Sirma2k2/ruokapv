@@ -10,7 +10,7 @@ import ServerIp from '../hooks/Global';
 
 const SignUpPage = () => {
   const navigation = useNavigation();
-  const {isLoggedIn } = useAuth();  // Get the login function from useAuth
+  const { isLoggedIn } = useAuth();  // Get the login function from useAuth
   const [isLoading, setIsLoading] = useState(false);
 
   const [userData, setUserData] = useState({
@@ -24,7 +24,7 @@ const SignUpPage = () => {
     activityLevel: '',
     dietType: '',
     goal: '',
-    gender: '',  // Add gender state
+    gender: '',  // Default gender set to 'male'
   });
 
   useEffect(() => {
@@ -131,17 +131,17 @@ const SignUpPage = () => {
       });
       if (response.status === 201) {
         console.log('Successfully added')
-        alert('Käyttäjä lisätty onnistuneesti')
+        alert('User added successfully');
+        setLogged(); // Pass login function here
       } else {
         console.log('Failed: ', response.status, ' ', response.headers)
-        alert('Virhe käyttäjän lisäämisessä')
+        alert('Failed to add user');
         return;
       }
     } catch(error) {
       console.error('Error:', error)
     }
 
-    setLogged(); // Pass login function here
   };
 
   // Values for the pickers
@@ -197,47 +197,48 @@ const SignUpPage = () => {
       <View style={styles.inputGroup}>
         <Text style={styles.label}>Age</Text>
         <RNPickerSelect
-          placeholder={{ label: 'Select age', value: null }}
+          placeholder={{ label: 'Select age', }} // Default value
           value={userData.age}
           onValueChange={handleInputChange('age')}
           items={ageValues.map((age) => ({ label: `${age}`, value: `${age}` }))}
-          style={pickerStyle}
+          style={pickerSelectStyles}
+          
         />
       </View>
 
       <View style={styles.inputGroup}>
         <Text style={styles.label}>Gender</Text>
         <RNPickerSelect
-          placeholder={{ label: 'Select gender', value: null }}
+          placeholder={{ label: 'Select gender' }} // Default value
           value={userData.gender}
           onValueChange={handleInputChange('gender')}
           items={[
             { label: 'Male', value: 'male' },
             { label: 'Female', value: 'female' },
           ]}
-          style={pickerStyle}
+          style={pickerSelectStyles}
         />
       </View>
 
       <View style={styles.inputGroup}>
         <Text style={styles.label}>Weight (kg)</Text>
         <RNPickerSelect
-          placeholder={{ label: 'Select weight', value: null }}
+          placeholder={{ label: 'Select weight'}} // Default value
           value={userData.weight}
           onValueChange={handleInputChange('weight')}
           items={weightValues.map((weight) => ({ label: `${weight}`, value: `${weight}` }))}
-          style={pickerStyle}
+          style={pickerSelectStyles}
         />
       </View>
 
       <View style={styles.inputGroup}>
         <Text style={styles.label}>Height (cm)</Text>
         <RNPickerSelect
-          placeholder={{ label: 'Select height', value: null }}
+          placeholder={{ label: 'Select height',}} // Default value
           value={userData.height}
           onValueChange={handleInputChange('height')}
           items={heightValues.map((height) => ({ label: `${height}`, value: `${height}` }))}
-          style={pickerStyle}
+          style={pickerSelectStyles}
         />
       </View>
 
@@ -296,26 +297,32 @@ const SignUpPage = () => {
   );
 };
 
-const pickerStyle = {
+const pickerSelectStyles = StyleSheet.create({
+  inputIOS: {
+    fontSize: 18,
+    paddingVertical: 12,
+    paddingHorizontal: 10,
+    borderWidth: 1,
+    borderColor: '#ddd',
+    borderRadius: 8,
+    color: 'red',
+    paddingRight: 30, // to ensure the text is never behind the icon
+    backgroundColor: '#fff',
+    marginBottom: 20,
+  },
   inputAndroid: {
     fontSize: 18,
-    padding: 10,
+    paddingVertical: 12,
+    paddingHorizontal: 10,
     borderWidth: 1,
-    borderRadius: 8,
     borderColor: '#ddd',
+    borderRadius: 8,
+    color: '#333',
+    paddingRight: 30, // to ensure the text is never behind the icon
     backgroundColor: '#fff',
     marginBottom: 20,
   },
- inputIOS: {
-    fontSize: 18,
-    padding: 10,
-    borderWidth: 1,
-    borderRadius: 8,
-    borderColor: '#ddd',
-    backgroundColor: '#fff',
-    marginBottom: 20,
-  },
-};
+});
 
 const styles = StyleSheet.create({
   container: { flex: 1, padding: 20, backgroundColor: '#f0f0f0' },
@@ -323,7 +330,6 @@ const styles = StyleSheet.create({
   label: { fontSize: 16, marginBottom: 5, color: '#333' },
   inputGroup: { marginBottom: 20 },
   input: { backgroundColor: '#fff', padding: 15, borderRadius: 8, borderColor: '#ddd', borderWidth: 1 },
-  picker: { height: '50%',  width: '100%',   marginBottom: 20,},
   buttonGroup: { flexDirection: 'row', justifyContent: 'space-between', marginBottom: 20 },
   choiceButton: { padding: 15, margin: 5, backgroundColor: '#eee', borderRadius: 8 },
   choiceButtonText: { textAlign: 'center', color: '#333' },
