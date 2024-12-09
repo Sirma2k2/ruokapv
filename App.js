@@ -15,7 +15,7 @@ export default function App() {
             <NavigationContainer>
                 {isLoggedIn ? (
                     <>
-                        {Platform.OS === 'android' && <TaskBar />}
+                        <TaskBar />
                         <TapBar />
                     </>
                 ) : (

@@ -49,7 +49,6 @@ const WelcomeScreen = ({ onLogin }) => {
           } catch(error) {
             console.error('Error:', error)
             alert('Error:', error);
-            //onLogin(); // HARDKOODATTU TAPA KIRJAUTUA KUN TIETOKANTA EI TOIMI, PITÄÄ MUISTAA POISTAA TÄMÄ RIVI
           } finally {
             setLoading(false); // Stop loading
           }
