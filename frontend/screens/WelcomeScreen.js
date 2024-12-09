@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { View, Text, TextInput, StyleSheet, TouchableOpacity, ActivityIndicator } from 'react-native';
+import { View, Text, TextInput, StyleSheet, TouchableOpacity, ActivityIndicator, Image } from 'react-native';
 import * as SecureStore from 'expo-secure-store'; // Import SecureStore
 import { useNavigation } from '@react-navigation/native'; // Import useNavigation hook
 
@@ -63,7 +63,10 @@ const WelcomeScreen = ({ onLogin }) => {
                 <>
                     <Text style={styles.mainHeader}>Fitnessbuddy</Text>
                     <View style={styles.iconContainer}>
-                        <Ionicons name="fitness" size={100} color="#007bff" />
+                    <Image
+                      source={require('../../assets/logo.png.webp')}
+                        style={styles.logo} // Style for the image
+                    />
                     </View>
                     {errorMessage ? <Text style={styles.error}>{errorMessage}</Text> : null}
                     <View style={styles.iconContainer}>
@@ -110,7 +113,7 @@ const styles = StyleSheet.create({
     switchButton: { width: '80%', paddingVertical: 15, borderRadius: 8, backgroundColor: '#28a745', alignItems: 'center' },
     buttonText: { color: '#fff', fontSize: 16, fontWeight: 'bold' },
     mainHeader: { fontSize: 40, marginBottom: 20, textAlign: 'center', fontWeight: 'bold', color: '#333' },
-    iconContainer: { alignItems: 'center', padding: 10 },
+    iconContainer: { alignItems: 'center', padding: 10 }, logo:{width: 150, height:150, resizeMode: 'contain'},
 });
 
 export default WelcomeScreen;
