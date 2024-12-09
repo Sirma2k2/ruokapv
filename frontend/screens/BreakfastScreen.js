@@ -65,10 +65,12 @@ const BreakfastScreen = ({ navigation }) => {
     const carbsAmount = (carbsPerGram * consumedAmount) / 100;
     const fatAmount = (fatPerGram * consumedAmount) / 100;
     const caloriesAmount = (caloriesPerGram * consumedAmount) / 100;
+    const storedData = await SecureStore.getItemAsync("userData");
+    const parsedData = JSON.parse(storedData);
   
     const foodData = {
-      knimi: food.product_name, 
-      ruokanimi: food.brands,
+      knimi: parsedData[0]?.knimi,
+      ruokanimi: food.product_name,
       maarag: consumedAmount,
       kalorit: caloriesAmount,
       proteiini: proteinAmount,

@@ -21,7 +21,13 @@ const HomeScreen = () => {
   useEffect(() => {
     const fetchFoodHistory = async () => {
       try {
-        const response = await fetch(ServerIp + '/get-food');
+        const storedData = await SecureStore.getItemAsync("userData");
+        const parsedData = JSON.parse(storedData);
+        const response = await fetch(ServerIp + '/get-food',{
+          headers: {
+            knimi: parsedData[0]?.knimi,
+          }
+        });
 
         if (response.ok) {
           const data = await response.json();

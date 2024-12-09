@@ -12,11 +12,17 @@ const GetCalories = () => {
     const fetchCalories = async () => {
       try {
         const storedLoginStatus = await SecureStore.getItemAsync('isLoggedIn');
+        const storedData = await SecureStore.getItemAsync("userData");
+        const parsedData = JSON.parse(storedData);
         if (storedLoginStatus !== 'true') {
           throw new Error('User is not logged in');
         }
 
-        const response = await fetch(ServerIp + '/get-calories');
+        const response = await fetch(ServerIp + '/get-calories',{
+          headers: {
+            knimi: parsedData[0]?.knimi,
+          }
+        });
         if (!response.ok) {
           throw new Error('Failed to fetch calories data');
         }
