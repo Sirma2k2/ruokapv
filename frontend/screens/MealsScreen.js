@@ -17,6 +17,8 @@ const MealsScreen = () => {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
   const [category, setCategory] = useState('Food'); 
+  const [MealName, setMealName] = useState('')
+  const [search, setSearch] = useState('')
 
   const searchFood = async (query) => {
     if (!query) return;
@@ -100,11 +102,15 @@ const MealsScreen = () => {
       <TextInput
         style={[styles.input, theme.input]}
         placeholder="Enter meal name"
+        value={MealName}
+        onChangeText={(text) => setMealName(text)}
         theme={{ colors: { background: '#e0e0e0' } }}
       />
 
-      {/* Category filter */}
-      <View style={styles.categorys}>
+{MealName ? (
+  <>
+  {/* Category filter */}
+  <View style={styles.categorys}>
         <Text style={[styles.categoryLabel, { color: theme.text.color }]}>Category:</Text>
         <Picker
           selectedValue={category}
@@ -120,12 +126,19 @@ const MealsScreen = () => {
       </View>
 
       {/* ds */}
-    
-        <Searchbar
+
+          <Searchbar
           placeholder={`Search for ${category}s`}
           onChangeText={setSearchMeals}
           value={searchMeals}
         />
+      </>
+      ) : null }
+
+      
+
+    
+      
     
       {/* Loading indicator */}
       {loading && <ActivityIndicator size="large" color="#ff0" />}
