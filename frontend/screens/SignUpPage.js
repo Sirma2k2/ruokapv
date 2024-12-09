@@ -188,7 +188,7 @@ const SignUpPage = () => {
         <Text style={styles.label}>Name</Text>
         <TextInput
           style={styles.input}
-          placeholder="Enter your name"
+          placeholder="Enter your username"
           value={userData.name}
           onChangeText={handleInputChange('name')}
         />
