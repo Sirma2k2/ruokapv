@@ -11,7 +11,7 @@ export const SaveFood = async (food, ateria, username, consumedAmount) => {
     const carbsPerGram = food.nutriments?.carbohydrates_100g || 0;
     const fatPerGram = food.nutriments?.fat_100g || 0;
     const caloriesPerGram = food.nutriments?.['energy-kcal'] || 0;
-    const image = food.image_small_url
+    const image = food?.image_small_url || "N/A";
     const proteinAmount = (proteinPerGram * consumedAmount) / 100;
     const carbsAmount = (carbsPerGram * consumedAmount) / 100;
     const fatAmount = (fatPerGram * consumedAmount) / 100;
@@ -30,21 +30,21 @@ export const SaveFood = async (food, ateria, username, consumedAmount) => {
     };
 
     try {
-    // Lähetetään POST-pyyntö
-    const response = await fetch(ServerIp + '/api/add-food', {
-        method: 'POST',
-        headers: {
-        'Content-Type': 'application/json',
-        },
-        body: JSON.stringify(foodData),
-    });
-    
-    if (!response.ok) {
-        console.log("response != ok");
-        throw new Error('Failed to save food to the database');
-    }
+        // Lähetetään POST-pyyntö
+        const response = await fetch(ServerIp + '/api/add-food', {
+            method: 'POST',
+            headers: {
+            'Content-Type': 'application/json',
+            },
+            body: JSON.stringify(foodData),
+        });
+        
+        if (!response.ok) {
+            console.log("response != ok");
+            throw new Error('Failed to save food to the database');
+        }
 
-    return response;
+        return response;
 
     } catch (error) {
         console.error('Error saving food:', error);

@@ -8,6 +8,7 @@ import * as Animatable from 'react-native-animatable';
 import { Picker } from '@react-native-picker/picker';
 import { getUserData } from '../hooks/UserData';
 import { useNavigation } from '@react-navigation/native'; // Import useNavigation hook
+import { SaveFood } from '../hooks/SaveFood';
 
 import ServerIp from '../hooks/Global';
 
@@ -58,11 +59,15 @@ const MealsScreen = ({ navigation }) => {
   }, [searchMeals])
 
   function extractServingSize(servingSizeStr) {
-    const match = servingSizeStr.match(/(\d+)/);
-    if (match) {
-        return parseInt(match[1], 10);
+    try{
+      const match = servingSizeStr.match(/(\d+)/);
+      if (match) {
+          return parseInt(match[1], 10);
+      }
+      return null;
+    }catch(err){
+      console.log(err);
     }
-    return null;
   }
 
   useEffect(() => {
@@ -73,7 +78,69 @@ const MealsScreen = ({ navigation }) => {
 
   const saveFoodMeal = async(food) => {
     //TALLENNETAAN YKSITTÄINEN RUOKA LISTASTA
-    console.log('New food added: ', food);
+    console.log('New food adding: ', food.product_name);
+    
+    const user = await getUserData();
+    const uname = user[0]?.knimi;
+    const ateria = "meal";
+    const consumedAmount = extractServingSize(food.quantity || food.quantity || "100");
+
+    console.log(uname, " ", ateria, " ",consumedAmount);
+
+    const response = await SaveFood(food, ateria, uname, consumedAmount);
+
+    if (response.ok) {
+
+      console.log("response.ok");
+
+      const data = await response.json();
+      const resid = data.id[0]?.id;
+
+      const proteinPerGram = food.nutriments?.proteins_100g || 0;
+      const carbsPerGram = food.nutriments?.carbohydrates_100g || 0;
+      const fatPerGram = food.nutriments?.fat_100g || 0;
+      const caloriesPerGram = food.nutriments?.['energy-kcal'] || 0;
+      const proteinAmount = (proteinPerGram * consumedAmount) / 100;
+      const carbsAmount = (carbsPerGram * consumedAmount) / 100;
+      const fatAmount = (fatPerGram * consumedAmount) / 100;
+      const caloriesAmount = (caloriesPerGram * consumedAmount) / 100;
+
+      //Saatu ruoka lisätään listaan joka lähetetään myöhemmin kokonaisuudessaan backendiin.
+      //Tätä voi käyttää mm. valittujen aterioiden näyttämiseen
+      //suurin osa ominaisuuksista vielä kovakoodattu.
+
+      const newFood = {
+        id: resid, //tämä id on juuri tämän ruuan id databasessa ja sitä tarvitaan /get-meal:issä
+        knimi: user[0]?.knimi || "N/A",
+        ruokanimi: food?.product_name || food.brands || "N/A", //nyt toimii :)
+        maarag: consumedAmount,
+        kalorit: Math.round(caloriesAmount),
+        proteiini: Math.round(proteinAmount),
+        hiilihydraatit: Math.round(carbsAmount),
+        rasvat: Math.round(fatAmount),
+        tyyppi: category?.toLowerCase() || "food",
+        picture: food?.image_small_url || "",
+      };
+
+
+      setFoods((prevFoods) => {
+        const updatedFoods = [...prevFoods, newFood];
+        console.log('foods:', updatedFoods); // Log updated foods
+        return updatedFoods;
+      });
+
+      console.log(foods);
+
+      console.log('Successfully added')
+      alert('Food saved successfully') 
+    } else { 
+      console.log('Failed: ', response.status)
+      alert('Error in saving food')
+      
+    }
+    setModalVisible(false)
+
+    /*
     try {
       //lähetetään ruoka databaseen
       const user = await getUserData();
@@ -135,8 +202,7 @@ const MealsScreen = ({ navigation }) => {
       
       console.error('Error:', error)
     }
-
-    setModalVisible(false)
+    */
   }
 
   const saveMeal = async () => {

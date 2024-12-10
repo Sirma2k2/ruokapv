@@ -53,7 +53,7 @@ app.get('/api/ruokadata', async (req, res) => {
 
 // API-reitti POST-pyynnölle (lisää ruoka)
 app.post('/api/add-food', async (req, res) => {
-  const { knimi, ruokanimi, maarag, kalorit, proteiini, hiilihydraatit, rasvat, tyyppi, img } = req.body;
+  const { knimi, ruokanimi, maarag, kalorit, proteiini, hiilihydraatit, rasvat, tyyppi, picture } = req.body;
   //Tyypillä tarkoitetaan food, salad, drink, other
   console.log("Trying to add: ", req.body);
   if (!knimi || !ruokanimi || !maarag) {
@@ -63,7 +63,7 @@ app.post('/api/add-food', async (req, res) => {
   try {
     // Lisätään uusi ruoka tietokantaan
     const query = 'INSERT INTO food(knimi, ruokanimi, tyyppi, maarag, kalorit, proteiini, hiilarit, rasvat, picture, create_time) VALUES($1, $2, $3, $4, $5, $6, $7, $8, $9, $10)';
-    const values = [knimi, ruokanimi, tyyppi, maarag, kalorit || null, proteiini || null, hiilihydraatit || null, rasvat || null, img || null, 'NOW()']; // Kalorit voivat olla valinnaisia
+    const values = [knimi, ruokanimi, tyyppi, maarag, kalorit || null, proteiini || null, hiilihydraatit || null, rasvat || null, picture || null, 'NOW()']; // Kalorit voivat olla valinnaisia
     await pool.query(query, values);
     //Haetaan lisätyn ruuan id ja palautetaan se frontendiin.
     const result = await pool.query('SELECT id FROM food ORDER BY id DESC LIMIT 1;');
