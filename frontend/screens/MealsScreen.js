@@ -73,7 +73,7 @@ const MealsScreen = () => {
         }, 
         body: JSON.stringify({
           knimi: user[0]?.knimi || "Kovakoodi",
-          ruokanimi: food[0]?.abbreviated_product_name || "Failsafe",
+          ruokanimi: food?.product_name || "Failsafe", //Nyt toimii :)
           maarag: 200, //extractServingSize(food[0]?.serving_size), //VÄLIAIKAINEN
           kalorit: food.nutriments?.['energy-kcal'],
           proteiini: 0,
@@ -95,7 +95,7 @@ const MealsScreen = () => {
         const newFood = {
           id: resid, //tämä id on juuri tämän ruuan id databasessa ja sitä tarvitaan /get-meal:issä
           knimi: user[0]?.knimi || "Kovakoodi",
-          ruokanimi: food[0]?.abbreviated_product_name || "Failsafe", //ei toimi
+          ruokanimi: food?.product_name || "Failsafe", //Nyt toimii :)
           maarag: 200,
           kalorit: food[0]?.nutriments?.['energy-kcal'] || 0,
           proteiini: 0,
