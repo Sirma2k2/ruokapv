@@ -109,7 +109,7 @@ const HomeScreen = () => {
       ) : (
         <ScrollView>
           <FlatList
-            data={foodHistory}
+            data={foodHistory.slice(-10)} //Rajotin 10 ruokaan toistaseksi koska ei jaksanu rullata
             keyExtractor={(item) => item.id}
             renderItem={({ item }) => (
               <View style={[styles.item, { borderBottomColor: theme.borderColor }]}>

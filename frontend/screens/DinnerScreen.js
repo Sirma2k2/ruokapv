@@ -5,6 +5,8 @@ import { ActivityIndicator, Searchbar } from 'react-native-paper';
 import * as Animatable from 'react-native-animatable';
 import Ionicons from '@expo/vector-icons/Ionicons';
 import ServerIp from '../hooks/Global';
+import * as SecureStore from 'expo-secure-store';
+import { SaveFood } from '../hooks/SaveFood';
 
 
 const DinnerScreen = ({ navigation }) => {
@@ -51,17 +53,39 @@ const DinnerScreen = ({ navigation }) => {
   }, [searchDinner]);
 
   const saveFoodMeal = async (food) => {
+
     if (!consumedAmount || isNaN(consumedAmount) || consumedAmount <= 0) {
       Alert.alert("Error", "Please enter a valid amount in grams.");
       return;
     }
-  
+    
+    const storedData = await SecureStore.getItemAsync("userData");
+    const parsedData = JSON.parse(storedData);
+    const uname = parsedData[0]?.knimi;
+    const ateria = "dinner";
+
+    const response = await SaveFood(food, ateria, uname, consumedAmount);
+
+    if (response.ok){
+      const result = await response.json();
+      console.log(result);
+      setModalVisible(false);
+      setConsumedAmount('');
+      Alert.alert("Success", response.message || "Food saved successfully!");
+    }
+
+
+    /*
+    if (!consumedAmount || isNaN(consumedAmount) || consumedAmount <= 0) {
+      Alert.alert("Error", "Please enter a valid amount in grams.");
+      return;
+    }
     // Lasketaan ravintosisältö per syötetty määrä
     const proteinPerGram = food.nutriments?.proteins_100g || 0;
     const carbsPerGram = food.nutriments?.carbohydrates_100g || 0;
     const fatPerGram = food.nutriments?.fat_100g || 0;
     const caloriesPerGram = food.nutriments?.['energy-kcal'] || 0;
-  
+    const image = food.image_small_url
     const proteinAmount = (proteinPerGram * consumedAmount) / 100;
     const carbsAmount = (carbsPerGram * consumedAmount) / 100;
     const fatAmount = (fatPerGram * consumedAmount) / 100;
@@ -69,16 +93,17 @@ const DinnerScreen = ({ navigation }) => {
     const storedData = await SecureStore.getItemAsync("userData");
     const parsedData = JSON.parse(storedData);
   
+    
     const foodData = {
       knimi: parsedData[0]?.knimi, 
       ruokanimi: food.brands,
-      tyyppi: "xxx", //VÄLIAIKAINEN
+      tyyppi: "dinner", //VÄLIAIKAINEN
       maarag: consumedAmount,
-      kalorit: caloriesAmount,
-      proteiini: proteinAmount,
-      hiilihydraatit: carbsAmount,
-      rasvat: fatAmount,
-      picture: "xxxx" //VÄLIAIKAINEN
+      kalorit: Math.round(caloriesAmount),
+      proteiini: Math.round(proteinAmount),
+      hiilihydraatit: Math.round(carbsAmount),
+      rasvat: Math.round(fatAmount),
+      picture: image
     };
   
     try {
@@ -92,10 +117,11 @@ const DinnerScreen = ({ navigation }) => {
       });
   
       if (!response.ok) {
+        console.log("response != ok");
         throw new Error('Failed to save food to the database');
       }
-  
       const result = await response.json();
+      console.log(result);
       Alert.alert("Success", result.message || "Food saved successfully!");
       setModalVisible(false);
       setConsumedAmount('');
@@ -103,6 +129,7 @@ const DinnerScreen = ({ navigation }) => {
       console.error('Error saving food:', error);
       Alert.alert("Error", "Failed to save food to database.");
     }
+    */
   };
 
   return (
@@ -241,7 +268,7 @@ const DinnerScreen = ({ navigation }) => {
 
                     <TouchableOpacity
                       style={styles.button}
-                      onPress={() => saveFoodMeal(selectedFood)}
+                      onPress={() => {saveFoodMeal(selectedFood)}}
                     >
                       <Text >Save food</Text>
                     </TouchableOpacity>

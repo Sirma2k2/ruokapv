@@ -6,6 +6,8 @@ import { FlatList } from 'react-native';
 import * as Animatable from 'react-native-animatable';
 import Ionicons from '@expo/vector-icons/Ionicons';
 import ServerIp from '../hooks/Global';
+import { SaveFood } from '../hooks/SaveFood';
+import * as SecureStore from 'expo-secure-store';
 
 const BreakfastScreen = ({ navigation }) => {
   const { theme } = useTheme(); // Access the theme from context
@@ -53,57 +55,29 @@ const BreakfastScreen = ({ navigation }) => {
 
 
   const saveFoodMeal = async (food) => {
+    console.log("breakfast save");
     if (!consumedAmount || isNaN(consumedAmount) || consumedAmount <= 0) {
       Alert.alert("Error", "Please enter a valid amount in grams.");
       return;
     }
-  
-    // Lasketaan ravintosisältö per syötetty määrä
-    const proteinPerGram = food.nutriments?.proteins_100g || 0;
-    const carbsPerGram = food.nutriments?.carbohydrates_100g || 0;
-    const fatPerGram = food.nutriments?.fat_100g || 0;
-    const caloriesPerGram = food.nutriments?.['energy-kcal'] || 0;
-  
-    const proteinAmount = (proteinPerGram * consumedAmount) / 100;
-    const carbsAmount = (carbsPerGram * consumedAmount) / 100;
-    const fatAmount = (fatPerGram * consumedAmount) / 100;
-    const caloriesAmount = (caloriesPerGram * consumedAmount) / 100;
+    
     const storedData = await SecureStore.getItemAsync("userData");
     const parsedData = JSON.parse(storedData);
-  
-    const foodData = {
-      knimi: parsedData[0]?.knimi,
-      ruokanimi: food.product_name,
-      maarag: consumedAmount,
-      kalorit: caloriesAmount,
-      proteiini: proteinAmount,
-      hiilihydraatit: carbsAmount,
-      rasvat: fatAmount,
-    };
-  
-    try {
-      // Lähetetään POST-pyyntö
-      const response = await fetch(ServerIp + '/api/add-food', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify(foodData),
-      });
-  
-      if (!response.ok) {
-        throw new Error('Failed to save food to the database');
-      }
-  
+    const uname = parsedData[0]?.knimi;
+    const ateria = "breakfast";
+
+    const response = await SaveFood(food, ateria, uname, consumedAmount);
+
+    if (response.ok){
       const result = await response.json();
-      Alert.alert("Success", result.message || "Food saved successfully!");
+      console.log(result);
       setModalVisible(false);
       setConsumedAmount('');
-    } catch (error) {
-      console.error('Error saving food:', error);
-      Alert.alert("Error", "Failed to save food to database.");
+      Alert.alert("Success", response.message || "Food saved successfully!");
     }
+
   };
+
   return (
     <View style={[styles.container, { backgroundColor: theme.container.backgroundColor }]}>
       {/* Top Tab Bar */}
