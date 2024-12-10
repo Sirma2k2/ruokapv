@@ -3,6 +3,7 @@ import { View, Text, TouchableOpacity, StyleSheet, Modal, TextInput } from 'reac
 import { useTheme } from '../components/ThemeContext'; // Import the useTheme hook
 import { ActivityIndicator, Searchbar } from 'react-native-paper';
 import { FlatList } from 'react-native';
+import { useRoute } from '@react-navigation/native';
 import * as Animatable from 'react-native-animatable';
 import { Picker } from '@react-native-picker/picker';
 import { getUserData } from '../hooks/UserData';
@@ -10,9 +11,9 @@ import { useNavigation } from '@react-navigation/native'; // Import useNavigatio
 
 import ServerIp from '../hooks/Global';
 
-const MealsScreen = () => {
+const MealsScreen = ({ navigation }) => {
   const { theme } = useTheme(); // Access the theme from context
-  const navigation = useNavigation(); // Initialize navigation
+  //const navigation = useNavigation(); // Initialize navigation
   const [searchMeals, setSearchMeals] = useState('');
   const [modalVisible, setModalVisible] = useState(false);
   const [confirmationVisible, setConfirmationVisible] = useState(false); // State for confirmation modal
@@ -24,6 +25,9 @@ const MealsScreen = () => {
   const [MealName, setMealName] = useState('')
   const [search, setSearch] = useState('')
   const [foods, setFoods] = useState([]);
+  const [MealType, setMealType] = useState(selectedMealType || '')
+  const route = useRoute();
+  const { selectedMealType } = route.params || {}; 
 
   const searchFood = async (query) => {
     if (!query) return;
@@ -60,6 +64,12 @@ const MealsScreen = () => {
     }
     return null;
   }
+
+  useEffect(() => {
+    if (selectedMealType) {
+        setMealType(selectedMealType);
+    }
+}, [selectedMealType]);
 
   const saveFoodMeal = async(food) => {
     //TALLENNETAAN YKSITTÄINEN RUOKA LISTASTA
@@ -133,19 +143,20 @@ const MealsScreen = () => {
     //TALLENNETAAN ATERIA
     try {
       const user = await getUserData();
+      const foodIds = foods.map((food) => food.id)
       const response = await fetch(ServerIp + '/api/add-meal', {
         method: 'POST', 
         headers: { 
           'content-type': 'application/json',
         }, 
         body: JSON.stringify({
-          ateria: "dinner", //tämän tulee olla joko dinner, breakfast tai lunch dynaamisesti
+          ateria: MealType, //tämän tulee olla joko dinner, breakfast tai lunch dynaamisesti
           knimi: user[0]?.knimi || "Kovakoodi",
           mealname: MealName,
-          food: 25 || null, //Rivillä 96 mainittu id tähän. toistaiseksi kovakoodattu
-          drink: 24 || null,
-          salad: 23 || null,
-          other: 22 || null
+          food: foodIds[0]  || null, //Rivillä 96 mainittu id tähän. toistaiseksi kovakoodattu
+          drink: foodIds[1] || null,
+          salad: foodIds[2] || null,
+          other: foodIds[3] || null
         }),
       })
       if (response.ok) {

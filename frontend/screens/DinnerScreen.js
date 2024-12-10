@@ -271,7 +271,7 @@ const DinnerScreen = ({ navigation }) => {
     
     <TouchableOpacity 
       style={[styles.button, { backgroundColor: theme.buttonBackgroundColor }]} 
-      onPress={() => navigation.navigate('Meals')}
+      onPress={() => navigation.navigate('Meals', { selectedMealType: 'Dinner' })}
     >
       <Text style={[styles.buttonText, { color: theme.buttonText.color }]}>Create a new meal</Text>
       <Ionicons name="fast-food" size={24} color={theme.iconColor} style={styles.icon} />
