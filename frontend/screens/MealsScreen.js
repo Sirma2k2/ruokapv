@@ -5,6 +5,7 @@ import { ActivityIndicator, Searchbar } from 'react-native-paper';
 import { FlatList } from 'react-native';
 import * as Animatable from 'react-native-animatable';
 import { Picker } from '@react-native-picker/picker';
+import { getUserData } from '../hooks/UserData';
 
 import ServerIp from '../hooks/Global';
 
@@ -19,6 +20,8 @@ const MealsScreen = () => {
   const [category, setCategory] = useState('Food'); 
   const [MealName, setMealName] = useState('')
   const [search, setSearch] = useState('')
+  const [foods, setFoods] = useState([]);
+
 
   const searchFood = async (query) => {
     if (!query) return;
@@ -56,24 +59,62 @@ const MealsScreen = () => {
     return null;
 }
 
-  const saveFoodMeal = async(food) => {
-    console.log('New meal created:', food);
 
+  const saveFoodMeal = async(food) => {
+    //TALLENNETAAN YKSITTÄINEN RUOKA LISTASTA
+    console.log('New food added: ', food);
     try {
+      //lähetetään ruoka databaseen
+      const user = await getUserData();
       const response = await fetch(ServerIp + '/api/add-food', {
         method: 'POST', 
         headers: { 
           'content-type': 'application/json',
         }, 
         body: JSON.stringify({
-          knimi: 'kovakoodinimi',
-          ruokanimi: food.abbreviated_product_name,
-          maarag: extractServingSize(food.serving_size),
-          kalorit: food.nutriments?.['energy-kcal']
-          //img: food.image_small_url
+          knimi: user[0]?.knimi || "Kovakoodi",
+          ruokanimi: food[0]?.abbreviated_product_name || "Failsafe",
+          maarag: 200, //extractServingSize(food[0]?.serving_size), //VÄLIAIKAINEN
+          kalorit: food.nutriments?.['energy-kcal'],
+          proteiini: 0,
+          hiilihydraatit: 0,
+          rasvat: 0,
+          tyyppi: category.toLowerCase(),
+          img: food.image_small_url
         }),
       })
       if (response.ok) {
+
+        const data = await response.json();
+        const resid = data.id[0]?.id;
+
+        //Saatu ruoka lisätään listaan joka lähetetään myöhemmin kokonaisuudessaan backendiin.
+        //Tätä voi käyttää mm. valittujen aterioiden näyttämiseen
+        //suurin osa ominaisuuksista vielä kovakoodattu.
+
+        const newFood = {
+          id: resid, //tämä id on juuri tämän ruuan id databasessa ja sitä tarvitaan /get-meal:issä
+          knimi: user[0]?.knimi || "Kovakoodi",
+          ruokanimi: food[0]?.abbreviated_product_name || "Failsafe", //ei toimi
+          maarag: 200,
+          kalorit: food[0]?.nutriments?.['energy-kcal'] || 0,
+          proteiini: 0,
+          hiilihydraatit: 0,
+          rasvat: 0,
+          tyyppi: category?.toLowerCase() || "food",
+          img: food[0]?.image_small_url || "",
+        };
+
+        
+
+        setFoods((prevFoods) => {
+          const updatedFoods = [...prevFoods, newFood];
+          console.log('foods:', updatedFoods); // Log updated foods
+          return updatedFoods;
+        });
+
+        console.log(foods);
+
         console.log('Successfully added')
         alert('Food saved successfully') 
       } else { 
@@ -81,16 +122,42 @@ const MealsScreen = () => {
         alert('Error in saving food')
         
       }
-      } catch(error) {
-        
-        console.error('Error:', error)
-      }
+    } catch(error) {
+      
+      console.error('Error:', error)
+    }
 
     setModalVisible(false)
   }
 
-  const saveMeal = (food) => {
-    console.log('New meal created:', food)
+  const saveMeal = async () => {
+    //TALLENNETAAN ATERIA
+    try {
+      const user = await getUserData();
+      const response = await fetch(ServerIp + '/api/add-meal', {
+        method: 'POST', 
+        headers: { 
+          'content-type': 'application/json',
+        }, 
+        body: JSON.stringify({
+          ateria: "dinner", //tämän tulee olla joko dinner, breakfast tai lunch dynaamisesti
+          knimi: user[0]?.knimi || "Kovakoodi",
+          mealname: MealName,
+          food: 25 || null, //Rivillä 96 mainittu id tähän. toistaiseksi kovakoodattu
+          drink: 24 || null,
+          salad: 23 || null,
+          other: 22 || null
+        }),
+      })
+      if (response.ok) {
+        alert("added meal to database");
+        setFoods([]); //Tyhjennetään lista
+      } else { 
+        alert("error");
+      }
+      } catch(error) {
+
+      }
     setModalVisible(false)
   }
 
@@ -241,7 +308,7 @@ const MealsScreen = () => {
 
       <TouchableOpacity
         style={styles.button}
-        onPress={() => saveFoodMeal(selectedFood)}
+        onPress={() => saveMeal(selectedFood)}
       >
         <Text>Save meal</Text>
       </TouchableOpacity>

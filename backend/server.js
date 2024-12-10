@@ -43,7 +43,7 @@ app.get('/api/searchFood', async (req, res) => {
 // API-reitti, joka hakee tietoja tietokannasta
 app.get('/api/ruokadata', async (req, res) => {
   try {
-    const result = await pool.query('SELECT * FROM ruoka'); // Hakee kaikki tiedot taulusta tapahtumaid
+    const result = await pool.query('SELECT * FROM food'); // Hakee kaikki tiedot taulusta tapahtumaid
     res.json(result.rows); // Palautetaan tiedot JSON-muodossa
   } catch (err) {
     console.error('Database query error', err);
@@ -53,24 +53,116 @@ app.get('/api/ruokadata', async (req, res) => {
 
 // API-reitti POST-pyynnölle (lisää ruoka)
 app.post('/api/add-food', async (req, res) => {
-  const { knimi, ruokanimi, maarag, kalorit } = req.body;
-
+  const { knimi, ruokanimi, maarag, kalorit, proteiini, hiilihydraatit, rasvat, tyyppi, img } = req.body;
+  //Tyypillä tarkoitetaan food, salad, drink, other
+  console.log("Trying to add: ", req.body);
   if (!knimi || !ruokanimi || !maarag) {
     return res.status(400).json({ error: 'Name, food name, and amount are required' });
   }
 
   try {
     // Lisätään uusi ruoka tietokantaan
-    const query = 'INSERT INTO ruoka(knimi, ruokanimi, maarag, kalorit) VALUES($1, $2, $3, $4)';
-    const values = [knimi, ruokanimi, maarag, kalorit || null]; // Kalorit voivat olla valinnaisia
-
+    const query = 'INSERT INTO food(knimi, ruokanimi, tyyppi, maarag, kalorit, proteiini, hiilarit, rasvat, picture) VALUES($1, $2, $3, $4, $5, $6, $7, $8, $9)';
+    const values = [knimi, ruokanimi, tyyppi, maarag, kalorit || null, proteiini || null, hiilihydraatit || null, rasvat || null, img || null]; // Kalorit voivat olla valinnaisia
     await pool.query(query, values);
-    res.status(201).json({ message: 'Food added successfully' });
+    //Haetaan lisätyn ruuan id ja palautetaan se frontendiin.
+    const result = await pool.query('SELECT id FROM food ORDER BY id DESC LIMIT 1;');
+    res.status(201).json({ message: 'Food added successfully', id: result.rows });
   } catch (err) {
     console.error('Error inserting data into database', err);
     res.status(500).json({ error: 'Failed to add food to database' });
   }
+}); 
+
+//aterian tallennus
+app.post('/api/add-meal', async (req, res) => {
+  const { knimi, ateria, mealname, food, salad, drink, other } = req.body;
+
+  if (!knimi || !mealname ) {
+    return res.status(400).json({ error: 'Name, food name, and amount are required' });
+  }
+
+  try {
+    /*
+      food, salad, drink ja other ovat kaikki integerejä jotka vastaavat kyseisen ruuan id:tä food pöydässä.
+    */
+    const query = `INSERT INTO meals (knimi, mealname, ateria, food_id, salad_id, drink_id, other_id) VALUES($1, $2, $3, $4, $5, $6, $7)`;
+    const values = [knimi, mealname, ateria, food, salad || null, drink || null, other || null]; //tyyppi, knimi, mealname ja food pakollisia
+
+    await pool.query(query, values);
+    res.status(201).json({ message: 'Meal added successfully' });
+  } catch (err) {
+    console.error('Error inserting data into database', err);
+    res.status(500).json({ error: 'Failed to add meal to database' });
+  }
 });
+
+//Aterioiden haku
+app.get('/api/get-meals', async (req, res) => {
+  const { knimi, ateria } = req.query;
+  console.log("nimi: ",knimi, " ateria: ", ateria);
+  if (!knimi || !ateria) {
+    return res.status(400).json({ error: 'Knimi and Ateria are required' });
+  }
+
+  try {
+    //Hakee knimen ja aterian nimen mukaan aterian ja palauttaa aterian ja siihen kuuluvien ruokien tiedot.
+    //Olis ollu proceduuri tietokannassa mutta en saanu toimimaan
+    const query = `
+      SELECT 
+        m.id AS meal_id,
+        m.knimi,
+        m.mealname,
+        f.ruokanimi AS food_ruokanimi,
+        f.tyyppi AS food_typpi,
+        f.kalorit AS food_kalorit,
+        f.proteiini AS food_proteiini,
+        f.hiilarit AS food_hiilarit,
+        f.rasvat AS food_rasvat,
+        f.picture AS food_picture,
+        s.ruokanimi AS salad_ruokanimi,
+        s.tyyppi AS salad_typpi,
+        s.kalorit AS salad_kalorit,
+        s.proteiini AS salad_proteiini,
+        s.hiilarit AS salad_hiilarit,
+        s.rasvat AS salad_rasvat,
+        s.picture AS salad_picture,
+        dr.ruokanimi AS drink_ruokanimi,
+        dr.tyyppi AS drink_typpi,
+        dr.kalorit AS drink_kalorit,
+        dr.proteiini AS drink_proteiini,
+        dr.hiilarit AS drink_hiilarit,
+        dr.rasvat AS drink_rasvat,
+        dr.picture AS drink_picture,
+        o.ruokanimi AS other_ruokanimi,
+        o.tyyppi AS other_typpi,
+        o.kalorit AS other_kalorit,
+        o.proteiini AS other_proteiini,
+        o.hiilarit AS other_hiilarit,
+        o.rasvat AS other_rasvat,
+        o.picture AS other_picture
+      FROM meals m
+      JOIN food f ON m.food_id = f.id
+      JOIN food s ON m.salad_id = s.id
+      JOIN food dr ON m.drink_id = dr.id
+      JOIN food o ON m.other_id = o.id
+      WHERE m.knimi = $1
+        AND m.ateria = $2;
+    `;
+    
+    const result = await pool.query(query, [knimi, ateria]);
+
+    if (result.rows.length === 0) {
+      return res.status(404).json({ message: 'No meals found for this knimi' });
+    }
+    //ja ei muuta ku kaikki sellasenaan etiä päin aamuja frontendin miehille.
+    res.status(200).json(result.rows);
+  } catch (error) {
+    console.error('Error fetching meals:', error);
+    res.status(500).json({ error: 'Internal Server Error' });
+  }
+});
+
 app.get('/get-user', async( req,res)=> {
   try {
     const result = await pool.query('SELECT * FROM users')
@@ -129,6 +221,12 @@ app.post('/add-user', async (req, res) => {
 app.get('/get-calories', async (req, res) => {
   const knimi = req.headers.knimi;
 
+  const data = await pool.query('SELECT kalorit FROM food WHERE knimi = $1 ORDER BY id DESC LIMIT 3', [knimi]);
+  const eaten = data.rows.reduce((total, row) => total + row.kalorit, 0);
+  console.log(eaten);
+  await pool.query('UPDATE calories SET food = $1 WHERE knimi = $2', [eaten, knimi]);
+  
+
   if (!knimi) {
     return res.status(400).json({ error: 'Name is required' });
   }
@@ -171,7 +269,7 @@ app.post('/login', async(req,res)=> {
 app.get('/get-food', async(req,res)=> {
   const knimi = req.headers.knimi;
   console.log("knimi: ",knimi)
-  const query = 'SELECT ruokanimi, maarag, kalorit FROM ruoka WHERE knimi = $1';
+  const query = 'SELECT ruokanimi, maarag, kalorit FROM food WHERE knimi = $1';
   const value = [knimi];
 
   try { 

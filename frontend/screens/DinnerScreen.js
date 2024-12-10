@@ -69,11 +69,13 @@ const DinnerScreen = ({ navigation }) => {
     const foodData = {
       knimi: parsedData[0]?.knimi, 
       ruokanimi: food.brands,
+      tyyppi: "xxx", //VÄLIAIKAINEN
       maarag: consumedAmount,
       kalorit: caloriesAmount,
       proteiini: proteinAmount,
       hiilihydraatit: carbsAmount,
       rasvat: fatAmount,
+      picture: "xxxx" //VÄLIAIKAINEN
     };
   
     try {
