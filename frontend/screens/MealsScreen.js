@@ -6,13 +6,16 @@ import { FlatList } from 'react-native';
 import * as Animatable from 'react-native-animatable';
 import { Picker } from '@react-native-picker/picker';
 import { getUserData } from '../hooks/UserData';
+import { useNavigation } from '@react-navigation/native'; // Import useNavigation hook
 
 import ServerIp from '../hooks/Global';
 
 const MealsScreen = () => {
   const { theme } = useTheme(); // Access the theme from context
+  const navigation = useNavigation(); // Initialize navigation
   const [searchMeals, setSearchMeals] = useState('');
   const [modalVisible, setModalVisible] = useState(false);
+  const [confirmationVisible, setConfirmationVisible] = useState(false); // State for confirmation modal
   const [selectedFood, setSelectedFood] = useState(null);
   const [foodResults, setFoodResults] = useState([]);
   const [loading, setLoading] = useState(false);
@@ -21,7 +24,6 @@ const MealsScreen = () => {
   const [MealName, setMealName] = useState('')
   const [search, setSearch] = useState('')
   const [foods, setFoods] = useState([]);
-
 
   const searchFood = async (query) => {
     if (!query) return;
@@ -57,8 +59,7 @@ const MealsScreen = () => {
         return parseInt(match[1], 10);
     }
     return null;
-}
-
+  }
 
   const saveFoodMeal = async(food) => {
     //TALLENNETAAN YKSITTÄINEN RUOKA LISTASTA
@@ -105,8 +106,6 @@ const MealsScreen = () => {
           img: food[0]?.image_small_url || "",
         };
 
-        
-
         setFoods((prevFoods) => {
           const updatedFoods = [...prevFoods, newFood];
           console.log('foods:', updatedFoods); // Log updated foods
@@ -152,13 +151,23 @@ const MealsScreen = () => {
       if (response.ok) {
         alert("added meal to database");
         setFoods([]); //Tyhjennetään lista
+        navigation.goBack();
       } else { 
         alert("error");
       }
       } catch(error) {
-
+        console.error('Error:', error);
       }
     setModalVisible(false)
+  }
+
+  const handleSaveMeal = () => {
+    setConfirmationVisible(true); // Show confirmation modal
+  }
+
+  const handleConfirmSave = () => {
+    setConfirmationVisible(false); // Hide confirmation modal
+    saveMeal(); // Proceed with saving the meal
   }
 
   return (
@@ -306,9 +315,35 @@ const MealsScreen = () => {
         </View>
       </Modal>
 
+      {/* Confirmation Modal */}
+      <Modal
+        animationType="slide"
+        transparent={true}
+        visible={confirmationVisible}
+        onRequestClose={() => setConfirmationVisible(false)}
+      >
+        <View style={styles.modalOverlay}>
+          <View style={styles.modalContent}>
+            <Text style={styles.modalText}>Have you added all items?</Text>
+            <TouchableOpacity
+              style={styles.button}
+              onPress={handleConfirmSave}
+            >
+              <Text>Yes</Text>
+            </TouchableOpacity>
+            <TouchableOpacity
+              style={styles.button}
+              onPress={() => setConfirmationVisible(false)}
+            >
+              <Text>No</Text>
+            </TouchableOpacity>
+          </View>
+        </View>
+      </Modal>
+
       <TouchableOpacity
         style={styles.button}
-        onPress={() => saveMeal(selectedFood)}
+        onPress={handleSaveMeal}
       >
         <Text>Save meal</Text>
       </TouchableOpacity>

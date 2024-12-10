@@ -181,6 +181,14 @@ app.post('/add-user', async (req, res) => {
     return res.status(400).json({ error: 'Name, email, password, age, weight, height, activity level, diet type, goal, and gender are required' });
   }
 
+  const existingUserQuery = 'SELECT * FROM users WHERE knimi = $1';
+  const existingUserValues = [knimi];
+  const existingUserResult = await pool.query(existingUserQuery, existingUserValues);
+
+  if (existingUserResult.rowCount > 0) {
+    return res.status(400).json({ error: 'Username already exists' });
+  }
+
   try {
     const query1 = 'SELECT email FROM users WHERE email = $1 OR knimi = $2';
     const values1 = [email, knimi];

@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useEffect } from 'react';
 import { StyleSheet, Platform } from 'react-native';
 import { NavigationContainer } from '@react-navigation/native';
 import { ThemeProvider } from './frontend/components/ThemeContext'; // Assuming theme is used
@@ -9,6 +9,7 @@ import AppNavigator from './frontend/navigation/AppNavigator'; // Import AppNavi
 
 export default function App() {
     const { isLoggedIn, login } = useAuth();
+
 
     return (
         <ThemeProvider>
