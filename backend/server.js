@@ -54,7 +54,7 @@ app.get('/api/ruokadata', async (req, res) => {
 // API-reitti POST-pyynnölle (lisää ruoka)
 app.post('/api/add-food', async (req, res) => {
   const { knimi, ruokanimi, maarag, kalorit, proteiini, hiilihydraatit, rasvat, tyyppi, img } = req.body;
-  //Tyypillä tarkoitetaan food, salad, drink, other//
+  //Tyypillä tarkoitetaan food, salad, drink, other
   console.log("Trying to add: ", req.body);
   if (!knimi || !ruokanimi || !maarag) {
     return res.status(400).json({ error: 'Name, food name, and amount are required' });
@@ -65,13 +65,16 @@ app.post('/api/add-food', async (req, res) => {
     const query = 'INSERT INTO food(knimi, ruokanimi, tyyppi, maarag, kalorit, proteiini, hiilarit, rasvat, picture) VALUES($1, $2, $3, $4, $5, $6, $7, $8, $9)';
     const values = [knimi, ruokanimi, tyyppi, maarag, kalorit || null, proteiini || null, hiilihydraatit || null, rasvat || null, img || null]; // Kalorit voivat olla valinnaisia
     await pool.query(query, values);
+    //Haetaan lisätyn ruuan id ja palautetaan se frontendiin.
     const result = await pool.query('SELECT id FROM food ORDER BY id DESC LIMIT 1;');
     res.status(201).json({ message: 'Food added successfully', id: result.rows });
   } catch (err) {
     console.error('Error inserting data into database', err);
     res.status(500).json({ error: 'Failed to add food to database' });
   }
-});
+}); 
+
+//aterian tallennus
 app.post('/api/add-meal', async (req, res) => {
   const { knimi, ateria, mealname, food, salad, drink, other } = req.body;
 
@@ -80,13 +83,11 @@ app.post('/api/add-meal', async (req, res) => {
   }
 
   try {
-    // Lisätään uusi ruoka tietokantaan
-    
     /*
       food, salad, drink ja other ovat kaikki integerejä jotka vastaavat kyseisen ruuan id:tä food pöydässä.
     */
-    const query = `INSERT INTO ${ateria} (knimi, mealname, food_id, salad_id, drink_id, other_id) VALUES($1, $2, $3, $4, $5, $6)`;
-    const values = [knimi, mealname, food, salad || null, drink || null, other || null]; //tyyppi, knimi, mealname ja food pakollisia
+    const query = `INSERT INTO meals (knimi, mealname, ateria, food_id, salad_id, drink_id, other_id) VALUES($1, $2, $3, $4, $5, $6, $7)`;
+    const values = [knimi, mealname, ateria, food, salad || null, drink || null, other || null]; //tyyppi, knimi, mealname ja food pakollisia
 
     await pool.query(query, values);
     res.status(201).json({ message: 'Meal added successfully' });
@@ -95,15 +96,17 @@ app.post('/api/add-meal', async (req, res) => {
     res.status(500).json({ error: 'Failed to add meal to database' });
   }
 });
+
+//Aterioiden haku
 app.get('/api/get-meals', async (req, res) => {
-  const { knimi, ateria } = req.query; // Get 'knimi' and 'ateria' from the query string
+  const { knimi, ateria } = req.query;
   console.log("nimi: ",knimi, " ateria: ", ateria);
   if (!knimi || !ateria) {
-    return res.status(400).json({ error: 'Knimi and Ateria are required' }); // Handle missing parameters
+    return res.status(400).json({ error: 'Knimi and Ateria are required' });
   }
 
   try {
-    // Dynamically select the table based on the 'ateria' value (e.g., 'breakfast', 'lunch', or 'dinner')
+    //Hakee knimen ja aterian nimen mukaan aterian ja palauttaa aterian ja siihen kuuluvien ruokien tiedot.
     const query = `
       SELECT 
         m.id AS meal_id,
@@ -147,17 +150,18 @@ app.get('/api/get-meals', async (req, res) => {
     `;
     
     const result = await pool.query(query, [knimi, ateria]);
-    // Check if any meals were found
+
     if (result.rows.length === 0) {
       return res.status(404).json({ message: 'No meals found for this knimi' });
     }
-    // Send the result as the response
+    //ja ei muuta ku kaikki sellasenaan etiä päin aamuja frontendin miehille.
     res.status(200).json(result.rows);
   } catch (error) {
     console.error('Error fetching meals:', error);
     res.status(500).json({ error: 'Internal Server Error' });
   }
 });
+
 app.get('/get-user', async( req,res)=> {
   try {
     const result = await pool.query('SELECT * FROM users')
@@ -207,6 +211,12 @@ app.post('/add-user', async (req, res) => {
 // API-reitti GET-pyynnölle (hae kalorit)
 app.get('/get-calories', async (req, res) => {
   const knimi = req.headers.knimi;
+
+  const data = await pool.query('SELECT kalorit FROM food WHERE knimi = $1 ORDER BY id DESC LIMIT 3', [knimi]);
+  const eaten = data.rows.reduce((total, row) => total + row.kalorit, 0);
+  console.log(eaten);
+  await pool.query('UPDATE calories SET food = $1 WHERE knimi = $2', [eaten, knimi]);
+  
 
   if (!knimi) {
     return res.status(400).json({ error: 'Name is required' });

@@ -59,9 +59,12 @@ const MealsScreen = () => {
     return null;
 }
 
+
   const saveFoodMeal = async(food) => {
+    //TALLENNETAAN YKSITTÄINEN RUOKA LISTASTA
     console.log('New food added: ', food);
     try {
+      //lähetetään ruoka databaseen
       const user = await getUserData();
       const response = await fetch(ServerIp + '/api/add-food', {
         method: 'POST', 
@@ -84,20 +87,25 @@ const MealsScreen = () => {
 
         const data = await response.json();
         const resid = data.id[0]?.id;
-        console.log("id: ", resid);
+
+        //Saatu ruoka lisätään listaan joka lähetetään myöhemmin kokonaisuudessaan backendiin.
+        //Tätä voi käyttää mm. valittujen aterioiden näyttämiseen
+        //suurin osa ominaisuuksista vielä kovakoodattu.
 
         const newFood = {
-          id: resid, // ID from the backend
+          id: resid, //tämä id on juuri tämän ruuan id databasessa ja sitä tarvitaan /get-meal:issä
           knimi: user[0]?.knimi || "Kovakoodi",
-          ruokanimi: food[0]?.abbreviated_product_name || "Failsafe",
+          ruokanimi: food[0]?.abbreviated_product_name || "Failsafe", //ei toimi
           maarag: 200,
           kalorit: food[0]?.nutriments?.['energy-kcal'] || 0,
           proteiini: 0,
           hiilihydraatit: 0,
           rasvat: 0,
-          tyyppi: category?.toLowerCase() || "default",
+          tyyppi: category?.toLowerCase() || "food",
           img: food[0]?.image_small_url || "",
         };
+
+        
 
         setFoods((prevFoods) => {
           const updatedFoods = [...prevFoods, newFood];
@@ -123,6 +131,7 @@ const MealsScreen = () => {
   }
 
   const saveMeal = async () => {
+    //TALLENNETAAN ATERIA
     try {
       const user = await getUserData();
       const response = await fetch(ServerIp + '/api/add-meal', {
@@ -131,10 +140,10 @@ const MealsScreen = () => {
           'content-type': 'application/json',
         }, 
         body: JSON.stringify({
-          ateria: "dinner",
+          ateria: "dinner", //tämän tulee olla joko dinner, breakfast tai lunch dynaamisesti
           knimi: user[0]?.knimi || "Kovakoodi",
           mealname: MealName,
-          food: 25 || null,
+          food: 25 || null, //Rivillä 96 mainittu id tähän. toistaiseksi kovakoodattu
           drink: 24 || null,
           salad: 23 || null,
           other: 22 || null
@@ -142,6 +151,7 @@ const MealsScreen = () => {
       })
       if (response.ok) {
         alert("added meal to database");
+        setFoods([]); //Tyhjennetään lista
       } else { 
         alert("error");
       }
