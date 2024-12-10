@@ -24,14 +24,17 @@ const BreakfastScreen = ({ navigation }) => {
     if (!query) return;
     setLoading(true);
     setError('');
-
+  
     try {
       const response = await fetch(ServerIp + `/api/searchFood?query=${query}`);
       if (response.ok) {
         const data = await response.json();
-        setFoodResults(data);
+        // Filter out items that do not have calorie information
+        const filteredData = data.filter(item => item.nutriments && item.nutriments['energy-kcal'] && item.nutriments['energy-kcal'] !== 0 && item.quantity && item.quantity !== 0);
+        setFoodResults(filteredData);
       } else {
         setError('No products found');
+        setTimeout(() => setError(''), 5000);
       }
       setLoading(false);
     } catch (error) {

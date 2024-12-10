@@ -60,7 +60,7 @@ const WelcomeScreen = ({ onLogin }) => {
               onLogin(); // Notify parent about successful login
             } else {
               console.log('Failed: ', response.status, ' ', response.headers);
-              alert('error', response.status);
+              alert('Incorrect credidentials, please try again', response.status);
               return;
             }
           } catch(error) {

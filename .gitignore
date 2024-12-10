@@ -33,3 +33,7 @@ yarn-error.*
 
 # typescript
 *.tsbuildinfo
+
+# ignore server ip address
+food-diary/frontend/hooks/Global.js
+

@@ -149,7 +149,7 @@ const MealsScreen = () => {
         }),
       })
       if (response.ok) {
-        alert("added meal to database");
+        alert("Meal saved successfully, good job!");
         setFoods([]); //Tyhjennetään lista
         navigation.goBack();
       } else { 
@@ -162,6 +162,14 @@ const MealsScreen = () => {
   }
 
   const handleSaveMeal = () => {
+    if(!MealName) {
+      alert('Please enter a meal name and add some food items');
+      return;
+    }
+    if (foods.length === 0) {
+      alert('Please add some food items to the meal before saving');
+      return;
+    }
     setConfirmationVisible(true); // Show confirmation modal
   }
 
