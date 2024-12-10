@@ -25,14 +25,17 @@ const LunchScreen = ({navigation}) => {
     if (!query) return;
     setLoading(true);
     setError('');
-
+  
     try {
       const response = await fetch(ServerIp + `/api/searchFood?query=${query}`);
       if (response.ok) {
         const data = await response.json();
-        setFoodResults(data);
+        // Filter out items that do not have calorie information
+        const filteredData = data.filter(item => item.nutriments && item.nutriments['energy-kcal'] && item.nutriments['energy-kcal'] !== 0 && item.quantity && item.quantity !== 0);
+        setFoodResults(filteredData);
       } else {
         setError('No products found');
+        setTimeout(() => setError(''), 5000);
       }
       setLoading(false);
     } catch (error) {
@@ -70,6 +73,7 @@ const LunchScreen = ({navigation}) => {
   }, []);
 
   const saveFoodMeal = async (food) => {
+    console.log('Saving food:', food.product_name);
     if (!consumedAmount || isNaN(consumedAmount) || consumedAmount <= 0) {
       Alert.alert("Error", "Please enter a valid amount in grams.");
       return;
@@ -109,6 +113,8 @@ const LunchScreen = ({navigation}) => {
       });
   
       if (!response.ok) {
+        alert('Failed to save food to the database');
+        console.error('Failed to save food to the database');
         throw new Error('Failed to save food to the database');
       }
   

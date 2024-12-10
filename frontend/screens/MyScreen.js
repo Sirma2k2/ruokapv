@@ -14,7 +14,6 @@ import { useTheme } from "../components/ThemeContext";
 import SettingsModal from "../components/SettingsModal";
 import { useNavigation } from '@react-navigation/native';
 
-
 const MyScreen = () => {
   const navigation = useNavigation();
 
@@ -57,11 +56,12 @@ const MyScreen = () => {
           age: parsedData[0]?.ika || "",
           weight: parsedData[0]?.paino || "",
           height: parsedData[0]?.pituus || "",
-          activityLevel: parsedData[0]?.aktiviteetti || "",
-          dietType: parsedData[0]?.tyyppi || "",
-          goal: parsedData[0]?.tavoite || "",
+          activityLevel: parsedData[0]?.aktiviteetti ? activityLevels[parsedData[0]?.aktiviteetti - 1].value : "",
+          dietType: parsedData[0]?.tyyppi ? dietTypes[parsedData[0]?.tyyppi - 1].value : "",
+          goal: parsedData[0]?.tavoite ? goals[parsedData[0]?.tavoite - 1].value : "",
         }; 
         setUserData(mappedData);
+        console.log("Mapped data: ", mappedData);
         return mappedData;
       }
     } catch (error) {
@@ -80,7 +80,12 @@ const MyScreen = () => {
 
   const handleSaveChanges = async () => {
     try {
-      const updatedData = { ...userData };
+      const updatedData = {
+        ...userData,
+        activityLevel: activityLevels.findIndex(level => level.value === userData.activityLevel) + 1,
+        dietType: dietTypes.findIndex(type => type.value === userData.dietType) + 1,
+        goal: goals.findIndex(goal => goal.value === userData.goal) + 1,
+      };
       await SecureStore.setItemAsync("userData", JSON.stringify(updatedData));
       alert("Profile updated successfully!");
     } catch (error) {
@@ -107,16 +112,14 @@ const MyScreen = () => {
     { label: "Gain Weight", value: "gain" },
   ];
 
-  //MUOKKAAMINEN PITÄÄ TEHÖ BACKENDIIN ERI ENDPOINTTIIN
-
   return (
     <ScrollView style={[styles.container, { backgroundColor: theme.container.backgroundColor }]}>
 
-<TouchableOpacity style={styles.Notes} onPress={() => {
+      <TouchableOpacity style={styles.Notes} onPress={() => {
         console.log("navigate to notes");
         navigation.navigate('NotesScreen');
       }}>
-      <Ionicons name="document-text" size={30} color={theme.text.color} />
+        <Ionicons name="document-text" size={30} color={theme.text.color} />
       </TouchableOpacity>
       <SettingsModal
         visible={settingsVisible}
