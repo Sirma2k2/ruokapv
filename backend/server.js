@@ -107,6 +107,7 @@ app.get('/api/get-meals', async (req, res) => {
 
   try {
     //Hakee knimen ja aterian nimen mukaan aterian ja palauttaa aterian ja siihen kuuluvien ruokien tiedot.
+    //Olis ollu proceduuri tietokannassa mutta en saanu toimimaan
     const query = `
       SELECT 
         m.id AS meal_id,
