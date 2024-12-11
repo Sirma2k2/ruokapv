@@ -37,7 +37,6 @@ const MealsScreen = ({ navigation }) => {
   const [search, setSearch] = useState('')
   const [foods, setFoods] = useState([]);
   const [MealType, setMealType] = useState(selectedMealType || '')
-  const route = useRoute();
   const { selectedMealType } = route.params || {}; 
 
   const searchFood = async (query) => {
