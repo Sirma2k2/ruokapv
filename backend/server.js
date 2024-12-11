@@ -163,6 +163,76 @@ app.get('/api/get-meals', async (req, res) => {
   }
 });
 
+app.get('/api/search-meals', async (req, res) => {
+  const { knimi, searchterm } = req.headers;
+  console.log("nimi: ",knimi, " search: ", searchterm);
+  if (!knimi || !searchterm) {
+    return res.status(400).json({ error: 'Knimi and query are required' });
+  }
+
+  try {
+    //Hakee knimen ja aterian nimen mukaan aterian ja palauttaa aterian ja siihen kuuluvien ruokien tiedot.
+    //Olis ollu proceduuri tietokannassa mutta en saanu toimimaan
+    const query = `
+  SELECT 
+    m.id AS meal_id,
+    m.knimi,
+    m.mealname,
+    f.ruokanimi AS food_ruokanimi,
+    f.tyyppi AS food_typpi,
+    f.kalorit AS food_kalorit,
+    f.proteiini AS food_proteiini,
+    f.hiilarit AS food_hiilarit,
+    f.rasvat AS food_rasvat,
+    f.picture AS food_picture,
+    s.ruokanimi AS salad_ruokanimi,
+    s.tyyppi AS salad_typpi,
+    s.kalorit AS salad_kalorit,
+    s.proteiini AS salad_proteiini,
+    s.hiilarit AS salad_hiilarit,
+    s.rasvat AS salad_rasvat,
+    s.picture AS salad_picture,
+    dr.ruokanimi AS drink_ruokanimi,
+    dr.tyyppi AS drink_typpi,
+    dr.kalorit AS drink_kalorit,
+    dr.proteiini AS drink_proteiini,
+    dr.hiilarit AS drink_hiilarit,
+    dr.rasvat AS drink_rasvat,
+    dr.picture AS drink_picture,
+    o.ruokanimi AS other_ruokanimi,
+    o.tyyppi AS other_typpi,
+    o.kalorit AS other_kalorit,
+    o.proteiini AS other_proteiini,
+    o.hiilarit AS other_hiilarit,
+    o.rasvat AS other_rasvat,
+    o.picture AS other_picture,
+    similarity(m.ateria, $2) AS similarity_score
+  FROM meals m
+  JOIN food f ON m.food_id = f.id
+  JOIN food s ON m.salad_id = s.id
+  JOIN food dr ON m.drink_id = dr.id
+  JOIN food o ON m.other_id = o.id
+  WHERE m.knimi = $1
+    AND m.mealname % $2
+  ORDER BY similarity_score DESC
+  LIMIT 10;
+    `;
+    
+    const result = await pool.query(query, [knimi, searchterm]);
+
+    if (result.rows.length === 0) {
+      console.log("No meals found");
+      return res.status(404).json({ message: 'No meals found for this search' });
+    }
+    //ja ei muuta ku kaikki sellasenaan etiä päin aamuja frontendin miehille.
+    console.log("Results sent: ", result.rowCount);
+    res.status(201).json(result.rows);
+  } catch (error) {
+    console.error('Error fetching meals:', error);
+    res.status(500).json({ error: 'Internal Server Error' });
+  }
+});
+
 app.get('/get-user', async( req,res)=> {
   try {
     const result = await pool.query('SELECT * FROM users')
