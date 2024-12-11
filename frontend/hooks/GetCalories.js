@@ -8,42 +8,42 @@ const GetCalories = () => {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
 
-  useEffect(() => {
-    const fetchCalories = async () => {
-      try {
-        const storedLoginStatus = await SecureStore.getItemAsync('isLoggedIn');
-        const storedData = await SecureStore.getItemAsync("userData");
-        const parsedData = JSON.parse(storedData);
-        if (storedLoginStatus !== 'true') {
-          throw new Error('User is not logged in');
-        }
-
-        const response = await fetch(ServerIp + '/get-calories',{
-          headers: {
-            knimi: parsedData[0]?.knimi,
-          }
-        });
-        if (!response.ok) {
-          throw new Error('Failed to fetch calories data');
-        }
-
-        const data = await response.json();
-        setCaloriesData({
-          goal: data.goal,
-          food: data.food,
-          remaining: data.goal - data.food,
-        });
-      } catch (error) {
-        setError(error.message);
-      } finally {
-        setLoading(false);
+  const fetchCalories = async () => {
+    try {
+      const storedLoginStatus = await SecureStore.getItemAsync('isLoggedIn');
+      const storedData = await SecureStore.getItemAsync("userData");
+      const parsedData = JSON.parse(storedData);
+      if (storedLoginStatus !== 'true') {
+        throw new Error('User is not logged in');
       }
-    };
 
+      const response = await fetch(ServerIp + '/get-calories',{
+        headers: {
+          knimi: parsedData[0]?.knimi,
+        }
+      });
+      if (!response.ok) {
+        throw new Error('Failed to fetch calories data');
+      }
+
+      const data = await response.json();
+      setCaloriesData({
+        goal: data.goal,
+        food: data.food,
+        remaining: data.goal - data.food,
+      });
+    } catch (error) {
+      setError(error.message);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  useEffect(() => {
     fetchCalories();
   }, []);
 
-  return { caloriesData, loading, error };
+  return { caloriesData, loading, error, fetchCalories };
 };
 
 export default GetCalories;
