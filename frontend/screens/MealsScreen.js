@@ -301,6 +301,7 @@ const MealsScreen = ({ _navigation }) => {
       {/* ds */}
 
           <Searchbar
+          style={[styles.searchBar]}
           placeholder={`Search for ${category}s`}
           onChangeText={setSearchMeals}
           value={searchMeals}
@@ -393,7 +394,7 @@ const MealsScreen = ({ _navigation }) => {
                     Calories: {selectedFood.nutriments?.['energy-kcal'] || 'N/A'} kcal
                 </Text> 
                 <TouchableOpacity
-                  style={styles.button}
+                  style={[styles.button, styles.buttoText]}
                   onPress={() => saveFoodMeal(selectedFood)}
                 >
                   <Text>Save food to meal</Text>
@@ -403,7 +404,7 @@ const MealsScreen = ({ _navigation }) => {
               <Text style={[styles.modalText, { color: theme.text.color }]}>No food selected</Text>
             )}
             <TouchableOpacity
-              style={styles.button}
+            style={[styles.button, styles.buttoText]}
               onPress={() => setModalVisible(false)}
             >
               <Text>Close</Text>
@@ -423,13 +424,13 @@ const MealsScreen = ({ _navigation }) => {
           <View style={styles.modalContent}>
             <Text style={styles.modalText}>Have you added all items?</Text>
             <TouchableOpacity
-              style={styles.button}
+              style={[styles.button, styles.buttoText]}
               onPress={handleConfirmSave}
             >
               <Text>Yes</Text>
             </TouchableOpacity>
             <TouchableOpacity
-              style={styles.button}
+              style={[styles.button, styles.buttoText]}
               onPress={() => setConfirmationVisible(false)}
             >
               <Text>No</Text>
@@ -439,7 +440,7 @@ const MealsScreen = ({ _navigation }) => {
       </Modal>
 
       <TouchableOpacity
-        style={styles.button}
+      style={[styles.button, styles.buttoText]}
         onPress={handleSaveMeal}
       >
         <Text>Save meal</Text>
@@ -514,14 +515,22 @@ const styles = StyleSheet.create({
     borderRadius: 8,
   },
   button: {
+    flexDirection: 'row', 
     alignItems: 'center',
     justifyContent: 'center',
     paddingVertical: 12,
     paddingHorizontal: 32,
-    borderRadius: 4,
-    marginVertical: 10,
+    borderRadius: 25,
     borderWidth: 2,
-    borderColor: 'blue',
+    borderColor: '#4169e1',
+    width: '90%', 
+    alignSelf: 'center',  
+    marginVertical: 10,  
+  },
+  buttonText: {
+    fontSize: 18,
+    fontWeight: '600',
+    marginRight: 10,  
   },
   modalOverlay: {
     flex: 1,

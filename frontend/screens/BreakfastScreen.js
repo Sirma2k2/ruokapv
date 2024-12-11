@@ -278,7 +278,7 @@ const BreakfastScreen = ({ navigation }) => {
     placeholder='Search my meals'
     onChangeText={setMealSearch}
     value={mealSearch}
-    style={styles.searchBar}
+    style={[styles.searchBar, {marginBottom: 20}]}
     ></Searchbar>
 
     {/* Show loading indicator */}
@@ -328,7 +328,7 @@ const BreakfastScreen = ({ navigation }) => {
         />
     
     <TouchableOpacity 
-      style={[styles.button, { backgroundColor: theme.buttonBackgroundColor }]} 
+      style={[styles.button,  { backgroundColor: theme.buttonBackgroundColor }]} 
       onPress={() => navigation.navigate('Meals', { selectedMealType: 'breakfast' })}
     >
       <Text style={[styles.buttonText, { color: theme.buttonText.color }]}>Create a new meal</Text>
@@ -387,19 +387,29 @@ const styles = StyleSheet.create({
     fontStyle: 'italic',
   },
   searchBar: {
-    marginHorizontal: 20,
     marginBottom: 20,
-    width: '90%',
+    width: '90%',  
+    borderRadius: 20,  
+    backgroundColor: '#eaeaea',  
+    alignSelf: 'center',  
   },
   button: {
+    flexDirection: 'row',  
     alignItems: 'center',
     justifyContent: 'center',
     paddingVertical: 12,
     paddingHorizontal: 32,
-    borderRadius: 4,
-    marginVertical: 40,
+    borderRadius: 25,
     borderWidth: 2,
-    borderColor: 'blue',
+    borderColor: '#4169e1',
+    width: '90%',  
+    alignSelf: 'center',  
+    marginVertical: 10,  
+  },
+  buttonText: {
+    fontSize: 18,
+    fontWeight: '600',
+    marginRight: 10,  
   },
   modalOverlay: {
     flex: 1,

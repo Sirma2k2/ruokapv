@@ -269,7 +269,8 @@ const LunchScreen = () => {
 
     <Searchbar 
     placeholder='Search my meals'
-    ></Searchbar>
+    style={[styles.searchBar, {marginBottom: 20}]}
+     />
     
     <TouchableOpacity 
       style={[styles.button, { backgroundColor: theme.buttonBackgroundColor }]} 
@@ -335,19 +336,29 @@ const styles = StyleSheet.create({
   },
 
   searchBar: {
-    marginHorizontal: 20,
     marginBottom: 20,
-    width: '90%',
+    width: '90%',  
+    borderRadius: 20,  
+    backgroundColor: '#eaeaea',  
+    alignSelf: 'center',  
   },
   button: {
+    flexDirection: 'row',  
     alignItems: 'center',
     justifyContent: 'center',
     paddingVertical: 12,
     paddingHorizontal: 32,
-    borderRadius: 4,
-    marginVertical: 40,
+    borderRadius: 25,
     borderWidth: 2,
-    borderColor: 'blue',
+    borderColor: '#4169e1',
+    width: '90%',  
+    alignSelf: 'center',  
+    marginVertical: 10,  
+  },
+  buttonText: {
+    fontSize: 18,
+    fontWeight: '600',
+    marginRight: 10,  
   },
   modalOverlay: {
     flex: 1,
