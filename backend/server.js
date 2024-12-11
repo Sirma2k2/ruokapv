@@ -5,7 +5,7 @@ const pool = require('./database'); // Tuodaan tietokantayhteys
 const dotenv = require('dotenv');
 const calculateCalories = require('./routes/calorieCalculator'); // Import the calorie calculator function
 
-//const bcrypt = require('bcrypt'); // VOISITTEKO KÄYTTÄÄ TÄTÄ KIRJASTOA SALASANOJEN HASHAAMISEEN
+//const bcrypt = require('bcrypt'); // VOISITTEKO KÄYTTÄÄ TÄTÄ KIRJASTOA SALASANOJEN HASHAAMISEEN //EI!
 
 
 dotenv.config();
