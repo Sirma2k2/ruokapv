@@ -8,14 +8,14 @@ import * as Animatable from 'react-native-animatable';
 import { Picker } from '@react-native-picker/picker';
 import { getUserData } from '../hooks/UserData';
 
-import { useNavigation, useRoute } from '@react-navigation/native'; // Import useNavigation and useRoute hooks
+import { useNavigation } from '@react-navigation/native'; // Import useNavigation and useRoute hooks
 
 import { SaveFood } from '../hooks/SaveFood';
 
 
 import ServerIp from '../hooks/Global';
 
-const MealsScreen = ({ navigation }) => {
+const MealsScreen = ({ _navigation }) => {
   const { theme } = useTheme(); // Access the theme from context
 
   const navigation = useNavigation(); // Initialize navigation
