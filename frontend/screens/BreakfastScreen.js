@@ -274,6 +274,15 @@ const BreakfastScreen = ({ navigation }) => {
   <>
     <Text style={[styles.header, { color: theme.text.color }]}> My Meals</Text>
 
+    <TouchableOpacity 
+      style={[styles.button,  { backgroundColor: theme.buttonBackgroundColor }]} 
+      onPress={() => navigation.navigate('Meals', { selectedMealType: 'breakfast' })}
+    >
+      <Text style={[styles.buttonText,{ color: theme.buttonText.color }]}>Create a new meal</Text>
+      <Ionicons name="fast-food" size={24} color={theme.iconColor} style={styles.icon} />
+    </TouchableOpacity>
+
+
     <Searchbar 
     placeholder='Search my meals'
     onChangeText={setMealSearch}
@@ -327,14 +336,7 @@ const BreakfastScreen = ({ navigation }) => {
           )}
         />
     
-    <TouchableOpacity 
-      style={[styles.button,  { backgroundColor: theme.buttonBackgroundColor }]} 
-      onPress={() => navigation.navigate('Meals', { selectedMealType: 'breakfast' })}
-    >
-      <Text style={[styles.buttonText, { color: theme.buttonText.color }]}>Create a new meal</Text>
-      <Ionicons name="fast-food" size={24} color={theme.iconColor} style={styles.icon} />
-    </TouchableOpacity>
-
+    
   </>
 )}
     </View>

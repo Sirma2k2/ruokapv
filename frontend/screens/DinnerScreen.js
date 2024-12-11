@@ -7,6 +7,9 @@ import Ionicons from '@expo/vector-icons/Ionicons';
 import ServerIp from '../hooks/Global';
 import * as SecureStore from 'expo-secure-store';
 import { SaveFood } from '../hooks/SaveFood';
+import { SearchMeals } from '../hooks/SearchMeals';
+import { getUserData } from '../hooks/UserData';
+
 
 
 const DinnerScreen = ({ navigation }) => {
@@ -16,6 +19,9 @@ const DinnerScreen = ({ navigation }) => {
   const [modalVisible, setModalVisible] = useState(false)
   const [selectedFood, setSelectedFood] = useState(null)
   const [consumedAmount, setConsumedAmount] = useState('')
+  
+  const [mealSearch, setMealSearch] = useState('');
+  const [mealResults, setMealResults] = useState('');
 
   const [foodResults, setFoodResults] = useState([])
   const [loading, setLoading] = useState(false)
@@ -50,7 +56,12 @@ const DinnerScreen = ({ navigation }) => {
     } else {
       setFoodResults([]);
     }
-  }, [searchDinner]);
+    if (mealSearch.length > 3) {
+      searchMyMeals(mealSearch);
+    } else{
+      setMealResults([]);
+    }
+  }, [searchDinner, mealSearch]);
 
   const saveFoodMeal = async (food) => {
 
@@ -132,6 +143,32 @@ const DinnerScreen = ({ navigation }) => {
     */
   };
 
+  const searchMyMeals = async (query) => {
+    console.log("Searching meals for: ", query);
+    if (!query) return;
+    setLoading(true);
+    setError('');
+  
+    try {
+      const user = await getUserData();
+      const username = user[0]?.knimi || "Failsafe";
+      const mealResponse= await SearchMeals(username,mealSearch);
+      console.log(mealResponse);
+      if (mealResponse.ok) {
+        const data = await mealResponse.json();
+        setMealResults(data);
+      } else {
+        setError('No products found');
+        setTimeout(() => setError(''), 5000);
+      }
+      setLoading(false);
+    } catch (error) {
+      console.error(error);
+      setError('Failed to fetch meal data');
+      setLoading(false);
+    }
+
+  };
   return (
     <View style={[styles.container, { backgroundColor: theme.container.backgroundColor }]}>
       {/* Top Tab Bar */}
@@ -291,12 +328,7 @@ const DinnerScreen = ({ navigation }) => {
 {activeTab === 'createMeal' && (
   <>
     <Text style={[styles.header, { color: theme.text.color }]}> My Meals</Text>
-  
-    <Searchbar 
-    placeholder='Search my meals'
-    style={[styles.searchBar, {marginBottom: 20}]}
-    />
-    
+
     <TouchableOpacity 
       style={[styles.button, { backgroundColor: theme.buttonBackgroundColor }]} 
       onPress={() => navigation.navigate('Meals', { selectedMealType: 'Dinner' })}
@@ -304,6 +336,60 @@ const DinnerScreen = ({ navigation }) => {
       <Text style={[styles.buttonText, { color: theme.buttonText.color }]}>Create a new meal</Text>
       <Ionicons name="fast-food" size={24} color={theme.iconColor} style={styles.icon} />
     </TouchableOpacity>
+
+  
+    <Searchbar 
+    placeholder='Search my meals'
+    onChangeText={setMealSearch}
+    value={mealSearch}
+    style={[styles.searchBar, {marginBottom: 20}]}
+     />
+
+     {/* Show loading indicator */}
+    {loading && <ActivityIndicator size="large" color="#ff0" />}
+
+{/* Show error message if there is one */}
+{error && <Text style={{ color: 'red' }}>{error}</Text>}
+
+{/* Display the search results */}
+  <FlatList
+    data={mealResults}
+    keyExtractor={(item, index) => index.toString()}
+    renderItem={({ item }) => (
+      <Animatable.View animation="fadeIn" duration={400}>
+      <TouchableOpacity
+        style={styles.foodItem}
+        onPress={() => {
+          console.log("TÄMÄ PITÄÄ VIELÄ KOODATA");
+        }}
+      >
+        <Text style={{ color: theme.text.color }}>
+          {item.mealname || 'No name'}
+        </Text>
+        <Text style={{ color: theme.text.color }}>
+          Ruoka: {item.food_ruokanimi || 'No food'}
+        </Text>
+
+        <Text style={{ color: theme.text.color }}>
+          Juoma: {item.drink_ruokanimi || 'No drink'}
+        </Text>
+
+        <Text style={{ color: theme.text.color }}>
+          Salad: {item.salad_ruokanimi || 'No salad'}
+        </Text>
+        <Text style={{ color: theme.text.color }}>
+          Other: {item.other_ruokaname || 'N/A'}
+        </Text>
+        <Text style={{ color: theme.text.color }}>
+          Total calories: {item.food_kalorit + item.salad_kalorit + item.drink_kalorit + item.other_kalorit || 'N/A'} kcal
+        </Text>
+
+
+      </TouchableOpacity>
+      </Animatable.View>
+    )}
+    
+    />
 
   </>
 )}
