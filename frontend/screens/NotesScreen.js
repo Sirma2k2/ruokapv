@@ -102,12 +102,14 @@ const NotesScreen = () => {
       />
 
     {/* Save Button */}
-    <TouchableOpacity style={styles.button} onPress={addNote}>
+    <TouchableOpacity 
+    style={[styles.button, styles.buttonText]} onPress={addNote}>
         <Text>Add Note</Text>
     </TouchableOpacity>
 
     {/* View Saved Notes Button */}
-    <TouchableOpacity style={styles.button} onPress={toggleModal}>
+    <TouchableOpacity
+    style={[styles.button, styles.buttonText]} onPress={toggleModal}>
         <Text>View Saved Notes</Text>
     </TouchableOpacity>
 
@@ -129,7 +131,7 @@ const NotesScreen = () => {
                   <Text style={styles.noteText}>Description: {note.description}</Text>
                   <Text style={styles.noteText}>Date: {note.date}</Text>
                   <TouchableOpacity
-                    style={styles.button}
+                    style={[styles.button, styles.buttonText]}
                     onPress={() => deleteNote(index)}
                   >
                     <Text>delete note</Text>
@@ -178,11 +180,16 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
     paddingVertical: 12,
     paddingHorizontal: 32,
-    borderRadius: 4,
+    borderRadius: 25,
     marginVertical: 10,
     borderWidth: 2, 
-    borderColor: 'blue',
+    borderColor: '#4169e1',
   },
+  buttonText: {
+    fontSize: 18,
+    fontWeight: '600',
+    marginLeft: 10,     
+  }, 
   modalOverlay: {
     flex: 1,
     justifyContent: 'center',
