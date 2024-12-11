@@ -1,14 +1,20 @@
-import React from 'react';
+import React, { useCallback } from 'react';
 import { View, Text, TouchableOpacity, StyleSheet, ActivityIndicator } from 'react-native';
 import { useTheme } from '../components/ThemeContext'; // Import the useTheme hook
 import Ionicons from '@expo/vector-icons/Ionicons';
 import CalorieTracker from '../components/CalorieTracker'; // Import CalorieTracker
 import GetCalories from '../hooks/GetCalories'; // Import GetCalories hook
-
+import { useFocusEffect } from '@react-navigation/native'; // Import useFocusEffect
 
 const FoodScreen = ({ navigation }) => {
   const { theme } = useTheme(); // Access the theme from context
-  const { caloriesData, loading, error } = GetCalories(); // Use GetCalories hook
+  const { caloriesData, loading, error, fetchCalories } = GetCalories(); // Use GetCalories hook
+
+  useFocusEffect(
+    useCallback(() => {
+      fetchCalories(); // Refresh calorie tracker data when screen comes into focus
+    }, [])
+  );
 
   return (
     <View style={[styles.container, { backgroundColor: theme.container.backgroundColor }]}>
