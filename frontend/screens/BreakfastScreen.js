@@ -438,7 +438,7 @@ const styles = StyleSheet.create({
   mealText: {
     fontSize: 16,
     color: '#333',
-  }
+  },
 });
 
 export default BreakfastScreen;

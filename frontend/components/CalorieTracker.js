@@ -5,6 +5,7 @@ const CalorieTracker = ({ goal, food, remaining }) => {
 
   return (
     <View style={styles.container}>
+      <Text style={styles.header}>Today's Calories</Text>
       {/* Top Row: Goal - Food = Remaining */}
       <TouchableOpacity onPress={() => console.log('Expand/collapse pressed')} style={styles.row}>
         {/* Goal Section */}
@@ -73,6 +74,13 @@ const styles = StyleSheet.create({
         fontSize: 16,
         fontWeight: 'bold',
         color: '#000000', // Universal color for both light and dark mode
+    },
+    header: {
+        fontSize: 20,
+        fontWeight: 'bold',
+        marginBottom: 5,
+        color: '#4169e1',
+        marginHorizontal: 50,
     },
 });
 

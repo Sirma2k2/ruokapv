@@ -349,7 +349,7 @@ app.post('/login', async(req,res)=> {
 app.get('/get-food', async(req,res)=> {
   const knimi = req.headers.knimi;
   console.log("knimi: ",knimi)
-  const query = 'SELECT ruokanimi, maarag, kalorit FROM food WHERE knimi = $1';
+  const query = 'SELECT * FROM food WHERE knimi = $1';
   const value = [knimi];
 
   try { 

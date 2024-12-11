@@ -1,46 +1,55 @@
 import React from 'react';
-import { View, Text, StyleSheet, ScrollView } from 'react-native';
+import { View, Text, StyleSheet, FlatList, Image } from 'react-native';
 
 const PieChart = ({ data }) => {
-  // Get the last 5 meals
-  const lastFiveMeals = data.slice(-5);
-  const totalCalories = lastFiveMeals.reduce((sum, item) => sum + item.calories, 0);
-  const pieSections = lastFiveMeals.map(item => ({
+  // Get the last 10 meals and reverse the order
+  const lastTenMeals = data.slice(-10).reverse();
+  const totalCalories = lastTenMeals.reduce((sum, item) => sum + item.calories, 0);
+  const pieSections = lastTenMeals.map(item => ({
     ...item,
     percentage: (item.calories / totalCalories) * 100,
   }));
 
   return (
-    <ScrollView horizontal pagingEnabled style={styles.scrollContainer}>
-      {/* Loop over pieSections and display each section */}
-      {pieSections.map((section, index) => (
-        <View key={index} style={styles.page}>
-          {/* Pie Chart Section */}
-          <View style={[styles.pieChartContainer]}>
-            <View style={[styles.pieSection, { flex: section.percentage }]}>
-              <Text style={styles.pieText}>{section.name}</Text>
+    <View style={styles.container}>
+      <Text style={styles.header}>Your Last 10 Foods</Text>
+      <FlatList
+        horizontal
+        data={pieSections}
+        keyExtractor={(item, index) => index.toString()}
+        renderItem={({ item }) => (
+          <View style={styles.page}>
+            {/* Pie Chart Section */}
+            <View style={styles.pieChartContainer}>
+              <View style={[styles.pieSection, { flex: item.percentage }]}>
+                <Image source={{ uri: item.picture }} style={styles.pieImage} />
+              </View>
+            </View>
+
+            {/* Meal Info Section */}
+            <View style={styles.textContainer}>
+              <Text style={styles.mealText}>{item.name}: {item.calories} kcal</Text>
+              <Text style={styles.mealText}>Percentage: {item.percentage.toFixed(2)}%</Text>
             </View>
           </View>
-
-          {/* Meal Info Section */}
-          <View style={styles.textContainer}>
-            <Text style={styles.mealText}>{section.name}: {section.calories} kcal</Text>
-            <Text style={styles.mealText}>Percentage: {section.percentage.toFixed(2)}%</Text>
-          </View>
-        </View>
-      ))}
-    </ScrollView>
+        )}
+        showsHorizontalScrollIndicator={true}
+      />
+      <Text style={styles.scrollHint}>Swipe to see more meals</Text>
+    </View>
   );
 };
 
 const styles = StyleSheet.create({
-  scrollContainer: { flexDirection: 'row' },
+  container: { alignItems: 'center', marginVertical: 20 },
+  header: { fontSize: 20, fontWeight: 'bold', marginBottom: 10, color: 'blue' },
   page: { width: 300, justifyContent: 'center', alignItems: 'center', padding: 10 },
   pieChartContainer: { flexDirection: 'row', justifyContent: 'center', alignItems: 'center', width: 150, height: 150, borderWidth: 1, borderColor: '#ccc', borderRadius: 75, overflow: 'hidden', position: 'relative' },
   pieSection: { height: '100%', justifyContent: 'center', alignItems: 'center' },
-  pieText: { position: 'absolute', color: 'light blue', textAlign: 'center', width: '100%', fontWeight: 'bold' },
+  pieImage: { width: '100%', height: '100%', resizeMode: 'cover' },
   textContainer: { marginTop: 10, alignItems: 'center' },
-  mealText: { fontSize: 12, marginBottom: 5, color: 'blue' },
+  mealText: { fontSize: 14, marginBottom: 5, color: 'blue' },
+  scrollHint: { marginTop: 10, fontSize: 12, color: 'gray' },
 });
 
 export default PieChart;
