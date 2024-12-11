@@ -293,17 +293,26 @@ app.post('/add-user', async (req, res) => {
 app.get('/get-calories', async (req, res) => {
   const knimi = req.headers.knimi;
 
-  const data = await pool.query('SELECT kalorit FROM food WHERE knimi = $1 ORDER BY id DESC LIMIT 3', [knimi]);
-  const eaten = data.rows.reduce((total, row) => total + row.kalorit, 0);
-  console.log(eaten);
-  await pool.query('UPDATE calories SET food = $1 WHERE knimi = $2', [eaten, knimi]);
-  
-
   if (!knimi) {
     return res.status(400).json({ error: 'Name is required' });
   }
 
+  // Calculate the start and end of the current day
+  const startOfDay = new Date();
+  startOfDay.setHours(0, 0, 0, 0);
+  const endOfDay = new Date();
+  endOfDay.setHours(23, 59, 59, 999);
+
   try {
+    // Fetch calories consumed from midnight to midnight of the current day
+    const data = await pool.query(
+      'SELECT kalorit FROM food WHERE knimi = $1 AND create_time BETWEEN $2 AND $3',
+      [knimi, startOfDay, endOfDay]
+    );
+    const eaten = data.rows.reduce((total, row) => total + row.kalorit, 0);
+    console.log(eaten);
+    await pool.query('UPDATE calories SET food = $1 WHERE knimi = $2', [eaten, knimi]);
+
     const query = 'SELECT goal, food, remaining FROM calories WHERE knimi = $1';
     const values = [knimi];
     const result = await pool.query(query, values);

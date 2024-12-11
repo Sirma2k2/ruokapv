@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import { View, Text, FlatList, StyleSheet, ScrollView, TouchableOpacity, ActivityIndicator, Platform } from 'react-native';
 import PieChart from '../components/PieChart'; // piechart.js josta tulee data
 import { useTheme } from '../components/ThemeContext'; 
@@ -7,6 +7,7 @@ import * as SecureStore from 'expo-secure-store'; // Import SecureStore for test
 import * as Updates from 'expo-updates';
 import CalorieTracker from '../components/CalorieTracker';
 import GetCalories from '../hooks/GetCalories'; // Import GetCalories hook
+import { useFocusEffect } from '@react-navigation/native'; // Import useFocusEffect
 
 import ServerIp from '../hooks/Global';
 
@@ -16,38 +17,42 @@ const HomeScreen = () => {
   const [totalCalories, setTotalCalories] = useState(0);
   const { theme } = useTheme();  // Access the theme from context
 
-  const { caloriesData, loading, error } = GetCalories(); // Use GetCalories hook
+  const { caloriesData, loading, error, fetchCalories } = GetCalories(); // Use GetCalories hook
 
-  useEffect(() => {
-    const fetchFoodHistory = async () => {
-      try {
-        const storedData = await SecureStore.getItemAsync("userData");
-        const parsedData = JSON.parse(storedData);
-        const response = await fetch(ServerIp + '/get-food',{
-          headers: {
-            knimi: parsedData[0]?.knimi,
-          }
-        });
-
-        if (response.ok) {
-          const data = await response.json();
-          
-          const transformedData = data.map(item => ({
-            id: item.id || Math.random().toString(), // Generoi id, jos sitä ei ole
-            name: item.ruokanimi,
-            amount: item.maarag,
-            calories: item.kalorit
-          }));
-          setFoodHistory(transformedData);
-        } else {
-          console.error('Failed to fetch food history');
+  const fetchFoodHistory = async () => {
+    try {
+      const storedData = await SecureStore.getItemAsync("userData");
+      const parsedData = JSON.parse(storedData);
+      const response = await fetch(ServerIp + '/get-food',{
+        headers: {
+          knimi: parsedData[0]?.knimi,
         }
-      } catch (error) {
-        console.error('Error fetching data', error);
+      });
+
+      if (response.ok) {
+        const data = await response.json();
+        
+        const transformedData = data.map(item => ({
+          id: item.id || Math.random().toString(), // Generoi id, jos sitä ei ole
+          name: item.ruokanimi,
+          amount: item.maarag,
+          calories: item.kalorit
+        }));
+        setFoodHistory(transformedData);
+      } else {
+        console.error('Failed to fetch food history');
       }
-    };
-    fetchFoodHistory();
-  }, []);
+    } catch (error) {
+      console.error('Error fetching data', error);
+    }
+  };
+
+  useFocusEffect(
+    useCallback(() => {
+      fetchFoodHistory();
+      fetchCalories(); // Ensure the calorie tracker data is also refreshed
+    }, [])
+  );
 
   const clearCredentials = async () => { // This became a logging out function will not work in web
     if(Platform.OS === 'web') {
@@ -146,7 +151,7 @@ const styles = StyleSheet.create({
   clearButton: { padding: 1, backgroundColor: 'transparent', borderRadius: 5, marginBottom: 10, alignSelf: 'flex-start' },
   buttonText: { color: 'blue', textAlign: 'center' },
   topContainer: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center' },
-  calorieTrackerContainer: { flexDirection: 'row', alignItems: 'center', marginRight: 20 }, // Added marginRight
+  calorieTrackerContainer: { flexDirection: 'row', alignItems: 'center', marginRight: -20 }, // Added marginRight
   logoutText: {fontSize: 12, marginTop: -2.5,},
 });
 
