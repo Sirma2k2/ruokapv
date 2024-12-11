@@ -3,19 +3,27 @@ import { View, Text, TouchableOpacity, StyleSheet, Modal, TextInput } from 'reac
 import { useTheme } from '../components/ThemeContext'; // Import the useTheme hook
 import { ActivityIndicator, Searchbar } from 'react-native-paper';
 import { FlatList } from 'react-native';
+import { useRoute } from '@react-navigation/native';
 import * as Animatable from 'react-native-animatable';
 import { Picker } from '@react-native-picker/picker';
 import { getUserData } from '../hooks/UserData';
+
 import { useNavigation, useRoute } from '@react-navigation/native'; // Import useNavigation and useRoute hooks
+
+import { SaveFood } from '../hooks/SaveFood';
+
 
 import ServerIp from '../hooks/Global';
 
-const MealsScreen = () => {
+const MealsScreen = ({ navigation }) => {
   const { theme } = useTheme(); // Access the theme from context
+
   const navigation = useNavigation(); // Initialize navigation
   const route = useRoute(); // Get the current route
   const screenName = route.name; // Get the screen name
   const mealType = screenName.replace('Screen', '').toLowerCase(); // Determine the meal type dynamically
+
+  //const navigation = useNavigation(); // Initialize navigation
 
   const [searchMeals, setSearchMeals] = useState('');
   const [modalVisible, setModalVisible] = useState(false);
@@ -28,6 +36,9 @@ const MealsScreen = () => {
   const [MealName, setMealName] = useState('')
   const [search, setSearch] = useState('')
   const [foods, setFoods] = useState([]);
+  const [MealType, setMealType] = useState(selectedMealType || '')
+  const route = useRoute();
+  const { selectedMealType } = route.params || {}; 
 
   const searchFood = async (query) => {
     if (!query) return;
@@ -60,17 +71,88 @@ const MealsScreen = () => {
   }, [searchMeals])
 
   function extractServingSize(servingSizeStr) {
-    const match = servingSizeStr.match(/(\d+)/);
-    if (match) {
-        return parseInt(match[1], 10);
-        console.log(match[1]);
+    try{
+      const match = servingSizeStr.match(/(\d+)/);
+      if (match) {
+          return parseInt(match[1], 10);
+      }
+      return null;
+    }catch(err){
+      console.log(err);
     }
-    return null;
   }
+
+  useEffect(() => {
+    if (selectedMealType) {
+        setMealType(selectedMealType);
+    }
+}, [selectedMealType]);
 
   const saveFoodMeal = async(food) => {
     //TALLENNETAAN YKSITTÄINEN RUOKA LISTASTA
-    console.log('New food added: ', food);
+    console.log('New food adding: ', food.product_name);
+    
+    const user = await getUserData();
+    const uname = user[0]?.knimi;
+    const ateria = "meal";
+    const consumedAmount = extractServingSize(food.quantity || food.quantity || "100");
+
+    console.log(uname, " ", ateria, " ",consumedAmount);
+
+    const response = await SaveFood(food, ateria, uname, consumedAmount);
+
+    if (response.ok) {
+
+      console.log("response.ok");
+
+      const data = await response.json();
+      const resid = data.id[0]?.id;
+
+      const proteinPerGram = food.nutriments?.proteins_100g || 0;
+      const carbsPerGram = food.nutriments?.carbohydrates_100g || 0;
+      const fatPerGram = food.nutriments?.fat_100g || 0;
+      const caloriesPerGram = food.nutriments?.['energy-kcal'] || 0;
+      const proteinAmount = (proteinPerGram * consumedAmount) / 100;
+      const carbsAmount = (carbsPerGram * consumedAmount) / 100;
+      const fatAmount = (fatPerGram * consumedAmount) / 100;
+      const caloriesAmount = (caloriesPerGram * consumedAmount) / 100;
+
+      //Saatu ruoka lisätään listaan joka lähetetään myöhemmin kokonaisuudessaan backendiin.
+      //Tätä voi käyttää mm. valittujen aterioiden näyttämiseen
+      //suurin osa ominaisuuksista vielä kovakoodattu.
+
+      const newFood = {
+        id: resid, //tämä id on juuri tämän ruuan id databasessa ja sitä tarvitaan /get-meal:issä
+        knimi: user[0]?.knimi || "N/A",
+        ruokanimi: food?.product_name || food.brands || "N/A", //nyt toimii :)
+        maarag: consumedAmount,
+        kalorit: Math.round(caloriesAmount),
+        proteiini: Math.round(proteinAmount),
+        hiilihydraatit: Math.round(carbsAmount),
+        rasvat: Math.round(fatAmount),
+        tyyppi: category?.toLowerCase() || "food",
+        picture: food?.image_small_url || "",
+      };
+
+
+      setFoods((prevFoods) => {
+        const updatedFoods = [...prevFoods, newFood];
+        console.log('foods:', updatedFoods); // Log updated foods
+        return updatedFoods;
+      });
+
+      console.log(foods);
+
+      console.log('Successfully added')
+      alert('Food saved successfully') 
+    } else { 
+      console.log('Failed: ', response.status)
+      alert('Error in saving food')
+      
+    }
+    setModalVisible(false)
+
+    /*
     try {
       //lähetetään ruoka databaseen
       const user = await getUserData();
@@ -132,27 +214,28 @@ const MealsScreen = () => {
       
       console.error('Error:', error)
     }
-
-    setModalVisible(false)
+    */
   }
 
   const saveMeal = async () => {
     //TALLENNETAAN ATERIA
     try {
       const user = await getUserData();
+      const foodIds = foods.map((food) => food.id)
       const response = await fetch(ServerIp + '/api/add-meal', {
         method: 'POST', 
         headers: { 
           'content-type': 'application/json',
         }, 
         body: JSON.stringify({
+
           ateria: mealType, // Use the dynamically determined meal type
           knimi: user[0]?.knimi || "Kovakoodi",
           mealname: MealName,
-          food: 25 || null, //Rivillä 96 mainittu id tähän. toistaiseksi kovakoodattu
-          drink: 24 || null,
-          salad: 23 || null,
-          other: 22 || null
+          food: foodIds[0]  || null, //Rivillä 96 mainittu id tähän. toistaiseksi kovakoodattu
+          drink: foodIds[1] || null,
+          salad: foodIds[2] || null,
+          other: foodIds[3] || null
         }),
       })
       if (response.ok) {

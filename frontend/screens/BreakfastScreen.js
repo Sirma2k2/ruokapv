@@ -6,6 +6,9 @@ import { FlatList } from 'react-native';
 import * as Animatable from 'react-native-animatable';
 import Ionicons from '@expo/vector-icons/Ionicons';
 import ServerIp from '../hooks/Global';
+import { SaveFood } from '../hooks/SaveFood';
+import * as SecureStore from 'expo-secure-store';
+import { SearchMeals } from '../hooks/SearchMeals';
 
 const BreakfastScreen = ({ navigation }) => {
   const { theme } = useTheme(); // Access the theme from context
@@ -15,10 +18,11 @@ const BreakfastScreen = ({ navigation }) => {
   const [newMealModalVisible, setNewMealModalVisible] = useState(false)
   const [selectedFood, setSelectedFood] = useState(null)
   const [consumedAmount, setConsumedAmount] = useState('');
-
   const [foodResults, setFoodResults] = useState([])
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState('')
+  const [mealSearch, setMealSearch] = useState('');
+  const [mealResults, setMealResults] = useState('');
 
   const searchFood = async (query) => {
     if (!query) return;
@@ -49,61 +53,65 @@ const BreakfastScreen = ({ navigation }) => {
     } else {
       setFoodResults([]);
     }
-  }, [searchBreakfast]);
+
+    if (mealSearch.length > 3) {
+      searchMyMeals(mealSearch);
+    } else{
+      setMealResults([]);
+    }
+
+  }, [searchBreakfast, mealSearch]);
 
 
   const saveFoodMeal = async (food) => {
+    console.log("breakfast save");
     if (!consumedAmount || isNaN(consumedAmount) || consumedAmount <= 0) {
       Alert.alert("Error", "Please enter a valid amount in grams.");
       return;
     }
-  
-    // Lasketaan ravintosisältö per syötetty määrä
-    const proteinPerGram = food.nutriments?.proteins_100g || 0;
-    const carbsPerGram = food.nutriments?.carbohydrates_100g || 0;
-    const fatPerGram = food.nutriments?.fat_100g || 0;
-    const caloriesPerGram = food.nutriments?.['energy-kcal'] || 0;
-  
-    const proteinAmount = (proteinPerGram * consumedAmount) / 100;
-    const carbsAmount = (carbsPerGram * consumedAmount) / 100;
-    const fatAmount = (fatPerGram * consumedAmount) / 100;
-    const caloriesAmount = (caloriesPerGram * consumedAmount) / 100;
+    
     const storedData = await SecureStore.getItemAsync("userData");
     const parsedData = JSON.parse(storedData);
-  
-    const foodData = {
-      knimi: parsedData[0]?.knimi,
-      ruokanimi: food.product_name,
-      maarag: consumedAmount,
-      kalorit: caloriesAmount,
-      proteiini: proteinAmount,
-      hiilihydraatit: carbsAmount,
-      rasvat: fatAmount,
-    };
-  
-    try {
-      // Lähetetään POST-pyyntö
-      const response = await fetch(ServerIp + '/api/add-food', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify(foodData),
-      });
-  
-      if (!response.ok) {
-        throw new Error('Failed to save food to the database');
-      }
-  
+    const uname = parsedData[0]?.knimi;
+    const ateria = "breakfast";
+
+    const response = await SaveFood(food, ateria, uname, consumedAmount);
+
+    if (response.ok){
       const result = await response.json();
-      Alert.alert("Success", result.message || "Food saved successfully!");
+      console.log(result);
       setModalVisible(false);
       setConsumedAmount('');
-    } catch (error) {
-      console.error('Error saving food:', error);
-      Alert.alert("Error", "Failed to save food to database.");
+      Alert.alert("Success", response.message || "Food saved successfully!");
     }
+
   };
+
+  const searchMyMeals = async (query) => {
+    console.log("Searching meals for: ", query);
+    if (!query) return;
+    setLoading(true);
+    setError('');
+  
+    try {
+      const mealResponse= await SearchMeals("Yrjosimo",mealSearch);
+      console.log(mealResponse);
+      if (mealResponse.ok) {
+        const data = await mealResponse.json();
+        setMealResults(data);
+      } else {
+        setError('No products found');
+        setTimeout(() => setError(''), 5000);
+      }
+      setLoading(false);
+    } catch (error) {
+      console.error(error);
+      setError('Failed to fetch meal data');
+      setLoading(false);
+    }
+
+  };
+
   return (
     <View style={[styles.container, { backgroundColor: theme.container.backgroundColor }]}>
       {/* Top Tab Bar */}
@@ -265,11 +273,60 @@ const BreakfastScreen = ({ navigation }) => {
 
     <Searchbar 
     placeholder='Search my meals'
+    onChangeText={setMealSearch}
+    value={mealSearch}
+    style={styles.searchBar}
     ></Searchbar>
+
+    {/* Show loading indicator */}
+    {loading && <ActivityIndicator size="large" color="#ff0" />}
+
+    {/* Show error message if there is one */}
+    {error && <Text style={{ color: 'red' }}>{error}</Text>}
+
+    {/* Display the search results */}
+      <FlatList
+        data={mealResults}
+        keyExtractor={(item, index) => index.toString()}
+        renderItem={({ item }) => (
+          <Animatable.View animation="fadeIn" duration={400}>
+          <TouchableOpacity
+            style={styles.foodItem}
+            onPress={() => {
+              console.log("TÄMÄ PITÄÄ VIELÄ KOODATA");
+            }}
+          >
+            <Text style={{ color: theme.text.color }}>
+              {item.mealname || 'No name'}
+            </Text>
+            <Text style={{ color: theme.text.color }}>
+              Ruoka: {item.food_ruokanimi || 'No food'}
+            </Text>
+
+            <Text style={{ color: theme.text.color }}>
+              Juoma: {item.drink_ruokanimi || 'No drink'}
+            </Text>
+
+            <Text style={{ color: theme.text.color }}>
+              Salad: {item.salad_ruokanimi || 'No salad'}
+            </Text>
+            <Text style={{ color: theme.text.color }}>
+              Other: {item.other_ruokaname || 'N/A'}
+            </Text>
+            <Text style={{ color: theme.text.color }}>
+              Total calories: {item.food_kalorit + item.salad_kalorit + item.drink_kalorit + item.other_kalorit || 'N/A'} kcal
+            </Text>
+
+
+          </TouchableOpacity>
+          </Animatable.View>
+
+          )}
+        />
     
     <TouchableOpacity 
       style={[styles.button, { backgroundColor: theme.buttonBackgroundColor }]} 
-      onPress={() => navigation.navigate('Meals')}
+      onPress={() => navigation.navigate('Meals', { selectedMealType: 'breakfast' })}
     >
       <Text style={[styles.buttonText, { color: theme.buttonText.color }]}>Create a new meal</Text>
       <Ionicons name="fast-food" size={24} color={theme.iconColor} style={styles.icon} />
