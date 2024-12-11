@@ -40,8 +40,6 @@ const HomeScreen = () => {
           type: 'food',
           picture: item?.picture // Use placeholder if no valid URL
         }));
-        console.log(data);
-       // console.log('Food History:', transformedData); // Log the food history
         setFoodHistory(transformedData);
       } else {
         console.error('Failed to fetch food history');

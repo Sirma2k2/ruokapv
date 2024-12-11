@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { View, Text, TouchableOpacity, StyleSheet, Modal, TextInput } from 'react-native';
+import { View, Text, TouchableOpacity, StyleSheet, Modal, TextInput, Image, Alert } from 'react-native';
 import { useTheme } from '../components/ThemeContext'; // Import the useTheme hook
 import { ActivityIndicator, Searchbar } from 'react-native-paper';
 import { FlatList } from 'react-native';
@@ -7,23 +7,17 @@ import { useRoute } from '@react-navigation/native';
 import * as Animatable from 'react-native-animatable';
 import { Picker } from '@react-native-picker/picker';
 import { getUserData } from '../hooks/UserData';
-
 import { useNavigation } from '@react-navigation/native'; // Import useNavigation and useRoute hooks
-
 import { SaveFood } from '../hooks/SaveFood';
-
-
 import ServerIp from '../hooks/Global';
 
 const MealsScreen = ({ _navigation }) => {
   const { theme } = useTheme(); // Access the theme from context
-
   const navigation = useNavigation(); // Initialize navigation
   const route = useRoute(); // Get the current route
   const screenName = route.name; // Get the screen name
   const mealType = screenName.replace('Screen', '').toLowerCase(); // Determine the meal type dynamically
-
-  //const navigation = useNavigation(); // Initialize navigation
+  const { selectedMealType } = route.params || {}; 
 
   const [searchMeals, setSearchMeals] = useState('');
   const [modalVisible, setModalVisible] = useState(false);
@@ -37,7 +31,6 @@ const MealsScreen = ({ _navigation }) => {
   const [search, setSearch] = useState('')
   const [foods, setFoods] = useState([]);
   const [MealType, setMealType] = useState(selectedMealType || '')
-  const { selectedMealType } = route.params || {}; 
 
   const searchFood = async (query) => {
     if (!query) return;
@@ -85,25 +78,22 @@ const MealsScreen = ({ _navigation }) => {
     if (selectedMealType) {
         setMealType(selectedMealType);
     }
-}, [selectedMealType]);
+  }, [selectedMealType]);
 
   const saveFoodMeal = async(food) => {
-    //TALLENNETAAN YKSITTÄINEN RUOKA LISTASTA
-    console.log('New food adding: ', food.product_name);
-    
+    if (!food.quantity || isNaN(food.quantity) || food.quantity <= 0) {
+      Alert.alert("Error", "Please enter a valid amount in grams.");
+      return;
+    }
+
     const user = await getUserData();
     const uname = user[0]?.knimi;
     const ateria = "meal";
-    const consumedAmount = extractServingSize(food.quantity || food.quantity || "100");
-
-    console.log(uname, " ", ateria, " ",consumedAmount);
+    const consumedAmount = extractServingSize(food.quantity || "100");
 
     const response = await SaveFood(food, ateria, uname, consumedAmount);
 
     if (response.ok) {
-
-      console.log("response.ok");
-
       const data = await response.json();
       const resid = data.id[0]?.id;
 
@@ -116,14 +106,10 @@ const MealsScreen = ({ _navigation }) => {
       const fatAmount = (fatPerGram * consumedAmount) / 100;
       const caloriesAmount = (caloriesPerGram * consumedAmount) / 100;
 
-      //Saatu ruoka lisätään listaan joka lähetetään myöhemmin kokonaisuudessaan backendiin.
-      //Tätä voi käyttää mm. valittujen aterioiden näyttämiseen
-      //suurin osa ominaisuuksista vielä kovakoodattu.
-
       const newFood = {
-        id: resid, //tämä id on juuri tämän ruuan id databasessa ja sitä tarvitaan /get-meal:issä
+        id: resid,
         knimi: user[0]?.knimi || "N/A",
-        ruokanimi: food?.product_name || food.brands || "N/A", //nyt toimii :)
+        ruokanimi: food?.product_name || food.brands || "N/A",
         maarag: consumedAmount,
         kalorit: Math.round(caloriesAmount),
         proteiini: Math.round(proteinAmount),
@@ -133,143 +119,70 @@ const MealsScreen = ({ _navigation }) => {
         picture: food?.image_small_url || "",
       };
 
-
       setFoods((prevFoods) => {
         const updatedFoods = [...prevFoods, newFood];
-        console.log('foods:', updatedFoods); // Log updated foods
         return updatedFoods;
       });
 
-      console.log(foods);
-
-      console.log('Successfully added')
-      alert('Food saved successfully') 
-    } else { 
-      console.log('Failed: ', response.status)
-      alert('Error in saving food')
-      
+      Alert.alert("Success", "Food saved successfully!");
+    } else {
+      Alert.alert("Error", "Failed to save food.");
     }
-    setModalVisible(false)
-
-    /*
-    try {
-      //lähetetään ruoka databaseen
-      const user = await getUserData();
-      const response = await fetch(ServerIp + '/api/add-food', {
-        method: 'POST', 
-        headers: { 
-          'content-type': 'application/json',
-        }, 
-        body: JSON.stringify({
-          knimi: user[0]?.knimi || "Kovakoodi",
-          ruokanimi: food?.product_name || "Failsafe", //Nyt toimii :)
-          maarag: 200, //extractServingSize(food[0]?.serving_size), //VÄLIAIKAINEN
-          kalorit: food.nutriments?.['energy-kcal'],
-          proteiini: 0,
-          hiilihydraatit: 0,
-          rasvat: 0,
-          tyyppi: category.toLowerCase(),
-          img: food.image_small_url
-        }),
-      })
-      if (response.ok) {
-
-        const data = await response.json();
-        const resid = data.id[0]?.id;
-
-        //Saatu ruoka lisätään listaan joka lähetetään myöhemmin kokonaisuudessaan backendiin.
-        //Tätä voi käyttää mm. valittujen aterioiden näyttämiseen
-        //suurin osa ominaisuuksista vielä kovakoodattu.
-
-        const newFood = {
-          id: resid, //tämä id on juuri tämän ruuan id databasessa ja sitä tarvitaan /get-meal:issä
-          knimi: user[0]?.knimi || "Kovakoodi",
-          ruokanimi: food?.product_name || "Failsafe", //Nyt toimii :)
-          maarag: 200,
-          kalorit: food[0]?.nutriments?.['energy-kcal'] || 0,
-          proteiini: 0,
-          hiilihydraatit: 0,
-          rasvat: 0,
-          tyyppi: category?.toLowerCase() || "food",
-          img: food[0]?.image_small_url || "",
-        };
-
-        setFoods((prevFoods) => {
-          const updatedFoods = [...prevFoods, newFood];
-          console.log('foods:', updatedFoods); // Log updated foods
-          return updatedFoods;
-        });
-
-        console.log(foods);
-
-        console.log('Successfully added')
-        alert('Food saved successfully') 
-      } else { 
-        console.log('Failed: ', response.status)
-        alert('Error in saving food')
-        
-      }
-    } catch(error) {
-      
-      console.error('Error:', error)
-    }
-    */
+    setModalVisible(false);
   }
 
   const saveMeal = async () => {
-    //TALLENNETAAN ATERIA
     try {
       const user = await getUserData();
-      const foodIds = foods.map((food) => food.id)
+      const foodIds = foods.map((food) => food.id);
       const response = await fetch(ServerIp + '/api/add-meal', {
         method: 'POST', 
         headers: { 
           'content-type': 'application/json',
         }, 
         body: JSON.stringify({
-
-          ateria: mealType, // Use the dynamically determined meal type
+          ateria: mealType,
           knimi: user[0]?.knimi || "Kovakoodi",
           mealname: MealName,
-          food: foodIds[0]  || null, //Rivillä 96 mainittu id tähän. toistaiseksi kovakoodattu
+          food: foodIds[0] || null,
           drink: foodIds[1] || null,
           salad: foodIds[2] || null,
           other: foodIds[3] || null
         }),
-      })
+      });
       if (response.ok) {
-        alert("Meal saved successfully, good job!");
-        setFoods([]); //Tyhjennetään lista
+        Alert.alert("Success", "Meal saved successfully!");
+        setFoods([]);
         navigation.goBack();
-      } else { 
-        alert("error");
+      } else {
+        Alert.alert("Error", "Failed to save meal.");
       }
-      } catch(error) {
-        console.error('Error:', error);
-      }
-    setModalVisible(false)
+    } catch (error) {
+      console.error('Error:', error);
+    }
+    setModalVisible(false);
   }
 
   const handleSaveMeal = () => {
-    if(!MealName) {
-      alert('Please enter a meal name and add some food items');
+    if (!MealName) {
+      Alert.alert('Error', 'Please enter a meal name and add some food items.');
       return;
     }
     if (foods.length === 0) {
-      alert('Please add some food items to the meal before saving');
+      Alert.alert('Error', 'Please add some food items to the meal before saving.');
       return;
     }
-    setConfirmationVisible(true); // Show confirmation modal
+    setConfirmationVisible(true);
   }
 
   const handleConfirmSave = () => {
-    setConfirmationVisible(false); // Hide confirmation modal
-    saveMeal(); // Proceed with saving the meal
+    setConfirmationVisible(false);
+    saveMeal();
   }
 
   return (
-<View style={[theme.container, { padding: 16 }]}>
-  <Text style={[styles.header, { color: theme.text.color }]}>Create a Meal</Text>
+    <View style={[theme.container, { padding: 16 }]}>
+      <Text style={[styles.header, { color: theme.text.color }]}>Create a Meal</Text>
 
       <Text style={[styles.label, theme.text]}>Meal name</Text>
       <TextInput
@@ -280,47 +193,36 @@ const MealsScreen = ({ _navigation }) => {
         theme={{ colors: { background: '#e0e0e0' } }}
       />
 
-{MealName ? (
-  <>
-  {/* Category filter */}
-  <View style={styles.categorys}>
-        <Text style={[styles.categoryLabel, { color: theme.text.color }]}>Category:</Text>
-        <Picker
-          selectedValue={category}
-          onValueChange={(itemValue) => setCategory(itemValue)}
-          style={styles.pickerStyle}
-          mode="dropdown" 
-        >
-          <Picker.Item label="Food" value="Food" />
-          <Picker.Item label="Drink" value="Drink" />
-          <Picker.Item label="Salad" value="Salad" />
-          <Picker.Item label="Other" value="Other" />
-        </Picker>
-      </View>
-
-      {/* ds */}
+      {MealName ? (
+        <>
+          <View style={styles.categorys}>
+            <Text style={[styles.categoryLabel, { color: theme.text.color }]}>Category:</Text>
+            <Picker
+              selectedValue={category}
+              onValueChange={(itemValue) => setCategory(itemValue)}
+              style={styles.pickerStyle}
+              mode="dropdown" 
+            >
+              <Picker.Item label="Food" value="Food" />
+              <Picker.Item label="Drink" value="Drink" />
+              <Picker.Item label="Salad" value="Salad" />
+              <Picker.Item label="Other" value="Other" />
+            </Picker>
+          </View>
 
           <Searchbar
-          style={[styles.searchBar]}
-          placeholder={`Search for ${category}s`}
-          onChangeText={setSearchMeals}
-          value={searchMeals}
-        />
-      </>
+            style={[styles.searchBar]}
+            placeholder={`Search for ${category}s`}
+            onChangeText={setSearchMeals}
+            value={searchMeals}
+          />
+        </>
       ) : null }
 
-      
-
-    
-      
-    
-      {/* Loading indicator */}
       {loading && <ActivityIndicator size="large" color="#ff0" />}
 
-      {/* Error message */}
       {error && <Text style={{ color: 'red' }}>{error}</Text>}
 
-      {/* Search results */}
       {category !== 'All' && (
         <FlatList
           data={foodResults}
@@ -334,26 +236,27 @@ const MealsScreen = ({ _navigation }) => {
                   setModalVisible(true);
                 }}
               >
+                <Image source={{ uri: item.image_url || 'https://via.placeholder.com/150' }} style={styles.foodImage} />
                 <Text style={{ color: theme.text.color }}>
-                {item.product_name || 'No name'}
-              </Text>
-              <Text style={{ color: theme.text.color }}>
-                {item.brands || 'No brand'}
-              </Text>
-              <Text style={{ color: theme.text.color }}>
+                  {item.product_name || 'No name'}
+                </Text>
+                <Text style={{ color: theme.text.color }}>
+                  {item.brands || 'No brand'}
+                </Text>
+                <Text style={{ color: theme.text.color }}>
                   Amount: {item.quantity || 'N/A'}
                 </Text>
-              <Text style={{ color: theme.text.color }}>
-                Protein: {item.nutriments?.proteins_100g || 'N/A'} g
-              </Text>
-              <Text style={{ color: theme.text.color }}>
-                Calories: {item.nutriments?.['energy-kcal'] || 'N/A'} kcal
-              </Text>
-              <Text style={{ color: theme.text.color }}>
+                <Text style={{ color: theme.text.color }}>
+                  Protein: {item.nutriments?.proteins_100g || 'N/A'} g
+                </Text>
+                <Text style={{ color: theme.text.color }}>
                   Carbohydrates: {item.nutriments?.carbohydrates_100g || 'N/A'} g
                 </Text>
                 <Text style={{ color: theme.text.color }}>
-                  Fat: {item.nutriments?.fat_100g || 'N/a'} g
+                  Fat: {item.nutriments?.fat_100g || 'N/A'} g
+                </Text>
+                <Text style={{ color: theme.text.color }}>
+                  Calories: {item.nutriments?.['energy-kcal'] || 'N/A'} kcal
                 </Text>
               </TouchableOpacity>
             </Animatable.View>
@@ -361,7 +264,6 @@ const MealsScreen = ({ _navigation }) => {
         />
       )}
 
-      {/* Modal */}
       <Modal
         animationType="slide"
         transparent={true}
@@ -372,6 +274,7 @@ const MealsScreen = ({ _navigation }) => {
           <View style={[styles.modalContent, { backgroundColor: theme.modalContainer.backgroundColor }]}>
             {selectedFood ? (
               <>
+                <Image source={{ uri: selectedFood.image_url || 'https://via.placeholder.com/150' }} style={styles.modalImage} />
                 <Text style={[styles.modalText, { color: theme.text.color }]}>
                   Name: {selectedFood.product_name || 'N/A'}
                 </Text>
@@ -385,14 +288,14 @@ const MealsScreen = ({ _navigation }) => {
                   Protein: {selectedFood.nutriments?.proteins_100g || 'N/A'}
                 </Text>
                 <Text style={styles.modalText}>
-                    Carbohydrates: {selectedFood.nutriments?.carbohydrates_100g || 'N/A'}
+                  Carbohydrates: {selectedFood.nutriments?.carbohydrates_100g || 'N/A'}
                 </Text>
                 <Text style={styles.modalText}>
-                    Fat: {selectedFood.nutriments?.fat_100g || 'N/A'}
+                  Fat: {selectedFood.nutriments?.fat_100g || 'N/A'}
                 </Text>
                 <Text style={styles.modalText}>
-                    Calories: {selectedFood.nutriments?.['energy-kcal'] || 'N/A'} kcal
-                </Text> 
+                  Calories: {selectedFood.nutriments?.['energy-kcal'] || 'N/A'} kcal
+                </Text>
                 <TouchableOpacity
                   style={[styles.button, styles.buttoText]}
                   onPress={() => saveFoodMeal(selectedFood)}
@@ -404,7 +307,7 @@ const MealsScreen = ({ _navigation }) => {
               <Text style={[styles.modalText, { color: theme.text.color }]}>No food selected</Text>
             )}
             <TouchableOpacity
-            style={[styles.button, styles.buttoText]}
+              style={[styles.button, styles.buttoText]}
               onPress={() => setModalVisible(false)}
             >
               <Text>Close</Text>
@@ -413,7 +316,6 @@ const MealsScreen = ({ _navigation }) => {
         </View>
       </Modal>
 
-      {/* Confirmation Modal */}
       <Modal
         animationType="slide"
         transparent={true}
@@ -440,12 +342,11 @@ const MealsScreen = ({ _navigation }) => {
       </Modal>
 
       <TouchableOpacity
-      style={[styles.button, styles.buttoText]}
+        style={[styles.button, styles.buttoText]}
         onPress={handleSaveMeal}
       >
         <Text>Save meal</Text>
       </TouchableOpacity>
-
     </View>
   )
 }
@@ -558,6 +459,18 @@ const styles = StyleSheet.create({
     marginVertical: 5,
     width: '80%',
     backgroundColor: '#f0f0f0',
+  },
+  foodImage: {
+    width: 200,
+    height: 100,
+    marginBottom: 10,
+    borderRadius: 5,
+  },
+  modalImage: {
+    width: 200,
+    height: 120,
+    marginBottom: 10,
+    borderRadius: 5,
   },
   mealItem: {
     padding: 10,
