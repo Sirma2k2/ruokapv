@@ -84,14 +84,17 @@ const MyScreen = () => {
 
   const handleSaveChanges = async () => {
     try {
+      //rikkoo kaiken koska tallentaa stringinä tavoitteet jne.
+      /*
       const updatedData = {
         ...userData,
-        activityLevel: activityLevels.findIndex(level => level.value === userData.activityLevel) + 1,
-        dietType: dietTypes.findIndex(type => type.value === userData.dietType) + 1,
-        goal: goals.findIndex(goal => goal.value === userData.goal) + 1,
+        aktiviteetti: activityLevels.findIndex(level => level.value === userData.aktiviteetti) + 1,
+        tyyppi: dietTypes.findIndex(type => type.value === userData.tyyppi) + 1,
+        tavoite: goals.findIndex(goal => goal.value === userData.tavoite) + 1,
       };
       await SecureStore.setItemAsync("userData", JSON.stringify(updatedData));
-      alert("Profile updated successfully!");
+      */
+      alert("Profile updated successfully! 👀");
     } catch (error) {
       console.error("Error saving user data:", error);
       alert("Failed to save changes. Please try again.");
