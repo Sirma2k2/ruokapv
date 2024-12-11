@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { View, Text, TouchableOpacity, StyleSheet, Modal, FlatList, Alert, TextInput } from 'react-native';
+import { View, Text, TouchableOpacity, StyleSheet, Modal, FlatList, Alert, TextInput, Image } from 'react-native';
 import { useTheme } from '../components/ThemeContext';
 import { ActivityIndicator, Searchbar } from 'react-native-paper';
 import * as Animatable from 'react-native-animatable';
@@ -9,7 +9,6 @@ import { SaveFood } from '../hooks/SaveFood';
 import * as SecureStore from 'expo-secure-store';
 import { SearchMeals } from '../hooks/SearchMeals';
 import { getUserData } from '../hooks/UserData';
-
 
 import ServerIp from '../hooks/Global';
 
@@ -200,6 +199,7 @@ const LunchScreen = () => {
                   setModalVisible(true);
                 }}
               >
+                <Image source={{ uri: item.image_url || 'https://via.placeholder.com/150' }} style={styles.foodImage} />
                 <Text style={{ color: theme.text.color }}>
                   {item.product_name || 'No name'}
                 </Text>
@@ -223,11 +223,8 @@ const LunchScreen = () => {
                 <Text style={{ color: theme.text.color }}>
                   Calories: {item.nutriments?.["energy-kcal"] || 'N/A'} kcal
                 </Text>
-
-
               </TouchableOpacity>
               </Animatable.View>
-
             )}
           />
 
@@ -242,6 +239,7 @@ const LunchScreen = () => {
               <View style={styles.modalContent}>
                 {selectedFood ? (
                   <>
+                    <Image source={{ uri: selectedFood.image_url || 'https://via.placeholder.com/150' }} style={styles.modalImage} />
                     <Text style={styles.modalText}>
                       Name: {selectedFood.product_name || 'N/A'}
                     </Text>
@@ -468,6 +466,18 @@ const styles = StyleSheet.create({
     marginVertical: 5,
     width: '80%',
     backgroundColor: '#f0f0f0',
+  },
+  foodImage: {
+    width: 200,
+    height: 100,
+    marginBottom: 10,
+    borderRadius: 5,
+  },
+  modalImage: {
+    width: 200,
+    height: 120,
+    marginBottom: 10,
+    borderRadius: 5,
   },
   mealItem: {
     padding: 10,

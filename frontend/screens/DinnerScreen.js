@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react';
-import { View, Text, TouchableOpacity, StyleSheet, FlatList, Modal, Alert, TextInput } from 'react-native';
-import { useTheme } from '../components/ThemeContext'; // Import the useTheme hook
+import { View, Text, TouchableOpacity, StyleSheet, Modal, FlatList, Alert, TextInput, Image } from 'react-native';
+import { useTheme } from '../components/ThemeContext';
 import { ActivityIndicator, Searchbar } from 'react-native-paper';
 import * as Animatable from 'react-native-animatable';
 import Ionicons from '@expo/vector-icons/Ionicons';
@@ -10,23 +10,22 @@ import { SaveFood } from '../hooks/SaveFood';
 import { SearchMeals } from '../hooks/SearchMeals';
 import { getUserData } from '../hooks/UserData';
 
-
-
 const DinnerScreen = ({ navigation }) => {
   const { theme } = useTheme(); // Access the theme from context
   const [activeTab, setActiveTab] = useState('addFood'); // Track the active tab
   const [searchDinner, setSearchDinner] = useState(''); // State for the search bar
-  const [modalVisible, setModalVisible] = useState(false)
+  const [modalVisible, setModalVisible] = useState(false); // For Modal visibility
   const [selectedFood, setSelectedFood] = useState(null)
-  const [consumedAmount, setConsumedAmount] = useState('')
-  
+  const [consumedAmount, setConsumedAmount] = useState('');
   const [mealSearch, setMealSearch] = useState('');
   const [mealResults, setMealResults] = useState('');
 
-  const [foodResults, setFoodResults] = useState([])
-  const [loading, setLoading] = useState(false)
-  const [error, setError] = useState(false)
+  // States for food results, loading, and error handling
+  const [foodResults, setFoodResults] = useState([]);
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState('');
 
+  // Fetch food data based on search query
   const searchFood = async (query) => {
     if (!query) return;
     setLoading(true);
@@ -63,6 +62,26 @@ const DinnerScreen = ({ navigation }) => {
     }
   }, [searchDinner, mealSearch]);
 
+  // State and logic to fetch previous meals
+  const [previousMeals, setPreviousMeals] = useState([]);
+  const getPreviousMeals = async () => {
+    try {
+      const response = await fetch(ServerIp + '/get-food');
+      if (response.ok) {
+        const data = await response.json();
+        setPreviousMeals(data);
+      } else {
+        console.error('Failed to fetch food history');
+      }
+    } catch (error) {
+      console.error('Error fetching data', error);
+    }
+  };
+
+  useEffect(() => {
+    getPreviousMeals();
+  }, []);
+
   const saveFoodMeal = async (food) => {
 
     if (!consumedAmount || isNaN(consumedAmount) || consumedAmount <= 0) {
@@ -84,63 +103,6 @@ const DinnerScreen = ({ navigation }) => {
       setConsumedAmount('');
       Alert.alert("Success", response.message || "Food saved successfully!");
     }
-
-
-    /*
-    if (!consumedAmount || isNaN(consumedAmount) || consumedAmount <= 0) {
-      Alert.alert("Error", "Please enter a valid amount in grams.");
-      return;
-    }
-    // Lasketaan ravintosisältö per syötetty määrä
-    const proteinPerGram = food.nutriments?.proteins_100g || 0;
-    const carbsPerGram = food.nutriments?.carbohydrates_100g || 0;
-    const fatPerGram = food.nutriments?.fat_100g || 0;
-    const caloriesPerGram = food.nutriments?.['energy-kcal'] || 0;
-    const image = food.image_small_url
-    const proteinAmount = (proteinPerGram * consumedAmount) / 100;
-    const carbsAmount = (carbsPerGram * consumedAmount) / 100;
-    const fatAmount = (fatPerGram * consumedAmount) / 100;
-    const caloriesAmount = (caloriesPerGram * consumedAmount) / 100;
-    const storedData = await SecureStore.getItemAsync("userData");
-    const parsedData = JSON.parse(storedData);
-  
-    
-    const foodData = {
-      knimi: parsedData[0]?.knimi, 
-      ruokanimi: food.brands,
-      tyyppi: "dinner", //VÄLIAIKAINEN
-      maarag: consumedAmount,
-      kalorit: Math.round(caloriesAmount),
-      proteiini: Math.round(proteinAmount),
-      hiilihydraatit: Math.round(carbsAmount),
-      rasvat: Math.round(fatAmount),
-      picture: image
-    };
-  
-    try {
-      // Lähetetään POST-pyyntö
-      const response = await fetch(ServerIp + '/api/add-food', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify(foodData),
-      });
-  
-      if (!response.ok) {
-        console.log("response != ok");
-        throw new Error('Failed to save food to the database');
-      }
-      const result = await response.json();
-      console.log(result);
-      Alert.alert("Success", result.message || "Food saved successfully!");
-      setModalVisible(false);
-      setConsumedAmount('');
-    } catch (error) {
-      console.error('Error saving food:', error);
-      Alert.alert("Error", "Failed to save food to database.");
-    }
-    */
   };
 
   const searchMyMeals = async (query) => {
@@ -210,8 +172,9 @@ const DinnerScreen = ({ navigation }) => {
             value={searchDinner}
             style={styles.searchBar}
           />
+
           {/* Show loading indicator */}
-          {loading && <ActivityIndicator size="large" color="#ff0" />}
+          {loading && <ActivityIndicator size={50} color="#ff0" />}
 
           {/* Show error message if there is one */}
           {error && <Text style={{ color: 'red' }}>{error}</Text>}
@@ -229,6 +192,7 @@ const DinnerScreen = ({ navigation }) => {
                   setModalVisible(true);
                 }}
               >
+                <Image source={{ uri: item.image_url || 'https://via.placeholder.com/150' }} style={styles.foodImage} />
                 <Text style={{ color: theme.text.color }}>
                   {item.product_name || 'No name'}
                 </Text>
@@ -252,12 +216,8 @@ const DinnerScreen = ({ navigation }) => {
                 <Text style={{ color: theme.text.color }}>
                   Calories: {item.nutriments?.["energy-kcal"] || 'N/A'} kcal
                 </Text>
-                
-       
-
               </TouchableOpacity>
               </Animatable.View>
-
             )}
           />
 
@@ -272,6 +232,7 @@ const DinnerScreen = ({ navigation }) => {
               <View style={styles.modalContent}>
                 {selectedFood ? (
                   <>
+                    <Image source={{ uri: selectedFood.image_url || 'https://via.placeholder.com/150' }} style={styles.modalImage} />
                     <Text style={styles.modalText}>
                       Name: {selectedFood.product_name || 'N/A'}
                     </Text>
@@ -305,7 +266,7 @@ const DinnerScreen = ({ navigation }) => {
 
                     <TouchableOpacity
                       style={styles.button}
-                      onPress={() => {saveFoodMeal(selectedFood)}}
+                      onPress={() => saveFoodMeal(selectedFood)}
                     >
                       <Text >Save food</Text>
                     </TouchableOpacity>
@@ -325,6 +286,7 @@ const DinnerScreen = ({ navigation }) => {
         </>
       )}
 
+    
 {activeTab === 'createMeal' && (
   <>
     <Text style={[styles.header, { color: theme.text.color }]}> My Meals</Text>
@@ -337,7 +299,6 @@ const DinnerScreen = ({ navigation }) => {
       <Ionicons name="fast-food" size={24} color={theme.iconColor} style={styles.icon} />
     </TouchableOpacity>
 
-  
     <Searchbar 
     placeholder='Search my meals'
     onChangeText={setMealSearch}
@@ -397,11 +358,12 @@ const DinnerScreen = ({ navigation }) => {
   )
 }
 
+
 const styles = StyleSheet.create({
   container: {
     flex: 1,
     justifyContent: 'flex-start',
-    alignItems: 'center',
+    alignItems: 'center'
   },
   tabBar: {
     flexDirection: 'row',
@@ -426,15 +388,9 @@ const styles = StyleSheet.create({
   },
   activeTabText: {
     color: '#007AFF', // Active tab text color
-    fontWeight: 'bold',
+    fontWeight: 'bold', 
   },
-  header: {
-    fontSize: 24,
-    marginTop: 40,
-    marginBottom: 20,
-    fontWeight: 'bold',
-    textAlign: 'center',
-  },
+
   subHeader: {
     marginTop: 20,
     fontSize: 18,
@@ -442,6 +398,15 @@ const styles = StyleSheet.create({
     marginBottom: 10,
     fontStyle: 'italic',
   },
+  
+  header: {
+    fontSize: 24,
+    marginTop: 40,
+    marginBottom: 20,
+    fontWeight: 'bold',
+    textAlign: 'center',
+  },
+
   searchBar: {
     marginBottom: 20,
     width: '90%',  
@@ -450,7 +415,7 @@ const styles = StyleSheet.create({
     alignSelf: 'center',  
   },
   button: {
-    flexDirection: 'row', 
+    flexDirection: 'row',  
     alignItems: 'center',
     justifyContent: 'center',
     paddingVertical: 12,
@@ -458,7 +423,7 @@ const styles = StyleSheet.create({
     borderRadius: 25,
     borderWidth: 2,
     borderColor: '#4169e1',
-    width: '90%', 
+    width: '90%',  
     alignSelf: 'center',  
     marginVertical: 10,  
   },
@@ -485,6 +450,7 @@ const styles = StyleSheet.create({
     marginBottom: 15,
     textAlign: 'center',
   },
+
   foodItem: {
     borderWidth: 1,
     borderColor: 'gray',
@@ -493,6 +459,18 @@ const styles = StyleSheet.create({
     marginVertical: 5,
     width: '80%',
     backgroundColor: '#f0f0f0',
+  },
+  foodImage: {
+    width: 200,
+    height: 100,
+    marginBottom: 10,
+    borderRadius: 5,
+  },
+  modalImage: {
+    width: 200,
+    height: 120,
+    marginBottom: 10,
+    borderRadius: 5,
   },
   mealItem: {
     padding: 10,
@@ -505,6 +483,6 @@ const styles = StyleSheet.create({
     fontSize: 16,
     color: '#333',
   },
-})
+});
 
 export default DinnerScreen;
