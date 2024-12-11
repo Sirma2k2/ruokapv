@@ -28,9 +28,9 @@ const GetCalories = () => {
 
       const data = await response.json();
       setCaloriesData({
-        goal: data.goal,
-        food: data.food,
-        remaining: data.goal - data.food,
+        goal: data.goal.toFixed(0),
+          food: data.food.toFixed(0),
+          remaining: (data.goal - data.food).toFixed(0),
       });
     } catch (error) {
       setError(error.message);

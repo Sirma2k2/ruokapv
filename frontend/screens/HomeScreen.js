@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useCallback } from 'react';
-import { View, Text, FlatList, StyleSheet, ScrollView, TouchableOpacity, ActivityIndicator, Platform } from 'react-native';
+import { View, Text, FlatList, StyleSheet, TouchableOpacity, ActivityIndicator, Platform } from 'react-native';
 import PieChart from '../components/PieChart'; // piechart.js josta tulee data
 import { useTheme } from '../components/ThemeContext'; 
 import Ionicons from 'react-native-vector-icons/Ionicons';
@@ -36,8 +36,12 @@ const HomeScreen = () => {
           id: item.id || Math.random().toString(), // Generoi id, jos sitä ei ole
           name: item.ruokanimi,
           amount: item.maarag,
-          calories: item.kalorit
+          calories: item.kalorit,
+          type: 'food',
+          picture: item?.picture // Use placeholder if no valid URL
         }));
+        console.log(data);
+       // console.log('Food History:', transformedData); // Log the food history
         setFoodHistory(transformedData);
       } else {
         console.error('Failed to fetch food history');
@@ -80,6 +84,26 @@ const HomeScreen = () => {
     }
   }, [foodHistory]);
 
+  const renderItem = ({ item }) => {
+    if (item.type === 'food') {
+      return (
+        <View style={[styles.item, { borderBottomColor: theme.borderColor }]}>
+          <Text style={{ color: theme.text.color }}>
+            {item.date}: {item.name}, {item.amount}g, {item.calories} calories
+          </Text>
+        </View>
+      );
+    } else if (item.type === 'pieChart') {
+      return <PieChart data={foodHistory} />;
+    }
+    return null;
+  };
+
+  const combinedData = [
+    ...foodHistory.slice(-10),
+    { id: 'pieChart', type: 'pieChart' }
+  ];
+
   return (
     <View style={[styles.container, { backgroundColor: theme.container.backgroundColor }]}>
       <View style={styles.topContainer}>
@@ -112,27 +136,21 @@ const HomeScreen = () => {
           </Text>
         </View>
       ) : (
-        <ScrollView>
-          <FlatList
-            data={foodHistory.slice(-10)} //Rajotin 10 ruokaan toistaseksi koska ei jaksanu rullata
-            keyExtractor={(item) => item.id}
-            renderItem={({ item }) => (
-              <View style={[styles.item, { borderBottomColor: theme.borderColor }]}>
-                <Text style={{ color: theme.text.color }}>
-                  {item.date}: {item.name}, {item.amount}g, {item.calories} calories
-                </Text>
-              </View>
-            )}
-          />
-          <Text style={[styles.averageText, { color: theme.text.color }]}>
-            The calories of your average meal: {averageCalories.toFixed(2)} calories
-          </Text>
-          <Text style={[styles.totalText, { color: theme.text.color}]}>
-            Total calories consumed: {totalCalories.toFixed(2)} calories
-          </Text>
-          <Text style={[styles.pieTitle, { color: theme.text.color }]}>Your last five meals</Text>
-          <PieChart data={foodHistory} />
-        </ScrollView>
+        <FlatList
+          data={combinedData}
+          keyExtractor={(item) => item.id}
+          renderItem={renderItem}
+          ListFooterComponent={() => (
+            <>
+              <Text style={[styles.averageText, { color: theme.text.color }]}>
+                The calories of your average meal: {averageCalories.toFixed(2)} calories
+              </Text>
+              <Text style={[styles.totalText, { color: theme.text.color}]}>
+                Total calories logged: {totalCalories.toFixed(2)} calories
+              </Text>
+            </>
+          )}
+        />
       )}
     </View>
   );
