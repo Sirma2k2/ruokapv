@@ -18,14 +18,14 @@ const MyScreen = () => {
   const navigation = useNavigation();
 
   const [userData, setUserData] = useState({ 
-    name: "",
+    knimi: "",
     email: "",
-    age: "",
-    weight: "",
-    height: "",
-    activityLevel: "",
-    dietType: "",
-    goal: "",
+    ika: "",
+    paino: "",
+    pituus: "",
+    aktiviteetti: "",
+    tyyppi: "",
+    tavoite: "",
   });
 
   const { theme, toggleTheme } = useTheme();
@@ -43,25 +43,29 @@ const MyScreen = () => {
   const handleSwitchChange = (key) => (newValue) => {
     setSwitchValues((prev) => ({ ...prev, [key]: newValue }));
   };
+  
+  const handleRefresh = () => {
+    loadUserData();
+  };
 
   const loadUserData = async () => {
     try {
       const storedData = await SecureStore.getItemAsync("userData");
       if (storedData) {
-        console.log(storedData)
+        console.log("LOAD Stored: ", storedData)
         const parsedData = JSON.parse(storedData);
         const mappedData = {
-          name: parsedData[0]?.knimi || "",
+          knimi: parsedData[0]?.knimi || "",
           email: parsedData[0]?.email || "",
-          age: parsedData[0]?.ika || "",
-          weight: parsedData[0]?.paino || "",
-          height: parsedData[0]?.pituus || "",
-          activityLevel: parsedData[0]?.aktiviteetti ? activityLevels[parsedData[0]?.aktiviteetti - 1].value : "",
-          dietType: parsedData[0]?.tyyppi ? dietTypes[parsedData[0]?.tyyppi - 1].value : "",
-          goal: parsedData[0]?.tavoite ? goals[parsedData[0]?.tavoite - 1].value : "",
+          ika: parsedData[0]?.ika || "",
+          paino: parsedData[0]?.paino || "",
+          pituus: parsedData[0]?.pituus || "",
+          aktiviteetti: parsedData[0]?.aktiviteetti ? activityLevels[parsedData[0]?.aktiviteetti - 1].value : "",
+          tyyppi: parsedData[0]?.tyyppi ? dietTypes[parsedData[0]?.tyyppi - 1].value : "",
+          tavoite: parsedData[0]?.tavoite ? goals[parsedData[0]?.tavoite - 1].value : "",
         }; 
         setUserData(mappedData);
-        console.log("Mapped data: ", mappedData);
+        console.log("LOAD Mapped data: ", mappedData);
         return mappedData;
       }
     } catch (error) {
@@ -121,6 +125,14 @@ const MyScreen = () => {
       }}>
         <Ionicons name="document-text" size={30} color={theme.text.color} />
       </TouchableOpacity>
+
+      <TouchableOpacity 
+        style={styles.refreshButton} 
+        onPress={handleRefresh}
+      >
+        <Ionicons name="refresh" size={30} color={theme.text.color} />
+      </TouchableOpacity>
+
       <SettingsModal
         visible={settingsVisible}
         toggleVisible={toggleSettingsVisible}
@@ -142,7 +154,7 @@ const MyScreen = () => {
         <Text style={[styles.label, theme.text]}>Name</Text>
         <TextInput
           style={[styles.input, { color: theme.text.color }]}
-          value={userData.name}
+          value={userData.knimi}
           editable={false}
         />
       </View>
@@ -160,7 +172,7 @@ const MyScreen = () => {
         <Text style={[styles.label, theme.text]}>Age</Text>
         <TextInput
           style={[styles.input, { color: theme.text.color }]}
-          value={userData.age.toString()}
+          value={userData.ika.toString()}
           editable={false}
         />
       </View>
@@ -170,7 +182,7 @@ const MyScreen = () => {
         <TextInput
           style={[styles.input, { color: theme.text.color }]}
           keyboardType="numeric"
-          value={userData.weight.toString()}
+          value={userData.paino.toString()}
           onChangeText={handleInputChange("weight")}
         />
       </View>
@@ -180,7 +192,7 @@ const MyScreen = () => {
         <TextInput
           style={[styles.input, { color: theme.text.color }]}
           keyboardType="numeric"
-          value={userData.height.toString()}
+          value={userData.pituus.toString()}
           onChangeText={handleInputChange("height")}
         />
       </View>
@@ -189,7 +201,7 @@ const MyScreen = () => {
         <Text style={[styles.label, theme.text]}>Activity Level</Text>
         <RNPickerSelect
           placeholder={{ label: "Select activity level", value: null }}
-          value={userData.activityLevel}
+          value={userData.aktiviteetti}
           onValueChange={handleInputChange("activityLevel")}
           items={activityLevels}
           style={{
@@ -203,7 +215,7 @@ const MyScreen = () => {
         <Text style={[styles.label, theme.text]}>Diet Type</Text>
         <RNPickerSelect
           placeholder={{ label: "Select diet type", value: null }}
-          value={userData.dietType}
+          value={userData.tyyppi}
           onValueChange={handleInputChange("dietType")}
           items={dietTypes}
           style={{
@@ -217,7 +229,7 @@ const MyScreen = () => {
         <Text style={[styles.label, theme.text]}>Goal</Text>
         <RNPickerSelect
           placeholder={{ label: "Select goal", value: null }}
-          value={userData.goal}
+          value={userData.tavoite}
           onValueChange={handleInputChange("goal")}
           items={goals}
           style={{
@@ -273,6 +285,12 @@ const styles = StyleSheet.create({
     margin: 5,
     padding: 5,
   },
+  refreshButton: {
+    position: "absolute",
+    top: -3,
+    right: 40,
+    padding: 1,
+  },  
 });
 
 export default MyScreen;

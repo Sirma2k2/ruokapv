@@ -327,7 +327,6 @@ app.post('/login', async(req,res)=> {
     const values = [email, pword];
     const result = await pool.query(query, values);
     if (result.rowCount != 0){
-      console.log(result.rows);
       return res.status(201).json({data: result.rows});
     }else{
       return res.status(401).json({ message: 'Incorrect credidentials' });

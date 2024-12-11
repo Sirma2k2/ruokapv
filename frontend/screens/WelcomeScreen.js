@@ -55,8 +55,9 @@ const WelcomeScreen = ({ onLogin }) => {
 
             if (response.status === 201) {
               console.log('logged in');
-              console.log(JSON.stringify(result.data));
-              await SecureStore.setItemAsync('userData', JSON.stringify(result.data));
+              const data = JSON.stringify(result.data)
+              console.log(data);
+              await SecureStore.setItemAsync('userData', data);
               onLogin(); // Notify parent about successful login
             } else {
               console.log('Failed: ', response.status, ' ', response.headers);
