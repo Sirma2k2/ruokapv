@@ -7,14 +7,24 @@ import { useRoute } from '@react-navigation/native';
 import * as Animatable from 'react-native-animatable';
 import { Picker } from '@react-native-picker/picker';
 import { getUserData } from '../hooks/UserData';
-import { useNavigation } from '@react-navigation/native'; // Import useNavigation hook
+
+import { useNavigation, useRoute } from '@react-navigation/native'; // Import useNavigation and useRoute hooks
+
 import { SaveFood } from '../hooks/SaveFood';
+
 
 import ServerIp from '../hooks/Global';
 
 const MealsScreen = ({ navigation }) => {
   const { theme } = useTheme(); // Access the theme from context
+
+  const navigation = useNavigation(); // Initialize navigation
+  const route = useRoute(); // Get the current route
+  const screenName = route.name; // Get the screen name
+  const mealType = screenName.replace('Screen', '').toLowerCase(); // Determine the meal type dynamically
+
   //const navigation = useNavigation(); // Initialize navigation
+
   const [searchMeals, setSearchMeals] = useState('');
   const [modalVisible, setModalVisible] = useState(false);
   const [confirmationVisible, setConfirmationVisible] = useState(false); // State for confirmation modal
@@ -39,9 +49,11 @@ const MealsScreen = ({ navigation }) => {
       const response = await fetch(ServerIp + `/api/searchFood?query=${query}`);
       if (response.ok) {
         const data = await response.json()
-        setFoodResults(data);
+        const filteredData = data.filter(item => item.nutriments && item.nutriments['energy-kcal'] && item.nutriments['energy-kcal'] !== 0 && item.quantity && item.quantity !== 0);
+        setFoodResults(filteredData);
       } else {
-        setError('No products found')
+        setError('No products found');
+        setTimeout(() => setError(''), 5000);
       }
     } catch (error) {
       setError('Failed to fetch food data')
@@ -216,7 +228,8 @@ const MealsScreen = ({ navigation }) => {
           'content-type': 'application/json',
         }, 
         body: JSON.stringify({
-          ateria: MealType, //tämän tulee olla joko dinner, breakfast tai lunch dynaamisesti
+
+          ateria: mealType, // Use the dynamically determined meal type
           knimi: user[0]?.knimi || "Kovakoodi",
           mealname: MealName,
           food: foodIds[0]  || null, //Rivillä 96 mainittu id tähän. toistaiseksi kovakoodattu

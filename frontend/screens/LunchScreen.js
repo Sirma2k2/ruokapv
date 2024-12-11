@@ -4,18 +4,27 @@ import { useTheme } from '../components/ThemeContext';
 import { ActivityIndicator, Searchbar } from 'react-native-paper';
 import * as Animatable from 'react-native-animatable';
 import Ionicons from '@expo/vector-icons/Ionicons';
+
+import { useNavigation, useRoute } from '@react-navigation/native'; // Import useRoute
+
 import { SaveFood } from '../hooks/SaveFood';
 import * as SecureStore from 'expo-secure-store';
 
+
 import ServerIp from '../hooks/Global';
 
-const LunchScreen = ({navigation}) => {
+const LunchScreen = () => {
   const { theme } = useTheme(); // Access the theme from context
+  const navigation = useNavigation(); // Initialize navigation
+  const route = useRoute(); // Get the current route
+  const screenName = route.name; // Get the screen name
+  const mealType = screenName.replace('Screen', '').toLowerCase(); // Determine the meal type dynamically
+
   const [activeTab, setActiveTab] = useState('addFood'); // Track the active tab
   const [searchLunch, setSearchLunch] = useState(''); // State for the search bar
   const [modalVisible, setModalVisible] = useState(false); // For Modal visibility
   const [selectedFood, setSelectedFood] = useState(null)
-  const [ consumedAmount, setConsumedAmount] = useState('');
+  const [consumedAmount, setConsumedAmount] = useState('');
 
   // States for food results, loading, and error handling
   const [foodResults, setFoodResults] = useState([]);
@@ -131,7 +140,7 @@ const LunchScreen = ({navigation}) => {
           <Text style={[styles.subHeader, { color: theme.text.color }]}>
           "Good food is the foundation of genuine happiness." 
           </Text>
-          <Text style={[styles.header, { color: theme.text.color }]}>Build Your Lunch</Text>
+          <Text style={[styles.header, { color: theme.text.color }]}>Build Your {mealType.charAt(0).toUpperCase() + mealType.slice(1)}</Text>
           <Searchbar
             placeholder="Search food"
             onChangeText={setSearchLunch}
