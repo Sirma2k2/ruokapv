@@ -9,6 +9,7 @@ import ServerIp from '../hooks/Global';
 import { SaveFood } from '../hooks/SaveFood';
 import * as SecureStore from 'expo-secure-store';
 import { SearchMeals } from '../hooks/SearchMeals';
+import { getUserData } from '../hooks/UserData';
 
 const BreakfastScreen = ({ navigation }) => {
   const { theme } = useTheme(); // Access the theme from context
@@ -94,7 +95,9 @@ const BreakfastScreen = ({ navigation }) => {
     setError('');
   
     try {
-      const mealResponse= await SearchMeals("Yrjosimo",mealSearch);
+      const user = await getUserData();
+      const username = user[0]?.knimi || "Failsafe";
+      const mealResponse= await SearchMeals(username,mealSearch);
       console.log(mealResponse);
       if (mealResponse.ok) {
         const data = await mealResponse.json();

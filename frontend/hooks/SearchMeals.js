@@ -3,7 +3,7 @@ import ServerIp from '../hooks/Global';
 export const SearchMeals = async (username, query) => {
     console.log('Headers sent to server:', {
         knimi: username,
-        searchTerm: query,
+        searchterm: query,
     });
 
     try {
@@ -17,13 +17,13 @@ export const SearchMeals = async (username, query) => {
         });
         
         if (!response.ok) {
-            throw new Error('Response not ok: ', response);
+            console.log("not ok maybe not found");
         }
 
         return response;
 
     } catch (error) {
-        console.error('Error searching meal', error);
+        console.log('Error searching meal', error);
         return error;
     }
 

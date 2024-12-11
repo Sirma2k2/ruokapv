@@ -90,6 +90,7 @@ app.post('/api/add-meal', async (req, res) => {
     const values = [knimi, mealname, ateria, food, salad || null, drink || null, other || null]; //tyyppi, knimi, mealname ja food pakollisia
 
     await pool.query(query, values);
+    console.log(knimi, " added meal: ", mealname);
     res.status(201).json({ message: 'Meal added successfully' });
   } catch (err) {
     console.error('Error inserting data into database', err);
@@ -171,6 +172,7 @@ app.get('/api/search-meals', async (req, res) => {
   }
 
   try {
+    await pool.query('SET statement_timeout = 10000');
     //Hakee knimen ja aterian nimen mukaan aterian ja palauttaa aterian ja siihen kuuluvien ruokien tiedot.
     //Olis ollu proceduuri tietokannassa mutta en saanu toimimaan
     const query = `
@@ -206,12 +208,12 @@ app.get('/api/search-meals', async (req, res) => {
     o.hiilarit AS other_hiilarit,
     o.rasvat AS other_rasvat,
     o.picture AS other_picture,
-    similarity(m.ateria, $2) AS similarity_score
+    similarity(m.mealname, $2) AS similarity_score
   FROM meals m
-  JOIN food f ON m.food_id = f.id
-  JOIN food s ON m.salad_id = s.id
-  JOIN food dr ON m.drink_id = dr.id
-  JOIN food o ON m.other_id = o.id
+  LEFT JOIN food f ON m.food_id = f.id
+  LEFT JOIN food s ON m.salad_id = s.id
+  LEFT JOIN food dr ON m.drink_id = dr.id
+  LEFT JOIN food o ON m.other_id = o.id
   WHERE m.knimi = $1
     AND m.mealname % $2
   ORDER BY similarity_score DESC
