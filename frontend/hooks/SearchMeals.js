@@ -1,6 +1,6 @@
 import ServerIp from '../hooks/Global';
 
-export const SearchMeals = async (username, query) => {
+export const SearchMeals = async (username, query = '') => {
     console.log('Headers sent to server:', {
         knimi: username,
         searchterm: query,
@@ -17,7 +17,7 @@ export const SearchMeals = async (username, query) => {
         });
         
         if (!response.ok) {
-            console.log("not ok maybe not found");
+            console.log("not ok, maybe not found");
         }
 
         return response;
@@ -27,4 +27,4 @@ export const SearchMeals = async (username, query) => {
         return error;
     }
 
-  };
+};
