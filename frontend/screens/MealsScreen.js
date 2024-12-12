@@ -81,10 +81,10 @@ const MealsScreen = ({ _navigation }) => {
   }, [selectedMealType]);
 
   const saveFoodMeal = async(food) => {
-    if (!food.quantity || isNaN(food.quantity) || food.quantity <= 0) {
-      Alert.alert("Error", "Please enter a valid amount in grams.");
-      return;
-    }
+    // if (!food.quantity || isNaN(food.quantity) || food.quantity <= 0) {
+    //   Alert.alert("Error", "Please enter a valid amount in grams.");
+    //   return;
+    // }
 
     const user = await getUserData();
     const uname = user[0]?.knimi;
