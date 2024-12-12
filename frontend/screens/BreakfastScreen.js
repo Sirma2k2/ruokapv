@@ -18,7 +18,9 @@ const BreakfastScreen = ({ navigation }) => {
   const [selectedFood, setSelectedFood] = useState(null)
   const [consumedAmount, setConsumedAmount] = useState('');
   const [mealSearch, setMealSearch] = useState('');
-  const [mealResults, setMealResults] = useState('');
+  const [mealResults, setMealResults] = useState([]);
+  const [allMeals, setAllMeals] = useState([]); // State to store all meals
+  const [loadingMeals, setLoadingMeals] = useState(false); // State for loading meals
 
   // States for food results, loading, and error handling
   const [foodResults, setFoodResults] = useState([]);
@@ -55,12 +57,15 @@ const BreakfastScreen = ({ navigation }) => {
     } else {
       setFoodResults([]);
     }
-    if (mealSearch.length > 3) {
-      searchMyMeals(mealSearch);
-    } else{
-      setMealResults([]);
+    if (mealSearch.length > 0) {
+      const filteredMeals = allMeals.filter(meal => 
+        meal.mealname.toLowerCase().includes(mealSearch.toLowerCase())
+      );
+      setMealResults(filteredMeals);
+    } else {
+      setMealResults(allMeals);
     }
-  }, [searchBreakfast, mealSearch]);
+  }, [searchBreakfast, mealSearch, allMeals]);
 
   // State and logic to fetch previous meals
   const [previousMeals, setPreviousMeals] = useState([]);
@@ -80,6 +85,29 @@ const BreakfastScreen = ({ navigation }) => {
 
   useEffect(() => {
     getPreviousMeals();
+  }, []);
+
+  const fetchAllMeals = async () => {
+    setLoadingMeals(true);
+    try {
+      const user = await getUserData();
+      const username = user[0]?.knimi || "Failsafe";
+      const mealResponse = await SearchMeals(username, ''); // Pass an empty string to fetch all meals
+      if (mealResponse.ok) {
+        const data = await mealResponse.json();
+        setAllMeals(data);
+        setMealResults(data);
+      } else {
+        console.error('Failed to fetch all meals');
+      }
+    } catch (error) {
+      console.error('Error fetching all meals', error);
+    }
+    setLoadingMeals(false);
+  };
+
+  useEffect(() => {
+    fetchAllMeals();
   }, []);
 
   const saveFoodMeal = async (food) => {
@@ -307,51 +335,54 @@ const BreakfastScreen = ({ navigation }) => {
      />
 
      {/* Show loading indicator */}
-    {loading && <ActivityIndicator size="large" color="#ff0" />}
+    {loadingMeals && <ActivityIndicator size="large" color="#ff0" />}
 
-{/* Show error message if there is one */}
-{error && <Text style={{ color: 'red' }}>{error}</Text>}
+    {/* Show error message if there is one */}
+    {error && <Text style={{ color: 'red' }}>{error}</Text>}
 
-{/* Display the search results */}
-  <FlatList
-    data={mealResults}
-    keyExtractor={(item, index) => index.toString()}
-    renderItem={({ item }) => (
-      <Animatable.View animation="fadeIn" duration={400}>
-      <TouchableOpacity
-        style={styles.foodItem}
-        onPress={() => {
-          console.log("TÄMÄ PITÄÄ VIELÄ KOODATA");
-        }}
-      >
-        <Text style={{ color: theme.text.color }}>
-          {item.mealname || 'No name'}
-        </Text>
-        <Text style={{ color: theme.text.color }}>
-          Ruoka: {item.food_ruokanimi || 'No food'}
-        </Text>
+    {/* Display the search results */}
+    {mealResults.length === 0 && !loadingMeals ? (
+      <View style={styles.emptyContainer}>
+        <Ionicons name="alert-circle-outline" size={50} color={theme.text.color} />
+        <Text style={[styles.emptyText, { color: theme.text.color }]}>No meals created yet</Text>
+      </View>
+    ) : (
+      <FlatList
+        data={mealResults}
+        keyExtractor={(item, index) => index.toString()}
+        renderItem={({ item }) => (
+          <Animatable.View animation="fadeIn" duration={400}>
+          <TouchableOpacity
+            style={styles.foodItem}
+            onPress={() => {
+              console.log("TÄMÄ PITÄÄ VIELÄ KOODATA");
+            }}
+          >
+            <Text style={{ color: theme.text.color }}>
+              {item.mealname || 'No name'}
+            </Text>
+            <Text style={{ color: theme.text.color }}>
+              Ruoka: {item.food_ruokanimi || 'No food'}
+            </Text>
 
-        <Text style={{ color: theme.text.color }}>
-          Juoma: {item.drink_ruokanimi || 'No drink'}
-        </Text>
+            <Text style={{ color: theme.text.color }}>
+              Juoma: {item.drink_ruokanimi || 'No drink'}
+            </Text>
 
-        <Text style={{ color: theme.text.color }}>
-          Salad: {item.salad_ruokanimi || 'No salad'}
-        </Text>
-        <Text style={{ color: theme.text.color }}>
-          Other: {item.other_ruokaname || 'N/A'}
-        </Text>
-        <Text style={{ color: theme.text.color }}>
-          Total calories: {item.food_kalorit + item.salad_kalorit + item.drink_kalorit + item.other_kalorit || 'N/A'} kcal
-        </Text>
-
-
-      </TouchableOpacity>
-      </Animatable.View>
+            <Text style={{ color: theme.text.color }}>
+              Salad: {item.salad_ruokanimi || 'No salad'}
+            </Text>
+            <Text style={{ color: theme.text.color }}>
+              Other: {item.other_ruokaname || 'N/A'}
+            </Text>
+            <Text style={{ color: theme.text.color }}>
+              Total calories: {item.food_kalorit + item.salad_kalorit + item.drink_kalorit + item.other_kalorit || 'N/A'} kcal
+            </Text>
+          </TouchableOpacity>
+          </Animatable.View>
+        )}
+      />
     )}
-    
-    />
-
   </>
 )}
     </View>
@@ -360,129 +391,27 @@ const BreakfastScreen = ({ navigation }) => {
 
 
 const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    justifyContent: 'flex-start',
-    alignItems: 'center'
-  },
-  tabBar: {
-    flexDirection: 'row',
-    width: '100%',
-    justifyContent: 'center',
-    borderBottomWidth: 1,
-    borderBottomColor: '#ddd',
-    backgroundColor: '#f9f9f9',
-  },
-  tab: {
-    flex: 1,
-    alignItems: 'center',
-    paddingVertical: 12,
-  },
-  activeTab: {
-    borderBottomWidth: 2,
-    borderBottomColor: '#007AFF', // Active tab underline color
-  },
-  tabText: {
-    fontSize: 16,
-    color: '#888',
-  },
-  activeTabText: {
-    color: '#007AFF', // Active tab text color
-    fontWeight: 'bold', 
-  },
-
-  subHeader: {
-    marginTop: 20,
-    fontSize: 18,
-    textAlign: 'center',
-    marginBottom: 10,
-    fontStyle: 'italic',
-  },
-  
-  header: {
-    fontSize: 24,
-    marginTop: 40,
-    marginBottom: 20,
-    fontWeight: 'bold',
-    textAlign: 'center',
-  },
-
-  searchBar: {
-    marginBottom: 20,
-    width: '90%',  
-    borderRadius: 20,  
-    backgroundColor: '#eaeaea',  
-    alignSelf: 'center',  
-  },
-  button: {
-    flexDirection: 'row',  
-    alignItems: 'center',
-    justifyContent: 'center',
-    paddingVertical: 12,
-    paddingHorizontal: 32,
-    borderRadius: 25,
-    borderWidth: 2,
-    borderColor: '#4169e1',
-    width: '90%',  
-    alignSelf: 'center',  
-    marginVertical: 10,  
-  },
-  buttonText: {
-    fontSize: 18,
-    fontWeight: '600',
-    marginRight: 10,  
-  },
-  modalOverlay: {
-    flex: 1,
-    justifyContent: 'center',
-    alignItems: 'center',
-    backgroundColor: 'rgba(0, 0, 0, 0.5)',
-  },
-  modalContent: {
-    backgroundColor: 'white',
-    padding: 20,
-    borderRadius: 10,
-    alignItems: 'center',
-    width: '80%',
-  },
-  modalText: {
-    fontSize: 18,
-    marginBottom: 15,
-    textAlign: 'center',
-  },
-
-  foodItem: {
-    borderWidth: 1,
-    borderColor: 'gray',
-    borderRadius: 5,
-    padding: 10,
-    marginVertical: 5,
-    width: '80%',
-    backgroundColor: '#f0f0f0',
-  },
-  foodImage: {
-    width: 200,
-    height: 100,
-    marginBottom: 10,
-    borderRadius: 5,
-  },
-  modalImage: {
-    width: 200,
-    height: 120,
-    marginBottom: 10,
-    borderRadius: 5,
-  },
-  mealItem: {
-    padding: 10,
-    marginVertical: 5,
-    backgroundColor: '#e9e9e9',
-    borderRadius: 5,
-    width: '80%',
-  },
-  mealText: {
-    fontSize: 16,
-    color: '#333',
-  },
+  container: { flex: 1, justifyContent: 'flex-start', alignItems: 'center' },
+  tabBar: { flexDirection: 'row', width: '100%', justifyContent: 'center', borderBottomWidth: 1, borderBottomColor: '#ddd', backgroundColor: '#f9f9f9' },
+  tab: { flex: 1, alignItems: 'center', paddingVertical: 12 },
+  activeTab: { borderBottomWidth: 2, borderBottomColor: '#007AFF' },
+  tabText: { fontSize: 16, color: '#888' },
+  activeTabText: { color: '#007AFF', fontWeight: 'bold' },
+  subHeader: { marginTop: 20, fontSize: 18, textAlign: 'center', marginBottom: 10, fontStyle: 'italic' },
+  header: { fontSize: 24, marginTop: 40, marginBottom: 20, fontWeight: 'bold', textAlign: 'center' },
+  searchBar: { marginBottom: 20, width: '90%', borderRadius: 20, backgroundColor: '#eaeaea', alignSelf: 'center' },
+  button: { flexDirection: 'row', alignItems: 'center', justifyContent: 'center', paddingVertical: 12, paddingHorizontal: 32, borderRadius: 25, borderWidth: 2, borderColor: '#4169e1', width: '90%', alignSelf: 'center', marginVertical: 10 },
+  buttonText: { fontSize: 18, fontWeight: '600', marginRight: 10 },
+  modalOverlay: { flex: 1, justifyContent: 'center', alignItems: 'center', backgroundColor: 'rgba(0, 0, 0, 0.5)' },
+  modalContent: { backgroundColor: 'white', padding: 20, borderRadius: 10, alignItems: 'center', width: '80%' },
+  modalText: { fontSize: 18, marginBottom: 15, textAlign: 'center' },
+  foodItem: { borderWidth: 1, borderColor: 'gray', borderRadius: 5, padding: 10, marginVertical: 5, width: '80%', backgroundColor: '#f0f0f0' },
+  foodImage: { width: 200, height: 100, marginBottom: 10, borderRadius: 5 },
+  modalImage: { width: 200, height: 120, marginBottom: 10, borderRadius: 5 },
+  mealItem: { padding: 10, marginVertical: 5, backgroundColor: '#e9e9e9', borderRadius: 5, width: '80%' },
+  mealText: { fontSize: 16, color: '#333' },
+  emptyContainer: { flex: 1, justifyContent: 'center', alignItems: 'center', marginTop: 20 },
+  emptyText: { fontSize: 18, fontWeight: 'bold', textAlign: 'center', marginTop: 10 },
 });
 
 export default BreakfastScreen;
