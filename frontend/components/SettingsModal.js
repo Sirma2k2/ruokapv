@@ -1,8 +1,9 @@
 import React from 'react';
 import { Modal, View, Text, TouchableOpacity, StyleSheet, Switch } from 'react-native';
 import Ionicons from 'react-native-vector-icons/Ionicons';
+import NotificationTool from './NotificationTool'; // Import NotificationTool
 
-const SettingsModal = ({ visible, toggleVisible, switchValues, handleSwitchChange, toggleTheme }) => (
+const SettingsModal = ({ visible, toggleVisible, switchValues, handleSwitchChange, toggleTheme, initialNotificationValue }) => (
   <Modal
     transparent={true}
     animationType="slide"
@@ -12,27 +13,7 @@ const SettingsModal = ({ visible, toggleVisible, switchValues, handleSwitchChang
     <View style={styles.modalOverlay}>
       <View style={styles.modalContainer}>
         <Text style={styles.settingsTitle}>Settings</Text>
-        <View style={styles.switchRow}>
-          <Switch
-            value={switchValues.option1}
-            onValueChange={handleSwitchChange('option1')}
-          />
-          <Text style={styles.menuItemText}>Option 1</Text>
-        </View>
-        <View style={styles.switchRow}>
-          <Switch
-            value={switchValues.option2}
-            onValueChange={handleSwitchChange('option2')}
-          />
-          <Text style={styles.menuItemText}>Option 2</Text>
-        </View>
-        <View style={styles.switchRow}>
-          <Switch
-            value={switchValues.option3}
-            onValueChange={handleSwitchChange('option3')}
-          />
-          <Text style={styles.menuItemText}>Option 3</Text>
-        </View>
+        <NotificationTool initialNotificationValue={initialNotificationValue} />
         <TouchableOpacity onPress={toggleTheme} style={styles.menuItem}>
           <Ionicons name="contrast-outline" size={24} color="black" />
           <Text style={styles.menuItemText}>Toggle Dark Mode</Text>
@@ -52,6 +33,7 @@ const styles = StyleSheet.create({
   switchRow: { flexDirection: 'row', alignItems: 'center', marginVertical: 10 },
   menuItemText: { fontSize: 16, marginLeft: 10 },
   settingsTitle: { fontSize: 20, fontWeight: 'bold', marginBottom: 10 },
+  menuItem: { flexDirection: 'row', alignItems: 'center', marginVertical: 10 },
 });
 
 export default SettingsModal;

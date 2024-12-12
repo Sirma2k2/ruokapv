@@ -76,12 +76,18 @@ const styles = StyleSheet.create({
         color: '#000000', // Universal color for both light and dark mode
     },
     header: {
-        fontSize: 20,
-        fontWeight: 'bold',
-        marginBottom: 5,
-        color: '#4169e1',
-        marginHorizontal: 50,
-    },
+      fontSize: 20,
+      fontWeight: 'bold',
+      marginBottom: 5,
+      color: '#4169e1',
+      marginHorizontal: 10,
+      flexShrink: 1, 
+      alignItems: 'flex-end', 
+      whiteSpace: 'nowrap', 
+      overflow: 'hidden', 
+      textAlign: 'center', 
+  },
+  
 });
 
 export default CalorieTracker;
