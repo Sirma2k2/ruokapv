@@ -57,7 +57,6 @@ const BreakfastScreen = ({ navigation }) => {
     } else {
       setFoodResults([]);
     }
-
     if (mealSearch.length > 0) {
       const filteredMeals = allMeals.filter(meal => 
         meal.mealname.toLowerCase().includes(mealSearch.toLowerCase())
@@ -65,7 +64,6 @@ const BreakfastScreen = ({ navigation }) => {
       setMealResults(filteredMeals);
     } else {
       setMealResults(allMeals);
-
     }
   }, [searchBreakfast, mealSearch, allMeals]);
 
