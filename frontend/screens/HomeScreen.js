@@ -108,7 +108,7 @@ const HomeScreen = () => {
         <TouchableOpacity style={styles.clearButton} onPress={clearCredentials}>
         <Ionicons 
           name="log-out-outline" 
-          size={30} 
+          size={20} 
           color={theme.text.color} 
           style={{ transform: [{ rotate: '180deg' }] }} 
         />
@@ -166,11 +166,11 @@ const styles = StyleSheet.create({
   pieTitle: { marginTop: 20, fontSize: 22, fontWeight: 'bold', textAlign: 'center' },
   emptyContainer: { flex: 1, justifyContent: 'center', alignItems: 'center', marginTop: 20 },
   emptyText: { fontSize: 18, fontWeight: 'bold', textAlign: 'center' },
-  clearButton: { padding: 1, backgroundColor: 'transparent', borderRadius: 5, marginBottom: 10, alignSelf: 'flex-start', alignItems: 'center', marginRight: 10, marginLeft: -8, },
+  clearButton: { padding: 1, backgroundColor: 'transparent', borderRadius: 5, marginTop: -14, alignSelf: 'flex-start', alignItems: 'center', marginRight: 10, marginLeft: -8,},
   buttonText: { color: 'blue', textAlign: 'center' },
   topContainer: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center' },
-  calorieTrackerWrapper: { marginLeft: -8, marginRight: 12, }, // Adjusted marginLeft
-  logoutText: {fontSize: 12, marginTop: -2.5,},
+  calorieTrackerWrapper: { marginLeft: -35, marginRight: 30, marginTop: 13,  }, // Adjusted marginLeft
+  logoutText: {fontSize: 10, marginTop: -2.5,},
 });
 
 export default HomeScreen;
