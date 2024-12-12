@@ -119,7 +119,9 @@ const HomeScreen = () => {
         ) : error ? (
           <Text style={{ color: 'red' }}>{error}</Text>
         ) : (
-          <CalorieTracker style={styles.calorieTrackerContainer} goal={caloriesData.goal} food={caloriesData.food} remaining={caloriesData.remaining} />
+          <View style={styles.calorieTrackerWrapper}>
+            <CalorieTracker goal={caloriesData.goal} food={caloriesData.food} remaining={caloriesData.remaining} />
+          </View>
         )}
       </View>
       <Text style={[styles.subtitle, { color: theme.text.color }]}>Meal diary</Text>
@@ -164,10 +166,10 @@ const styles = StyleSheet.create({
   pieTitle: { marginTop: 20, fontSize: 22, fontWeight: 'bold', textAlign: 'center' },
   emptyContainer: { flex: 1, justifyContent: 'center', alignItems: 'center', marginTop: 20 },
   emptyText: { fontSize: 18, fontWeight: 'bold', textAlign: 'center' },
-  clearButton: { padding: 1, backgroundColor: 'transparent', borderRadius: 5, marginBottom: 10, alignSelf: 'flex-start' },
+  clearButton: { padding: 1, backgroundColor: 'transparent', borderRadius: 5, marginBottom: 10, alignSelf: 'flex-start', alignItems: 'center', marginRight: 10, marginLeft: -8, },
   buttonText: { color: 'blue', textAlign: 'center' },
   topContainer: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center' },
-  calorieTrackerContainer: { flexDirection: 'row', alignItems: 'center', marginRight: -20 }, // Added marginRight
+  calorieTrackerWrapper: { marginLeft: -8, marginRight: 12, }, // Adjusted marginLeft
   logoutText: {fontSize: 12, marginTop: -2.5,},
 });
 
