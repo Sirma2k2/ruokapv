@@ -55,7 +55,8 @@ const BreakfastScreen = ({ navigation }) => {
     } else {
       setFoodResults([]);
     }
-    if (mealSearch.length > 3) {
+    console.log("mealSearch updated to: ", mealSearch);
+    if (mealSearch.length > 2) {
       searchMyMeals(mealSearch);
     } else{
       setMealResults([]);
