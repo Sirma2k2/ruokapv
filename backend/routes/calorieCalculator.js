@@ -13,9 +13,9 @@ const calculateCalories = (user) => { //backend hook to calculate calories
     const remainingCalories = goalCalories - foodCalories;
   
     return {
-      goal: goalCalories,
-      food: foodCalories,
-      remaining: remainingCalories,
+      goal: Math.round(goalCalories),
+      food: Math.round(foodCalories),
+      remaining: Math.round(remainingCalories),
     };
   };
   
