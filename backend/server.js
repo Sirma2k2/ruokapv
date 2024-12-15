@@ -98,6 +98,23 @@ app.post('/api/add-meal', async (req, res) => {
   }
 });
 
+//Tietojen päivitys
+app.post('/api/update-user', async (req, res) => {
+  const { knimi, aktiviteetti, tyyppi, tavoite } = req.body;
+  try {
+
+    const query = `UPDATE users SET aktiviteetti = $1, tyyppi = $2, tavoite = $3 WHERE knimi = $4`;
+    const values = [aktiviteetti, tyyppi, tavoite, knimi];
+
+    await pool.query(query, values);
+    console.log(knimi, " päivitetty data: ", aktiviteetti, tavoite , tyyppi);
+    res.status(201).json({ message: 'Update onnistuyi' });
+  } catch (err) {
+    console.error('Error inserting data into database', err);
+    res.status(500).json({ error: 'Failed update' });
+  }
+});
+
 //Aterioiden haku
 app.get('/api/get-meals', async (req, res) => {
   const { knimi, ateria } = req.query;
