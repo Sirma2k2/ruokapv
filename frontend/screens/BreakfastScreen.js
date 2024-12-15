@@ -87,7 +87,7 @@ const BreakfastScreen = ({ navigation }) => {
     getPreviousMeals();
   }, []);
 
-  const fetchAllMeals = async () => {
+  const fetchAllMeals = async () => { 
     setLoadingMeals(true);
     try {
       const user = await getUserData();
@@ -95,6 +95,7 @@ const BreakfastScreen = ({ navigation }) => {
       const mealResponse = await SearchMeals(username, ''); // Pass an empty string to fetch all meals
       if (mealResponse.ok) {
         const data = await mealResponse.json();
+        console.log('All meals for ',username, data);
         setAllMeals(data);
         setMealResults(data);
       } else {
@@ -111,7 +112,6 @@ const BreakfastScreen = ({ navigation }) => {
   }, []);
 
   const saveFoodMeal = async (food) => {
-
     if (!consumedAmount || isNaN(consumedAmount) || consumedAmount <= 0) {
       Alert.alert("Error", "Please enter a valid amount in grams.");
       return;
@@ -133,6 +133,58 @@ const BreakfastScreen = ({ navigation }) => {
     }
   };
 
+
+  const addQuickMeal = async (meal) => {
+    try {
+      const user = await getUserData();
+      const username = user[0]?.knimi || "Failsafe";
+  
+      // Fetch the original meal details
+      const response = await fetch(`${ServerIp}/api/get-meal-details?meal_id=${meal.meal_id}`);
+      if (!response.ok) {
+        throw new Error('Failed to fetch meal details');
+      }
+      const originalMeal = await response.json();
+  
+      // Log the original meal details to debug
+      console.log('Original meal details:', originalMeal);
+  
+      // Create a new meal with the same foods
+      const newMeal = {
+        knimi: username,
+        ateria: 'breakfast',
+        mealname: `${meal.mealname} (Copy)`,
+        food: originalMeal.food_id || null,
+        salad: originalMeal.salad_id || null,
+        drink: originalMeal.drink_id || null,
+        other: originalMeal.other_id || null,
+      };
+  
+      // Log the new meal details to debug
+      console.log('New meal details:', newMeal);
+  
+      const addResponse = await fetch(`${ServerIp}/api/add-meal`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(newMeal),
+      });
+  
+      if (addResponse.ok) {
+        const data = await addResponse.json();
+        Alert.alert("Success", `Meal "${data.message}" added successfully!`);
+        fetchAllMeals(); // Refresh the meal list
+      } else {
+        const errorData = await addResponse.json();
+        Alert.alert("Error", errorData.error || "Failed to add meal.");
+      }
+    } catch (error) {
+      console.error('Error adding meal:', error);
+      Alert.alert("Error", "Failed to add meal.");
+    }
+  };
+
   const searchMyMeals = async (query) => {
     console.log("Searching meals for: ", query);
     if (!query) return;
@@ -148,7 +200,7 @@ const BreakfastScreen = ({ navigation }) => {
         const data = await mealResponse.json();
         setMealResults(data);
       } else {
-        setError('No products found');
+        setError('No meals found');
         setTimeout(() => setError(''), 5000);
       }
       setLoading(false);
@@ -157,8 +209,8 @@ const BreakfastScreen = ({ navigation }) => {
       setError('Failed to fetch meal data');
       setLoading(false);
     }
-
   };
+
   return (
     <View style={[styles.container, { backgroundColor: theme.container.backgroundColor }]}>
       {/* Top Tab Bar */}
@@ -191,7 +243,7 @@ const BreakfastScreen = ({ navigation }) => {
       {activeTab === 'addFood' && (
         <>
           <Text style={[styles.subHeader, { color: theme.text.color }]}>
-          "The more you know, the more you can create. There's no end to imagination in the kitchen." 
+            "The more you know, the more you can create. There's no end to imagination in the kitchen." 
           </Text>
           <Text style={[styles.header, { color: theme.text.color }]}>Build Your Breakfast</Text>
           <Searchbar
@@ -213,38 +265,38 @@ const BreakfastScreen = ({ navigation }) => {
             keyExtractor={(item, index) => index.toString()}
             renderItem={({ item }) => (
               <Animatable.View animation="fadeIn" duration={400}>
-              <TouchableOpacity
-                style={styles.foodItem}
-                onPress={() => {
-                  setSelectedFood(item);
-                  setModalVisible(true);
-                }}
-              >
-                <Image source={{ uri: item.image_url || 'https://via.placeholder.com/150' }} style={styles.foodImage} />
-                <Text style={{ color: theme.text.color }}>
-                  {item.product_name || 'No name'}
-                </Text>
-                <Text style={{ color: theme.text.color }}>
-                  {item.brands || 'No brand'}
-                </Text>
+                <TouchableOpacity
+                  style={styles.foodItem}
+                  onPress={() => {
+                    setSelectedFood(item);
+                    setModalVisible(true);
+                  }}
+                >
+                  <Image source={{ uri: item.image_url || 'https://via.placeholder.com/150' }} style={styles.foodImage} />
+                  <Text style={{ color: theme.text.color }}>
+                    {item.product_name || 'No name'}
+                  </Text>
+                  <Text style={{ color: theme.text.color }}>
+                    {item.brands || 'No brand'}
+                  </Text>
 
-                <Text style={{ color: theme.text.color }}>
-                  Amount: {item.quantity || 'N/A'}
-                </Text>
+                  <Text style={{ color: theme.text.color }}>
+                    Amount: {item.quantity || 'N/A'}
+                  </Text>
 
-                <Text style={{ color: theme.text.color }}>
-                  Protein: {item.nutriments?.proteins_100g || 'N/A'} g
-                </Text>
-                <Text style={{ color: theme.text.color }}>
-                  Carbohydrates: {item.nutriments?.carbohydrates_100g || 'N/A'} g
-                </Text>
-                <Text style={{ color: theme.text.color }}>
-                  Fat: {item.nutriments?.fat_100g || 'N/a'} g
-                </Text>
-                <Text style={{ color: theme.text.color }}>
-                  Calories: {item.nutriments?.["energy-kcal"] || 'N/A'} kcal
-                </Text>
-              </TouchableOpacity>
+                  <Text style={{ color: theme.text.color }}>
+                    Protein: {item.nutriments?.proteins_100g || 'N/A'} g
+                  </Text>
+                  <Text style={{ color: theme.text.color }}>
+                    Carbohydrates: {item.nutriments?.carbohydrates_100g || 'N/A'} g
+                  </Text>
+                  <Text style={{ color: theme.text.color }}>
+                    Fat: {item.nutriments?.fat_100g || 'N/A'} g
+                  </Text>
+                  <Text style={{ color: theme.text.color }}>
+                    Calories: {item.nutriments?.["energy-kcal"] || 'N/A'} kcal
+                  </Text>
+                </TouchableOpacity>
               </Animatable.View>
             )}
           />
@@ -296,7 +348,7 @@ const BreakfastScreen = ({ navigation }) => {
                       style={styles.button}
                       onPress={() => saveFoodMeal(selectedFood)}
                     >
-                      <Text >Save food</Text>
+                      <Text>Save food</Text>
                     </TouchableOpacity>
                   </>
                 ) : (
@@ -314,81 +366,86 @@ const BreakfastScreen = ({ navigation }) => {
         </>
       )}
 
-    
-{activeTab === 'createMeal' && (
-  <>
-    <Text style={[styles.header, { color: theme.text.color }]}> My Meals</Text>
+      {activeTab === 'createMeal' && (
+        <>
+          <Text style={[styles.header, { color: theme.text.color }]}>My Meals</Text>
 
-    <TouchableOpacity 
-      style={[styles.button, { backgroundColor: theme.buttonBackgroundColor }]} 
-      onPress={() => navigation.navigate('Meals', { selectedMealType: 'breakfast' })}
-    >
-      <Text style={[styles.buttonText, { color: theme.buttonText.color }]}>Create a new meal</Text>
-      <Ionicons name="fast-food" size={24} color={theme.iconColor} style={styles.icon} />
-    </TouchableOpacity>
-
-    <Searchbar 
-    placeholder='Search my meals'
-    onChangeText={setMealSearch}
-    value={mealSearch}
-    style={[styles.searchBar, {marginBottom: 20}]}
-     />
-
-     {/* Show loading indicator */}
-    {loadingMeals && <ActivityIndicator size="large" color="#ff0" />}
-
-    {/* Show error message if there is one */}
-    {error && <Text style={{ color: 'red' }}>{error}</Text>}
-
-    {/* Display the search results */}
-    {mealResults.length === 0 && !loadingMeals ? (
-      <View style={styles.emptyContainer}>
-        <Ionicons name="alert-circle-outline" size={50} color={theme.text.color} />
-        <Text style={[styles.emptyText, { color: theme.text.color }]}>No meals created yet</Text>
-      </View>
-    ) : (
-      <FlatList
-        data={mealResults}
-        keyExtractor={(item, index) => index.toString()}
-        renderItem={({ item }) => (
-          <Animatable.View animation="fadeIn" duration={400}>
-          <TouchableOpacity
-            style={styles.foodItem}
-            onPress={() => {
-              console.log("TÄMÄ PITÄÄ VIELÄ KOODATA");
-            }}
+          <TouchableOpacity 
+            style={[styles.button, { backgroundColor: theme.buttonBackgroundColor }]} 
+            onPress={() => navigation.navigate('Meals', { selectedMealType: 'breakfast' })}
           >
-            <Text style={{ color: theme.text.color }}>
-              {item.mealname || 'No name'}
-            </Text>
-            <Text style={{ color: theme.text.color }}>
-              Ruoka: {item.food_ruokanimi || 'No food'}
-            </Text>
-
-            <Text style={{ color: theme.text.color }}>
-              Juoma: {item.drink_ruokanimi || 'No drink'}
-            </Text>
-
-            <Text style={{ color: theme.text.color }}>
-              Salad: {item.salad_ruokanimi || 'No salad'}
-            </Text>
-            <Text style={{ color: theme.text.color }}>
-              Other: {item.other_ruokaname || 'N/A'}
-            </Text>
-            <Text style={{ color: theme.text.color }}>
-              Total calories: {item.food_kalorit + item.salad_kalorit + item.drink_kalorit + item.other_kalorit || 'N/A'} kcal
-            </Text>
+            <Text style={[styles.buttonText, { color: theme.buttonText.color }]}>Create a new meal</Text>
+            <Ionicons name="fast-food" size={24} color={theme.iconColor} style={styles.icon} />
           </TouchableOpacity>
-          </Animatable.View>
-        )}
-      />
-    )}
-  </>
-)}
+
+          <Searchbar 
+            placeholder='Search my meals'
+            onChangeText={setMealSearch}
+            value={mealSearch}
+            style={[styles.searchBar, {marginBottom: 20}]}
+          />
+
+          {/* Show loading indicator */}
+          {loadingMeals && <ActivityIndicator size="large" color="#ff0" />}
+
+          {/* Show error message if there is one */}
+          {error && <Text style={{ color: 'red' }}>{error}</Text>}
+
+          {/* Display the search results */}
+          {mealResults.length === 0 && !loadingMeals ? (
+            <View style={styles.emptyContainer}>
+              <Ionicons name="alert-circle-outline" size={50} color={theme.text.color} />
+              <Text style={[styles.emptyText, { color: theme.text.color }]}>No meals created yet</Text>
+            </View>
+          ) : (
+            <FlatList
+  data={mealResults}
+  keyExtractor={(item, index) => index.toString()}
+  renderItem={({ item }) => (
+    <Animatable.View animation="fadeIn" duration={400}>
+      <TouchableOpacity
+        style={styles.foodItem}
+        onPress={() => {
+          console.log("Meal details to be implemented");
+          // You can navigate to a detailed view if needed
+        }}
+      >
+        <Text style={{ color: theme.text.color }}>
+          {item.mealname || 'No name'}
+        </Text>
+        <Text style={{ color: theme.text.color }}>
+          Ruoka: {item.food_ruokanimi || 'No food'}
+        </Text>
+        <Text style={{ color: theme.text.color }}>
+          Juoma: {item.drink_ruokanimi || 'No drink'}
+        </Text>
+        <Text style={{ color: theme.text.color }}>
+          Salad: {item.salad_ruokanimi || 'No salad'}
+        </Text>
+        <Text style={{ color: theme.text.color }}>
+          Other: {item.other_ruokaname || 'N/A'}
+        </Text>
+        <Text style={{ color: theme.text.color }}>
+          Total calories: {item.food_kalorit + item.salad_kalorit + item.drink_kalorit + item.other_kalorit || 'N/A'} kcal
+        </Text>
+        
+        {/* Updated "+" button to pass the specific meal item */}
+        <TouchableOpacity 
+          style={styles.addButton}
+          onPress={() => addQuickMeal(item)}
+        >
+          <Ionicons name="add-circle" size={30} color="#4169e1" />
+        </TouchableOpacity>
+      </TouchableOpacity>
+    </Animatable.View>
+  )}
+/>
+          )}
+        </>
+      )}
     </View>
   )
 }
-
 
 const styles = StyleSheet.create({
   container: { flex: 1, justifyContent: 'flex-start', alignItems: 'center' },
@@ -412,6 +469,7 @@ const styles = StyleSheet.create({
   mealText: { fontSize: 16, color: '#333' },
   emptyContainer: { flex: 1, justifyContent: 'center', alignItems: 'center', marginTop: 20 },
   emptyText: { fontSize: 18, fontWeight: 'bold', textAlign: 'center', marginTop: 10 },
+  addButton: { position: 'absolute', right: 10, top: 4 },
 });
 
 export default BreakfastScreen;

@@ -88,9 +88,10 @@ app.post('/api/add-meal', async (req, res) => {
     */
     const query = `INSERT INTO meals (knimi, mealname, ateria, food_id, salad_id, drink_id, other_id) VALUES($1, $2, $3, $4, $5, $6, $7)`;
     const values = [knimi, mealname, ateria, food, salad || null, drink || null, other || null]; //tyyppi, knimi, mealname ja food pakollisia
+    console.log("Executing query:", query, "with values:", values);
 
     await pool.query(query, values);
-    console.log(knimi, " added meal: ", mealname);
+    console.log(knimi, " added meal: ", mealname, "with food: ", food, " salad: ", salad, " drink: ", drink, " other: ", other);
     res.status(201).json({ message: 'Meal added successfully' });
   } catch (err) {
     console.error('Error inserting data into database', err);
@@ -160,6 +161,72 @@ app.get('/api/get-meals', async (req, res) => {
     res.status(200).json(result.rows);
   } catch (error) {
     console.error('Error fetching meals:', error);
+    res.status(500).json({ error: 'Internal Server Error' });
+  }
+});
+
+app.get('/api/get-meal-details', async (req, res) => {
+  const { meal_id } = req.query;
+
+  if (!meal_id) {
+    return res.status(400).json({ error: 'Meal ID is required' });
+  }
+
+  try {
+    const query = `
+      SELECT 
+        m.id AS meal_id,
+        m.knimi,
+        m.mealname,
+        m.ateria,
+        m.food_id,
+        m.salad_id,
+        m.drink_id,
+        m.other_id,
+        f.ruokanimi AS food_ruokanimi,
+        f.tyyppi AS food_typpi,
+        f.kalorit AS food_kalorit,
+        f.proteiini AS food_proteiini,
+        f.hiilarit AS food_hiilarit,
+        f.rasvat AS food_rasvat,
+        f.picture AS food_picture,
+        s.ruokanimi AS salad_ruokanimi,
+        s.tyyppi AS salad_typpi,
+        s.kalorit AS salad_kalorit,
+        s.proteiini AS salad_proteiini,
+        s.hiilarit AS salad_hiilarit,
+        s.rasvat AS salad_rasvat,
+        s.picture AS salad_picture,
+        dr.ruokanimi AS drink_ruokanimi,
+        dr.tyyppi AS drink_typpi,
+        dr.kalorit AS drink_kalorit,
+        dr.proteiini AS drink_proteiini,
+        dr.hiilarit AS drink_hiilarit,
+        dr.rasvat AS drink_rasvat,
+        dr.picture AS drink_picture,
+        o.ruokanimi AS other_ruokanimi,
+        o.tyyppi AS other_typpi,
+        o.kalorit AS other_kalorit,
+        o.proteiini AS other_proteiini,
+        o.hiilarit AS other_hiilarit,
+        o.rasvat AS other_rasvat,
+        o.picture AS other_picture
+      FROM meals m
+      LEFT JOIN food f ON m.food_id = f.id
+      LEFT JOIN food s ON m.salad_id = s.id
+      LEFT JOIN food dr ON m.drink_id = dr.id
+      LEFT JOIN food o ON m.other_id = o.id
+      WHERE m.id = $1;
+    `;
+    const result = await pool.query(query, [meal_id]);
+
+    if (result.rows.length === 0) {
+      return res.status(404).json({ message: 'Meal not found' });
+    }
+
+    res.status(200).json(result.rows[0]);
+  } catch (error) {
+    console.error('Error fetching meal details:', error);
     res.status(500).json({ error: 'Internal Server Error' });
   }
 });
