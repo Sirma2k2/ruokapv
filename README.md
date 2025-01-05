@@ -39,3 +39,7 @@ Tämä sovellus on kehitetty käyttäen seuraavia teknologioita:
 4. Seuraa päivittäistä kalorien kokonaissummaa ja varmista, että pysyt tavoitteissasi.
 
 ---
+
+## Sovelluksen demo
+
+https://youtu.be/9WN7WtPit-E
