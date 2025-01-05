@@ -19,7 +19,7 @@ Sovellus on toisen vuoden ammattikorkeakoulun ryhmötyöprojekti.
 
 ---
 
-## ⚙️ Teknologiat
+##  Teknologiat
 
 Tämä sovellus on kehitetty käyttäen seuraavia teknologioita:
 
@@ -31,7 +31,7 @@ Tämä sovellus on kehitetty käyttäen seuraavia teknologioita:
 
 ---
 
-## 📝 Käyttöohjeet
+##  Käyttöohjeet
 
 1. Kirjaudu sisään tai rekisteröidy sovelluksen käyttäjäksi.
 2. Aloita luomalla uusi ateria päivän ruokailua varten.
